@@ -1,159 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Capella University - Visitor Center Enhanced Chat</title>
-    
-    <!-- Required Meta Tag for Responsive Design -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-
-    <!-- Enhanced Chat Styling (Maintains Original Capella Branding) -->
-    <style type='text/css'>
-        /* Page styling */
-        body {
-            font-family: "Arial", sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        h1 {
-            color: #94B7BB;
-            margin-bottom: 20px;
-        }
-
-        p {
-            color: #666;
-            font-size: 16px;
-        }
-
-        /* Minimal CSS - Let chat widget show with default styling first */
-        .embeddedServiceHelpButton {
-            visibility: visible !important;
-            opacity: 1 !important;
-            display: block !important;
-        }
-        
-        .embeddedServiceHelpButton .helpButton .uiButton {
-            background: #94B7BB !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            display: block !important;
-        }
-    </style>
+  <title>Salesforce Chat Demo</title>
 </head>
 <body>
-    <div class="container">
-        <h1>🎓 Capella University Visitor Center</h1>
-        <p>Welcome! Look for the chat button in the bottom right corner to start a conversation with our visitor center agents.</p>
-    </div>
+  <h1>Welcome to Salesforce Messaging Test</h1>
+  <p>If the widget is set up correctly, you should see the chat bubble in the corner.</p>
 
-    <!-- Enhanced Chat JavaScript Implementation - Alternative Approach -->
-    <script type='text/javascript'>
-        function initEmbeddedMessaging() {
-            try {
-                console.log('Initializing Enhanced Chat - Testing different approach...');
-                
-                // Try with different settings
-                embeddedservice_bootstrap.settings.language = 'en_US';
-                embeddedservice_bootstrap.settings.displayHelpButton = true;
-                
-                // Try without scrt2URL first to see if that's causing issues
-                console.log('Attempting initialization without scrt2URL...');
-                embeddedservice_bootstrap.init(
-                    '00DEc00000GfZ2M',
-                    'CU_Enhanced_Messaging_Visitor_Center_Agents',
-                    'https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983'
-                );
+  <!-- Salesforce Messaging Snippet -->
+<script type='text/javascript'>
+	function initEmbeddedMessaging() {
+		try {
+			embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
 
-                console.log('Enhanced Chat init called - waiting for widget...');
-                
-                // Check multiple times for the widget
-                let checkCount = 0;
-                const checkForWidget = setInterval(() => {
-                    checkCount++;
-                    const chatButton = document.querySelector('.embeddedServiceHelpButton');
-                    const allEmbedded = document.querySelectorAll('[class*="embedded"]');
-                    
-                    console.log(`Check ${checkCount}: Chat button:`, !!chatButton, 'All embedded elements:', allEmbedded.length);
-                    
-                    if (chatButton || checkCount >= 10) {
-                        clearInterval(checkForWidget);
-                        if (chatButton) {
-                            console.log('✅ Chat widget found!', chatButton);
-                        } else {
-                            console.log('❌ Chat widget never appeared after 10 checks');
-                            console.log('Final DOM state:', document.body.innerHTML.includes('embedded'));
-                        }
-                    }
-                }, 1000);
-                
-            } catch (error) {
-                console.error('Enhanced Chat initialization error:', error);
-                console.error('Error details:', error.stack);
-            }
-        }
-        
-        // Alternative initialization if first attempt fails
-        function fallbackInit() {
-            console.log('Trying fallback initialization...');
-            try {
-                // Try with scrt2URL
-                embeddedservice_bootstrap.init(
-                    '00DEc00000GfZ2M',
-                    'CU_Enhanced_Messaging_Visitor_Center_Agents',
-                    'https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983',
-                    {
-                        scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
-                    }
-                );
-                console.log('Fallback initialization completed');
-            } catch (error) {
-                console.error('Fallback initialization also failed:', error);
-            }
-        }
-        
-        // Try fallback after 5 seconds if main init doesn't work
-        setTimeout(fallbackInit, 5000);
-    </script>
-
-    <!-- Load Enhanced Chat Bootstrap -->
-    <script type='text/javascript' 
-            src='https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983/assets/js/bootstrap.min.js' 
-            onload='initEmbeddedMessaging()'
-            async>
-    </script>
-
-    <!-- Debug monitoring script -->
-    <script type='text/javascript'>
-        console.log('Enhanced Chat page loaded - Debug mode');
-        
-        // Check if bootstrap loaded
-        setTimeout(() => {
-            console.log('Bootstrap check:', {
-                'embeddedservice_bootstrap exists': !!window.embeddedservice_bootstrap,
-                'embeddedservice_bootstrap.settings': !!window.embeddedservice_bootstrap?.settings,
-                'embeddedservice_bootstrap.init': !!window.embeddedservice_bootstrap?.init
-            });
-            
-            // Check DOM for any embedded service elements
-            const embeddedElements = document.querySelectorAll('[class*="embedded"], [id*="embedded"]');
-            console.log('Found embedded elements:', embeddedElements.length, embeddedElements);
-            
-            // Check if any errors in console
-            console.log('Current window.location:', window.location.href);
-        }, 3000);
-    </script>
+			embeddedservice_bootstrap.init(
+				'00DEc00000GfZ2M',
+				'test_embed',
+				'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724',
+				{
+					scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
+				}
+			);
+		} catch (err) {
+			console.error('Error loading Embedded Messaging: ', err);
+		}
+	};
+</script>
+<script type='text/javascript' src='https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
 </body>
 </html>
