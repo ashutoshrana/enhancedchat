@@ -19,26 +19,23 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
         }
 
         h1 {
             color: #94B7BB;
-            text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
-        .info-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border-left: 4px solid #94B7BB;
+        p {
+            color: #666;
+            font-size: 16px;
         }
 
         /* Enhanced Chat Button - Capella Branding */
@@ -81,11 +78,7 @@
             bottom: 45px !important;
         }
 
-        /* Hide default message content */
-        .message {
-            display: none !important; 
-        }
-        
+        /* Hide default minimized message content only */
         .embeddedServiceSidebarMinimizedDefaultUI .messageContent {
             display: none !important;
         }
@@ -128,51 +121,7 @@
 <body>
     <div class="container">
         <h1>🎓 Capella University Visitor Center</h1>
-        
-        <div class="info-section">
-            <h2>Welcome to Capella University!</h2>
-            <p>We're here to help you with your educational journey. Our Enhanced Chat system connects you directly with our visitor center agents who can assist with:</p>
-            <ul>
-                <li>Program information and course details</li>
-                <li>Admissions process and requirements</li>
-                <li>Financial aid and tuition information</li>
-                <li>Technical support for online learning</li>
-                <li>General questions about university services</li>
-            </ul>
-        </div>
-
-        <div class="info-section">
-            <h3>💬 Enhanced Chat Features</h3>
-            <p><strong>Look for the chat button in the bottom right corner!</strong></p>
-            <ul>
-                <li>✅ Real-time messaging with our visitor center agents</li>
-                <li>✅ Mobile-responsive design for all devices</li>
-                <li>✅ Secure communication through Salesforce platform</li>
-                <li>✅ Chat history and transcript options</li>
-                <li>✅ Professional Capella University branding</li>
-            </ul>
-        </div>
-
-        <div class="info-section">
-            <h3>🕒 Agent Availability</h3>
-            <p>Our visitor center agents are available during regular business hours. If no agents are currently available, you can leave a message and we'll get back to you promptly.</p>
-        </div>
-
-        <div class="info-section">
-            <h3>🔧 Technical Information</h3>
-            <p><em>This Enhanced Chat implementation uses:</em></p>
-            <ul>
-                <li><strong>Salesforce Service:</strong> CU_Enhanced_Messaging_Visitor_Center_Agents</li>
-                <li><strong>Chat Source:</strong> ES_General (Visitor Center)</li>
-                <li><strong>Environment:</strong> QASF Sandbox</li>
-                <li><strong>Responsive Design:</strong> Optimized for desktop and mobile</li>
-            </ul>
-        </div>
-
-        <!-- MIAW Required: Chat container for embedded messaging -->
-        <div id="chat-container" aria-label="Embedded chat support" role="application">
-            <!-- Enhanced Chat will be initialized here -->
-        </div>
+        <p>Welcome! Look for the chat button in the bottom right corner to start a conversation with our visitor center agents.</p>
     </div>
 
     <!-- Enhanced Chat JavaScript Implementation - MIAW Compliant -->
@@ -324,7 +273,6 @@
                     embeddedservice_bootstrap.settings.storageDomain = 'https://strategiced--qasf.sandbox.my.salesforce.com';
                     
                     // MIAW Required: Enhanced messaging specific settings
-                    embeddedservice_bootstrap.settings.targetElement = 'chat-container';
                     embeddedservice_bootstrap.settings.isOfflineSupportEnabled = false;
                     
                     // MIAW Required: Initialize Enhanced Chat
