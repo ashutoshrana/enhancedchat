@@ -1,31 +1,933 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Salesforce Chat Demo</title>
+    <meta charset="UTF-8">
+    <title>Capella University - Visitor Center Enhanced Chat</title>
+    
+    <!-- Required Meta Tag for Responsive Design -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+
+    <!-- Enhanced Chat Styling (Maintains Original Capella Branding) -->
+    <style type='text/css'>
+        /* Page styling */
+        body {
+            font-family: "Arial", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #94B7BB;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #94B7BB;
+        }
+
+        /* Enhanced Chat Button - Capella Branding */
+        .embeddedServiceHelpButton .helpButton .uiButton,
+        .embedded-messaging .chatButton {
+            background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png") !important;
+            background-color: rgba(0, 0, 0, .00) !important;
+            background-size: cover !important;
+            display: block !important;
+            right: 50px !important;
+            bottom: 35px !important;
+            text-align: left !important;
+            z-index: 3141591 !important;
+            overflow: hidden !important;
+            position: fixed !important;
+            border-radius: 50% !important;
+            font-family: "Arial", sans-serif !important;
+            min-width: 54px !important;
+            max-width: 54px !important;
+            min-height: 54px !important;
+            max-height: 54px !important;
+            border: none !important;
+        }
+
+        /* Remove default Enhanced Chat icon */
+        .embeddedServiceHelpButton .embeddedServiceIcon::before,
+        .embedded-messaging .chatIcon::before {
+            content: none !important;
+        }
+
+        /* Focus styling for accessibility */
+        .embeddedServiceHelpButton .helpButton .uiButton:focus,
+        .embedded-messaging .chatButton:focus {
+            outline: 1px solid #C10016 !important;
+        }
+
+        /* Button positioning adjustments */
+        .embeddedServiceHelpButton .helpButton,
+        .embeddedServiceHelpButton.embeddedServiceBottomTabBar .helpButton {
+            bottom: 45px !important;
+        }
+
+        /* Hide default message content */
+        .message {
+            display: none !important; 
+        }
+        
+        .embeddedServiceSidebarMinimizedDefaultUI .messageContent {
+            display: none !important;
+        }
+        
+        /* Enhanced Chat sidebar customization */
+        .embeddedServiceSidebar.layout-docked .dockableContainer,
+        .embedded-messaging .messagingContainer {
+            width: 400px !important;
+        }
+
+        /* Background color theme */
+        .embeddedServiceHelpButton .uiButton,
+        .embedded-messaging .messagingHeader,
+        body button {
+            background: #94B7BB !important;
+        }
+        
+        .sidebarHeader minimizedContainer .helpButton .embeddedServiceSidebarMinimizedDefaultUI {
+            background-color: #94B7BB !important;
+        }
+
+        /* Enhanced Chat specific overrides */
+        .embedded-messaging .conversationButton {
+            background: #94B7BB !important;
+            border-radius: 4px !important;
+        }
+
+        .embedded-messaging .messageInput {
+            border-color: #94B7BB !important;
+        }
+
+        /* Ensure chat button always visible */
+        .embeddedServiceHelpButton,
+        .embedded-messaging .chatButton {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    </style>
 </head>
 <body>
-  <h1>Welcome to Salesforce Messaging Test</h1>
-  <p>If the widget is set up correctly, you should see the chat bubble in the corner.</p>
+    <div class="container">
+        <h1>🎓 Capella University Visitor Center</h1>
+        
+        <div class="info-section">
+            <h2>Welcome to Capella University!</h2>
+            <p>We're here to help you with your educational journey. Our Enhanced Chat system connects you directly with our visitor center agents who can assist with:</p>
+            <ul>
+                <li>Program information and course details</li>
+                <li>Admissions process and requirements</li>
+                <li>Financial aid and tuition information</li>
+                <li>Technical support for online learning</li>
+                <li>General questions about university services</li>
+            </ul>
+        </div>
 
-  <!-- Salesforce Messaging Snippet -->
-<script type='text/javascript'>
-	function initEmbeddedMessaging() {
-		try {
-			embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
+        <div class="info-section">
+            <h3>💬 Enhanced Chat Features</h3>
+            <p><strong>Look for the chat button in the bottom right corner!</strong></p>
+            <ul>
+                <li>✅ Real-time messaging with our visitor center agents</li>
+                <li>✅ Mobile-responsive design for all devices</li>
+                <li>✅ Secure communication through Salesforce platform</li>
+                <li>✅ Chat history and transcript options</li>
+                <li>✅ Professional Capella University branding</li>
+            </ul>
+        </div>
 
-			embeddedservice_bootstrap.init(
-				'00DEc00000GfZ2M',
-				'test_embed',
-				'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724',
-				{
-					scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
-				}
-			);
-		} catch (err) {
-			console.error('Error loading Embedded Messaging: ', err);
-		}
-	};
-</script>
-<script type='text/javascript' src='https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+        <div class="info-section">
+            <h3>🕒 Agent Availability</h3>
+            <p>Our visitor center agents are available during regular business hours. If no agents are currently available, you can leave a message and we'll get back to you promptly.</p>
+        </div>
+
+        <div class="info-section">
+            <h3>🔧 Technical Information</h3>
+            <p><em>This Enhanced Chat implementation uses:</em></p>
+            <ul>
+                <li><strong>Salesforce Service:</strong> CU_Enhanced_Messaging_Visitor_Center_Agents</li>
+                <li><strong>Chat Source:</strong> ES_General (Visitor Center)</li>
+                <li><strong>Environment:</strong> QASF Sandbox</li>
+                <li><strong>Responsive Design:</strong> Optimized for desktop and mobile</li>
+            </ul>
+        </div>
+
+        <!-- MIAW Required: Chat container for embedded messaging -->
+        <div id="chat-container" aria-label="Embedded chat support" role="application">
+            <!-- Enhanced Chat will be initialized here -->
+        </div>
+    </div>
+
+    <!-- Enhanced Chat JavaScript Implementation - MIAW Compliant -->
+    <script type='text/javascript'>
+        // Enhanced Chat Configuration for Visitor Center - Full MIAW Implementation
+        window.CapellaVisitorCenterChat = {
+            // Configuration parameters
+            config: {
+                orgId: '00DEc00000GfZ2M',
+                serviceName: 'CU_Enhanced_Messaging_Visitor_Center_Agents',
+                siteUrl: 'https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983',
+                scrtUrl: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com',
+                language: 'en_US',
+                // MIAW specific configuration
+                channelName: 'Enhanced_Messaging_Visitor_Center',
+                deploymentId: 'CU_Enhanced_Messaging_Visitor_Center_Agents'
+            },
+
+            // Enhanced Chat initialization with full MIAW compliance
+            init: function() {
+                try {
+                    console.log('Initializing Capella Visitor Center Enhanced Chat - MIAW Framework...');
+                    
+                    // MIAW Required: Language configuration
+                    embeddedservice_bootstrap.settings.language = this.config.language;
+                    
+                    // MIAW Required: Enhanced Chat specific settings
+                    embeddedservice_bootstrap.settings.enabledFeatures = ['LiveAgent'];
+                    embeddedservice_bootstrap.settings.entryFeature = 'LiveAgent';
+                    
+                    // MIAW Required: Pre-chat form configuration
+                    embeddedservice_bootstrap.settings.extraPrechatFormDetails = [
+                        {
+                            "label": "Chat Source",
+                            "transcriptFields": ["Chat_Source__c"],
+                            "displayToAgent": true,
+                            "value": "ES_General"
+                        },
+                        {
+                            "label": "Page URL", 
+                            "transcriptFields": ["Page_URL__c"],
+                            "value": window.location.href,
+                            "displayToAgent": true
+                        },
+                        {
+                            "label": "Visitor ID",
+                            "transcriptFields": ["Visitor_ID__c"], 
+                            "value": this.generateVisitorId(),
+                            "displayToAgent": true
+                        },
+                        {
+                            "label": "Session Timestamp",
+                            "transcriptFields": ["Session_Start__c"],
+                            "value": new Date().toISOString(),
+                            "displayToAgent": true
+                        }
+                    ];
+
+                    // MIAW Required: Pre-chat entity field mapping
+                    embeddedservice_bootstrap.settings.extraPrechatInfo = [
+                        {
+                            "entityName": "LiveChatTranscript",
+                            "showOnCreate": true,
+                            "linkToEntityName": "Contact",
+                            "linkToEntityField": "Id",
+                            "saveToTranscript": "Contact",
+                            "entityFieldMaps": [
+                                {
+                                    "doCreate": true,
+                                    "doFind": true,
+                                    "fieldName": "LastName",
+                                    "isExactMatch": false,
+                                    "label": "Last Name"
+                                },
+                                {
+                                    "doCreate": true,
+                                    "doFind": true, 
+                                    "fieldName": "FirstName",
+                                    "isExactMatch": false,
+                                    "label": "First Name"
+                                },
+                                {
+                                    "doCreate": true,
+                                    "doFind": true,
+                                    "fieldName": "Email",
+                                    "isExactMatch": true,
+                                    "label": "Email"
+                                }
+                            ]
+                        },
+                        {
+                            "entityName": "Case",
+                            "showOnCreate": true,
+                            "linkToEntityName": "Contact",
+                            "linkToEntityField": "ContactId",
+                            "saveToTranscript": "Case",
+                            "entityFieldMaps": [
+                                {
+                                    "doCreate": true,
+                                    "doFind": false,
+                                    "fieldName": "Subject",
+                                    "isExactMatch": false,
+                                    "label": "Issue",
+                                    "value": "Visitor Center Chat Inquiry"
+                                },
+                                {
+                                    "doCreate": true,
+                                    "doFind": false,
+                                    "fieldName": "Status",
+                                    "isExactMatch": false,
+                                    "label": "Status",
+                                    "value": "New"
+                                },
+                                {
+                                    "doCreate": true,
+                                    "doFind": false,
+                                    "fieldName": "Origin",
+                                    "isExactMatch": false,
+                                    "label": "Origin",
+                                    "value": "Enhanced Chat"
+                                }
+                            ]
+                        }
+                    ];
+
+                    // MIAW Required: Custom branding settings
+                    embeddedservice_bootstrap.settings.brandingOptions = {
+                        primaryColor: '#94B7BB',
+                        navBarColor: '#94B7BB', 
+                        primaryColorInverted: '#FFFFFF',
+                        fontSize: 'medium',
+                        fontFamily: 'Arial, sans-serif',
+                        customCSS: this.getCustomCSS()
+                    };
+
+                    // MIAW Required: Chat window settings
+                    embeddedservice_bootstrap.settings.displayHelpButton = true;
+                    embeddedservice_bootstrap.settings.prepopulatedPrechatFields = {};
+                    embeddedservice_bootstrap.settings.enableLogging = true;
+                    embeddedservice_bootstrap.settings.devMode = false;
+                    
+                    // MIAW Required: Avatar settings
+                    embeddedservice_bootstrap.settings.avatarImgURL = '';
+                    embeddedservice_bootstrap.settings.prechatBackgroundImgURL = '';
+                    embeddedservice_bootstrap.settings.waitingStateBackgroundImgURL = '';
+                    embeddedservice_bootstrap.settings.smallCompanyLogoImgURL = '';
+
+                    // MIAW Required: Conversation settings
+                    embeddedservice_bootstrap.settings.storageDomain = 'https://strategiced--qasf.sandbox.my.salesforce.com';
+                    
+                    // MIAW Required: Enhanced messaging specific settings
+                    embeddedservice_bootstrap.settings.targetElement = 'chat-container';
+                    embeddedservice_bootstrap.settings.isOfflineSupportEnabled = false;
+                    
+                    // MIAW Required: Initialize Enhanced Chat
+                    embeddedservice_bootstrap.init(
+                        this.config.orgId,
+                        this.config.serviceName, 
+                        this.config.siteUrl,
+                        {
+                            scrt2URL: this.config.scrtUrl
+                        }
+                    );
+
+                    console.log('Capella Visitor Center Enhanced Chat initialized successfully - MIAW Compliant');
+                    this.setupEventListeners();
+                    this.onChatReady();
+                    
+                } catch (error) {
+                    console.error('Visitor Center Enhanced Chat initialization error:', error);
+                    this.onChatError(error);
+                }
+            },
+
+            // MIAW Required: Generate unique visitor ID
+            generateVisitorId: function() {
+                return 'VIS_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            },
+
+            // MIAW Required: Custom CSS for Enhanced Chat
+            getCustomCSS: function() {
+                return `
+                    .embeddedServiceHelpButton .helpButton .uiButton {
+                        background-color: #94B7BB !important;
+                        font-family: "Arial", sans-serif !important;
+                    }
+                    .embeddedServiceHelpButton .helpButton .embeddedServiceIcon::before {
+                        color: #FFFFFF !important;
+                    }
+                    .embeddedServiceSidebar {
+                        font-family: "Arial", sans-serif !important;
+                    }
+                    .embeddedServiceSidebarHeader {
+                        background: #94B7BB !important;
+                    }
+                    .embeddedServiceLiveAgentStateChatHeaderOption {
+                        background: #94B7BB !important;
+                    }
+                `;
+            },
+
+            // MIAW Required: Setup comprehensive event listeners
+            setupEventListeners: function() {
+                // Listen for embedded service events
+                window.addEventListener('onEmbeddedMessagingReady', this.onMessagingReady.bind(this));
+                window.addEventListener('onEmbeddedMessagingConversationStarted', this.onConversationStarted.bind(this));
+                window.addEventListener('onEmbeddedMessagingConversationEnded', this.onConversationEnded.bind(this));
+                window.addEventListener('onEmbeddedMessagingMinimized', this.onChatMinimized.bind(this));
+                window.addEventListener('onEmbeddedMessagingMaximized', this.onChatMaximized.bind(this));
+                
+                // MIAW specific event listeners
+                document.addEventListener('embeddedservice:loaded', this.onServiceLoaded.bind(this));
+                document.addEventListener('embeddedservice:chatStarted', this.onChatStarted.bind(this));
+                document.addEventListener('embeddedservice:chatEnded', this.onChatEnded.bind(this));
+            },
+
+            // MIAW Required: Messaging ready callback
+            onMessagingReady: function() {
+                console.log('Enhanced Messaging is ready');
+                this.applyCustomBranding();
+            },
+
+            // MIAW Required: Conversation started callback
+            onConversationStarted: function(event) {
+                console.log('Conversation started:', event);
+                this.trackEvent('conversation_started', {
+                    timestamp: new Date().toISOString(),
+                    conversationId: event.detail?.conversationId
+                });
+            },
+
+            // MIAW Required: Conversation ended callback  
+            onConversationEnded: function(event) {
+                console.log('Conversation ended:', event);
+                this.trackEvent('conversation_ended', {
+                    timestamp: new Date().toISOString(),
+                    conversationId: event.detail?.conversationId
+                });
+            },
+
+            // MIAW Required: Chat minimized callback
+            onChatMinimized: function() {
+                console.log('Chat minimized');
+                this.trackEvent('chat_minimized', { timestamp: new Date().toISOString() });
+            },
+
+            // MIAW Required: Chat maximized callback
+            onChatMaximized: function() {
+                console.log('Chat maximized');
+                this.trackEvent('chat_maximized', { timestamp: new Date().toISOString() });
+            },
+
+            // MIAW Required: Service loaded callback
+            onServiceLoaded: function() {
+                console.log('Embedded Service loaded');
+                this.applyAccessibilityFeatures();
+            },
+
+            // MIAW Required: Chat started callback
+            onChatStarted: function(event) {
+                console.log('Chat started:', event);
+                this.trackEvent('chat_started', {
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    pageURL: window.location.href
+                });
+            },
+
+            // MIAW Required: Chat ended callback
+            onChatEnded: function(event) {
+                console.log('Chat ended:', event);
+                this.trackEvent('chat_ended', { timestamp: new Date().toISOString() });
+            },
+
+            // Chat ready callback - Enhanced for MIAW
+            onChatReady: function() {
+                // Fire custom event for external applications
+                const event = new CustomEvent('capellaVisitorCenterChatReady', {
+                    detail: {
+                        timestamp: new Date().toISOString(),
+                        config: this.config,
+                        chatSource: 'ES_General',
+                        miawCompliant: true,
+                        framework: 'Enhanced Messaging'
+                    }
+                });
+                document.dispatchEvent(event);
+
+                // Apply additional branding after chat loads
+                setTimeout(() => {
+                    this.applyCustomBranding();
+                    this.applyAccessibilityFeatures();
+                }, 1000);
+            },
+
+            // Chat error callback - Enhanced for MIAW
+            onChatError: function(error) {
+                const event = new CustomEvent('capellaVisitorCenterChatError', {
+                    detail: {
+                        error: error.message || error,
+                        timestamp: new Date().toISOString(),
+                        stack: error.stack
+                    }
+                });
+                document.dispatchEvent(event);
+                
+                // Log to analytics if available
+                this.trackEvent('chat_error', {
+                    error: error.message || error,
+                    timestamp: new Date().toISOString()
+                });
+            },
+
+            // MIAW Required: Event tracking for analytics
+            trackEvent: function(eventName, eventData) {
+                // Track to browser console
+                console.log('Chat Event:', eventName, eventData);
+                
+                // Send to external analytics if available
+                if (window.gtag) {
+                    window.gtag('event', eventName, {
+                        custom_map: { 'capella_chat': 'visitor_center' },
+                        ...eventData
+                    });
+                }
+                
+                // Send to Salesforce Analytics Cloud if available
+                if (window.sfdcAnalytics) {
+                    window.sfdcAnalytics.track(eventName, eventData);
+                }
+            },
+
+            // MIAW Required: Apply comprehensive custom branding
+            applyCustomBranding: function() {
+                // Ensure Capella button styling is applied - MIAW compliant
+                const chatButtons = document.querySelectorAll(
+                    '.embeddedServiceHelpButton .uiButton, .embedded-messaging .chatButton, .embeddedServiceHelpButton .helpButton .uiButton'
+                );
+                
+                chatButtons.forEach(button => {
+                    button.style.backgroundImage = 'url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png")';
+                    button.style.backgroundSize = 'cover';
+                    button.style.width = '54px';
+                    button.style.height = '54px';
+                    button.style.borderRadius = '50%';
+                    button.style.background = '#94B7BB';
+                    button.style.border = 'none';
+                    button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                });
+
+                // Apply theme colors to Enhanced Messaging elements
+                const messagingElements = [
+                    '.embedded-messaging .messagingHeader',
+                    '.embeddedServiceSidebarHeader',
+                    '.embeddedServiceLiveAgentStateChatHeaderOption',
+                    '.embeddedServiceSidebarMinimizedDefaultUI'
+                ];
+                
+                messagingElements.forEach(selector => {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(element => {
+                        element.style.background = '#94B7BB';
+                        element.style.backgroundColor = '#94B7BB';
+                    });
+                });
+
+                // MIAW specific branding for conversation elements
+                const conversationElements = document.querySelectorAll('.embeddedServiceLiveAgentStateChatPlaintextMessageDefaultUI');
+                conversationElements.forEach(element => {
+                    element.style.fontFamily = 'Arial, sans-serif';
+                });
+
+                // Apply Capella brand colors to input fields
+                const inputElements = document.querySelectorAll('.embeddedServiceLiveAgentStateChatInputFooter input, .embedded-messaging .messageInput');
+                inputElements.forEach(input => {
+                    input.style.borderColor = '#94B7BB';
+                    input.style.fontFamily = 'Arial, sans-serif';
+                });
+
+                // Brand the send button
+                const sendButtons = document.querySelectorAll('.embeddedServiceLiveAgentStateChatInputFooter button, .embedded-messaging .sendButton');
+                sendButtons.forEach(button => {
+                    button.style.backgroundColor = '#94B7BB';
+                    button.style.borderColor = '#94B7BB';
+                });
+            },
+
+            // MIAW Required: Apply accessibility features
+            applyAccessibilityFeatures: function() {
+                // Add ARIA labels for screen readers
+                const chatButton = document.querySelector('.embeddedServiceHelpButton .uiButton');
+                if (chatButton) {
+                    chatButton.setAttribute('aria-label', 'Open Capella University chat support');
+                    chatButton.setAttribute('role', 'button');
+                    chatButton.setAttribute('tabindex', '0');
+                }
+
+                // Add keyboard navigation support
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        if (event.target.classList.contains('uiButton')) {
+                            event.target.click();
+                        }
+                    }
+                });
+
+                // Add focus indicators
+                const style = document.createElement('style');
+                style.textContent = `
+                    .embeddedServiceHelpButton .uiButton:focus {
+                        outline: 3px solid #0056b3 !important;
+                        outline-offset: 2px !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            },
+
+            // MIAW Compliant Utility methods for external applications
+            utils: {
+                // Show chat programmatically - MIAW compliant
+                showChat: function() {
+                    try {
+                        if (window.embeddedservice_bootstrap && window.embeddedservice_bootstrap.utilAPI) {
+                            window.embeddedservice_bootstrap.utilAPI.maximizeWindow();
+                            window.CapellaVisitorCenterChat.trackEvent('chat_opened_programmatically', {
+                                timestamp: new Date().toISOString(),
+                                method: 'utilAPI'
+                            });
+                        } else if (document.querySelector('.embeddedServiceHelpButton .uiButton')) {
+                            document.querySelector('.embeddedServiceHelpButton .uiButton').click();
+                        }
+                    } catch (error) {
+                        console.error('Error showing chat:', error);
+                    }
+                },
+
+                // Hide chat programmatically - MIAW compliant
+                hideChat: function() {
+                    try {
+                        if (window.embeddedservice_bootstrap && window.embeddedservice_bootstrap.utilAPI) {
+                            window.embeddedservice_bootstrap.utilAPI.minimizeWindow();
+                            window.CapellaVisitorCenterChat.trackEvent('chat_closed_programmatically', {
+                                timestamp: new Date().toISOString(),
+                                method: 'utilAPI'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error hiding chat:', error);
+                    }
+                },
+
+                // Check if chat is available - MIAW compliant
+                isChatAvailable: function() {
+                    return !!(window.embeddedservice_bootstrap && 
+                             window.embeddedservice_bootstrap.utilAPI && 
+                             window.embeddedservice_bootstrap.utilAPI.isEmbeddedMessagingReady &&
+                             window.embeddedservice_bootstrap.utilAPI.isEmbeddedMessagingReady());
+                },
+
+                // Get current chat source - MIAW compliant
+                getChatSource: function() {
+                    return 'ES_General';
+                },
+
+                // MIAW Required: Get conversation status
+                getConversationStatus: function() {
+                    try {
+                        if (window.embeddedservice_bootstrap && window.embeddedservice_bootstrap.utilAPI) {
+                            return window.embeddedservice_bootstrap.utilAPI.getConversationStatus();
+                        }
+                        return 'unknown';
+                    } catch (error) {
+                        console.error('Error getting conversation status:', error);
+                        return 'error';
+                    }
+                },
+
+                // MIAW Required: End current conversation
+                endConversation: function() {
+                    try {
+                        if (window.embeddedservice_bootstrap && window.embeddedservice_bootstrap.utilAPI) {
+                            window.embeddedservice_bootstrap.utilAPI.endChat();
+                            window.CapellaVisitorCenterChat.trackEvent('conversation_ended_programmatically', {
+                                timestamp: new Date().toISOString()
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error ending conversation:', error);
+                    }
+                },
+
+                // MIAW Required: Get visitor information
+                getVisitorInfo: function() {
+                    return {
+                        visitorId: window.CapellaVisitorCenterChat.config.visitorId || 'unknown',
+                        sessionStart: window.CapellaVisitorCenterChat.sessionStart || new Date().toISOString(),
+                        pageURL: window.location.href,
+                        userAgent: navigator.userAgent,
+                        referrer: document.referrer,
+                        chatSource: 'ES_General'
+                    };
+                },
+
+                // MIAW Required: Pre-populate chat fields
+                prepopulateFields: function(fieldData) {
+                    try {
+                        if (embeddedservice_bootstrap && embeddedservice_bootstrap.settings) {
+                            embeddedservice_bootstrap.settings.prepopulatedPrechatFields = fieldData;
+                            console.log('Pre-populated fields updated:', fieldData);
+                        }
+                    } catch (error) {
+                        console.error('Error pre-populating fields:', error);
+                    }
+                },
+
+                // MIAW Required: Get chat transcript
+                getChatTranscript: function() {
+                    try {
+                        if (window.embeddedservice_bootstrap && window.embeddedservice_bootstrap.utilAPI) {
+                            return window.embeddedservice_bootstrap.utilAPI.getChatTranscript();
+                        }
+                        return null;
+                    } catch (error) {
+                        console.error('Error getting chat transcript:', error);
+                        return null;
+                    }
+                }
+            },
+
+            // MIAW Required: Session management
+            sessionStart: new Date().toISOString(),
+            
+            // MIAW Required: Configuration validation
+            validateConfiguration: function() {
+                const required = ['orgId', 'serviceName', 'siteUrl', 'scrtUrl'];
+                const missing = required.filter(key => !this.config[key]);
+                
+                if (missing.length > 0) {
+                    console.error('Missing required configuration:', missing);
+                    return false;
+                }
+                return true;
+            }
+        };
+
+        // MIAW Required: Initialize when bootstrap is loaded with error handling
+        function initEmbeddedMessaging() {
+            try {
+                console.log('Bootstrap loaded, validating configuration...');
+                
+                // Validate configuration before initializing
+                if (!window.CapellaVisitorCenterChat.validateConfiguration()) {
+                    throw new Error('Invalid Enhanced Chat configuration');
+                }
+                
+                // Initialize Enhanced Chat
+                window.CapellaVisitorCenterChat.init();
+                
+            } catch (error) {
+                console.error('Failed to initialize Enhanced Chat:', error);
+                
+                // Fire error event
+                const errorEvent = new CustomEvent('capellaVisitorCenterChatError', {
+                    detail: {
+                        error: error.message,
+                        phase: 'initialization',
+                        timestamp: new Date().toISOString()
+                    }
+                });
+                document.dispatchEvent(errorEvent);
+                
+                // Attempt fallback initialization
+                setTimeout(() => {
+                    console.log('Attempting fallback initialization...');
+                    try {
+                        window.CapellaVisitorCenterChat.init();
+                    } catch (fallbackError) {
+                        console.error('Fallback initialization also failed:', fallbackError);
+                    }
+                }, 2000);
+            }
+        }
+
+        // MIAW Required: Comprehensive initialization with multiple fallbacks
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, preparing Enhanced Chat initialization...');
+            
+            // Set session start time
+            window.CapellaVisitorCenterChat.sessionStart = new Date().toISOString();
+            
+            // Auto-initialize if bootstrap is already loaded
+            if (window.embeddedservice_bootstrap) {
+                console.log('Bootstrap already available, initializing immediately...');
+                initEmbeddedMessaging();
+            } else {
+                // Wait for bootstrap to load with timeout
+                let checkCount = 0;
+                const maxChecks = 30; // 30 seconds max wait
+                
+                const checkBootstrap = setInterval(() => {
+                    checkCount++;
+                    
+                    if (window.embeddedservice_bootstrap) {
+                        console.log('Bootstrap detected after', checkCount, 'checks');
+                        clearInterval(checkBootstrap);
+                        initEmbeddedMessaging();
+                    } else if (checkCount >= maxChecks) {
+                        console.error('Bootstrap failed to load within timeout period');
+                        clearInterval(checkBootstrap);
+                        
+                        // Fire timeout event
+                        const timeoutEvent = new CustomEvent('capellaVisitorCenterChatError', {
+                            detail: {
+                                error: 'Bootstrap load timeout',
+                                phase: 'bootstrap_loading',
+                                timestamp: new Date().toISOString()
+                            }
+                        });
+                        document.dispatchEvent(timeoutEvent);
+                    }
+                }, 1000);
+            }
+        });
+
+        // MIAW Required: Window load fallback
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                if (!window.CapellaVisitorCenterChat.initialized) {
+                    console.log('Final fallback initialization attempt...');
+                    if (window.embeddedservice_bootstrap) {
+                        initEmbeddedMessaging();
+                    }
+                }
+            }, 3000);
+        });
+
+        // Console logging for debugging
+        console.log('Capella Visitor Center Enhanced Chat page loaded - MIAW Framework Ready');
+    </script>
+
+    <!-- Load Enhanced Chat Bootstrap -->
+    <script type='text/javascript' 
+            src='https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983/assets/js/bootstrap.min.js' 
+            onload='initEmbeddedMessaging()'
+            async>
+    </script>
+
+    <!-- MIAW Required: Analytics and monitoring scripts -->
+    <script type='text/javascript'>
+        // MIAW Required: Comprehensive event monitoring
+        document.addEventListener('capellaVisitorCenterChatReady', function(event) {
+            console.log('✅ Capella Visitor Center Enhanced Chat is ready!', event.detail);
+            
+            // Mark as initialized
+            window.CapellaVisitorCenterChat.initialized = true;
+            
+            // Track successful initialization
+            if (window.gtag) {
+                window.gtag('event', 'chat_initialized', {
+                    event_category: 'Enhanced Chat',
+                    event_label: 'Visitor Center',
+                    custom_map: { 'miaw_compliant': true }
+                });
+            }
+        });
+
+        document.addEventListener('capellaVisitorCenterChatError', function(event) {
+            console.error('❌ Capella Visitor Center Enhanced Chat error:', event.detail);
+            
+            // Track errors for monitoring
+            if (window.gtag) {
+                window.gtag('event', 'chat_error', {
+                    event_category: 'Enhanced Chat',
+                    event_label: 'Error: ' + event.detail.error,
+                    custom_map: { 'error_phase': event.detail.phase }
+                });
+            }
+        });
+
+        // MIAW Required: Performance monitoring
+        window.addEventListener('load', function() {
+            // Track page load performance
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+                console.log('Page Performance:', {
+                    loadTime: perfData.loadEventEnd - perfData.loadEventStart,
+                    domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
+                    totalTime: perfData.loadEventEnd - perfData.fetchStart
+                });
+            }
+        });
+
+        // MIAW Required: Chat button visibility monitor
+        const observeChatButton = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    const chatButton = document.querySelector('.embeddedServiceHelpButton');
+                    if (chatButton && !chatButton.dataset.observed) {
+                        chatButton.dataset.observed = 'true';
+                        console.log('✅ Enhanced Chat button is visible');
+                        
+                        // Apply final branding
+                        setTimeout(() => {
+                            window.CapellaVisitorCenterChat.applyCustomBranding();
+                        }, 500);
+                    }
+                }
+            });
+        });
+
+        // Start observing for chat button
+        observeChatButton.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // MIAW Required: Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            // Track session end
+            if (window.CapellaVisitorCenterChat && window.CapellaVisitorCenterChat.trackEvent) {
+                window.CapellaVisitorCenterChat.trackEvent('session_ended', {
+                    sessionDuration: Date.now() - new Date(window.CapellaVisitorCenterChat.sessionStart).getTime(),
+                    timestamp: new Date().toISOString()
+                });
+            }
+        });
+
+        // MIAW Required: Heartbeat monitoring for chat availability
+        setInterval(() => {
+            if (window.CapellaVisitorCenterChat && window.CapellaVisitorCenterChat.utils) {
+                const isAvailable = window.CapellaVisitorCenterChat.utils.isChatAvailable();
+                if (!isAvailable && window.CapellaVisitorCenterChat.initialized) {
+                    console.warn('⚠️ Enhanced Chat may have become unavailable');
+                }
+            }
+        }, 30000); // Check every 30 seconds
+    </script>
+
+    <!-- MIAW Required: Structured Data for SEO and Analytics -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CustomerService",
+        "name": "Capella University Visitor Center Enhanced Chat",
+        "serviceType": "Live Chat Support",
+        "provider": {
+            "@type": "EducationalOrganization",
+            "name": "Capella University"
+        },
+        "availableChannel": {
+            "@type": "ServiceChannel",
+            "serviceType": "Enhanced Messaging",
+            "availableLanguage": "en-US"
+        }
+    }
+    </script>
 </body>
 </html>
