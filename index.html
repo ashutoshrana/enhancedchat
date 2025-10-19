@@ -140,10 +140,21 @@
                 deploymentId: 'CU_Enhanced_Messaging_Visitor_Center_Agents'
             },
 
+            // Initialization flags
+            initialized: false,
+            initializing: false,
+
             // Enhanced Chat initialization with full MIAW compliance
             init: function() {
+                // Prevent multiple initializations
+                if (this.initialized || this.initializing) {
+                    console.log('Enhanced Chat already initialized or initializing, skipping...');
+                    return;
+                }
+                
                 try {
                     console.log('Initializing Capella Visitor Center Enhanced Chat - MIAW Framework...');
+                    this.initializing = true;
                     
                     // MIAW Required: Language configuration
                     embeddedservice_bootstrap.settings.language = this.config.language;
@@ -268,9 +279,6 @@
                     embeddedservice_bootstrap.settings.prechatBackgroundImgURL = '';
                     embeddedservice_bootstrap.settings.waitingStateBackgroundImgURL = '';
                     embeddedservice_bootstrap.settings.smallCompanyLogoImgURL = '';
-
-                    // MIAW Required: Conversation settings
-                    embeddedservice_bootstrap.settings.storageDomain = 'https://strategiced--qasf.sandbox.my.salesforce.com';
                     
                     // MIAW Required: Enhanced messaging specific settings
                     embeddedservice_bootstrap.settings.isOfflineSupportEnabled = false;
@@ -286,11 +294,14 @@
                     );
 
                     console.log('Capella Visitor Center Enhanced Chat initialized successfully - MIAW Compliant');
+                    this.initialized = true;
+                    this.initializing = false;
                     this.setupEventListeners();
                     this.onChatReady();
                     
                 } catch (error) {
                     console.error('Visitor Center Enhanced Chat initialization error:', error);
+                    this.initializing = false;
                     this.onChatError(error);
                 }
             },
@@ -666,96 +677,28 @@
             }
         };
 
-        // MIAW Required: Initialize when bootstrap is loaded with error handling
+        // Initialize when bootstrap is loaded - Single initialization only
         function initEmbeddedMessaging() {
+            // Prevent multiple initializations
+            if (window.CapellaVisitorCenterChat.initialized) {
+                console.log('Enhanced Chat already initialized, skipping...');
+                return;
+            }
+            
             try {
-                console.log('Bootstrap loaded, validating configuration...');
+                console.log('Bootstrap loaded, initializing Enhanced Chat...');
                 
-                // Validate configuration before initializing
-                if (!window.CapellaVisitorCenterChat.validateConfiguration()) {
-                    throw new Error('Invalid Enhanced Chat configuration');
-                }
+                // Mark as initializing to prevent multiple calls
+                window.CapellaVisitorCenterChat.initializing = true;
                 
                 // Initialize Enhanced Chat
                 window.CapellaVisitorCenterChat.init();
                 
             } catch (error) {
                 console.error('Failed to initialize Enhanced Chat:', error);
-                
-                // Fire error event
-                const errorEvent = new CustomEvent('capellaVisitorCenterChatError', {
-                    detail: {
-                        error: error.message,
-                        phase: 'initialization',
-                        timestamp: new Date().toISOString()
-                    }
-                });
-                document.dispatchEvent(errorEvent);
-                
-                // Attempt fallback initialization
-                setTimeout(() => {
-                    console.log('Attempting fallback initialization...');
-                    try {
-                        window.CapellaVisitorCenterChat.init();
-                    } catch (fallbackError) {
-                        console.error('Fallback initialization also failed:', fallbackError);
-                    }
-                }, 2000);
+                window.CapellaVisitorCenterChat.initializing = false;
             }
         }
-
-        // MIAW Required: Comprehensive initialization with multiple fallbacks
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, preparing Enhanced Chat initialization...');
-            
-            // Set session start time
-            window.CapellaVisitorCenterChat.sessionStart = new Date().toISOString();
-            
-            // Auto-initialize if bootstrap is already loaded
-            if (window.embeddedservice_bootstrap) {
-                console.log('Bootstrap already available, initializing immediately...');
-                initEmbeddedMessaging();
-            } else {
-                // Wait for bootstrap to load with timeout
-                let checkCount = 0;
-                const maxChecks = 30; // 30 seconds max wait
-                
-                const checkBootstrap = setInterval(() => {
-                    checkCount++;
-                    
-                    if (window.embeddedservice_bootstrap) {
-                        console.log('Bootstrap detected after', checkCount, 'checks');
-                        clearInterval(checkBootstrap);
-                        initEmbeddedMessaging();
-                    } else if (checkCount >= maxChecks) {
-                        console.error('Bootstrap failed to load within timeout period');
-                        clearInterval(checkBootstrap);
-                        
-                        // Fire timeout event
-                        const timeoutEvent = new CustomEvent('capellaVisitorCenterChatError', {
-                            detail: {
-                                error: 'Bootstrap load timeout',
-                                phase: 'bootstrap_loading',
-                                timestamp: new Date().toISOString()
-                            }
-                        });
-                        document.dispatchEvent(timeoutEvent);
-                    }
-                }, 1000);
-            }
-        });
-
-        // MIAW Required: Window load fallback
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                if (!window.CapellaVisitorCenterChat.initialized) {
-                    console.log('Final fallback initialization attempt...');
-                    if (window.embeddedservice_bootstrap) {
-                        initEmbeddedMessaging();
-                    }
-                }
-            }, 3000);
-        });
 
         // Console logging for debugging
         console.log('Capella Visitor Center Enhanced Chat page loaded - MIAW Framework Ready');
@@ -848,15 +791,24 @@
             }
         });
 
-        // MIAW Required: Heartbeat monitoring for chat availability
+        // MIAW Required: Heartbeat monitoring for chat availability (reduced frequency)
         setInterval(() => {
-            if (window.CapellaVisitorCenterChat && window.CapellaVisitorCenterChat.utils) {
-                const isAvailable = window.CapellaVisitorCenterChat.utils.isChatAvailable();
-                if (!isAvailable && window.CapellaVisitorCenterChat.initialized) {
-                    console.warn('⚠️ Enhanced Chat may have become unavailable');
+            if (window.CapellaVisitorCenterChat && window.CapellaVisitorCenterChat.initialized && window.CapellaVisitorCenterChat.utils) {
+                try {
+                    const isAvailable = window.CapellaVisitorCenterChat.utils.isChatAvailable();
+                    // Only log if there's a significant change in availability
+                    if (!isAvailable && window.CapellaVisitorCenterChat.wasAvailable !== false) {
+                        console.warn('⚠️ Enhanced Chat may have become unavailable');
+                        window.CapellaVisitorCenterChat.wasAvailable = false;
+                    } else if (isAvailable && window.CapellaVisitorCenterChat.wasAvailable !== true) {
+                        console.log('✅ Enhanced Chat is available');
+                        window.CapellaVisitorCenterChat.wasAvailable = true;
+                    }
+                } catch (error) {
+                    // Ignore availability check errors during normal operation
                 }
             }
-        }, 30000); // Check every 30 seconds
+        }, 60000); // Check every 60 seconds (reduced frequency)
     </script>
 
     <!-- MIAW Required: Structured Data for SEO and Analytics -->
