@@ -9,24 +9,23 @@
 
   <!-- Salesforce Messaging Snippet -->
 <script type='text/javascript'>
-      function initEmbeddedMessaging() {
-          try {
-              embeddedservice_bootstrap.settings.language = 'en_US';
+	function initEmbeddedMessaging() {
+		try {
+			embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
 
-              embeddedservice_bootstrap.init(
-                  '00DEc00000GfZ2M',
-                  'CU_Enhanced_Messaging_Visitor_Center_Agents',
-                  'https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983',
-                  {
-                      scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
-                  }
-              );
-          } catch (err) {
-              console.error('Error loading Embedded Messaging: ', err);
-          }
-      }
-  </script>
-  <script type='text/javascript' src='https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983/assets/js/bootstrap.min.js' 
-  onload='initEmbeddedMessaging()'></script>
+			embeddedservice_bootstrap.init(
+				'00DEc00000GfZ2M',
+				'test_embed',
+				'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724',
+				{
+					scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
+				}
+			);
+		} catch (err) {
+			console.error('Error loading Embedded Messaging: ', err);
+		}
+	};
+</script>
+<script type='text/javascript' src='https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js'></script>
 </body>
 </html>
