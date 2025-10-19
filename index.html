@@ -38,83 +38,18 @@
             font-size: 16px;
         }
 
-        /* Enhanced Chat Button - Capella Branding */
-        .embeddedServiceHelpButton .helpButton .uiButton,
-        .embedded-messaging .chatButton {
-            background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png") !important;
-            background-color: rgba(0, 0, 0, .00) !important;
-            background-size: cover !important;
-            display: block !important;
-            right: 50px !important;
-            bottom: 35px !important;
-            text-align: left !important;
-            z-index: 3141591 !important;
-            overflow: hidden !important;
-            position: fixed !important;
-            border-radius: 50% !important;
-            font-family: "Arial", sans-serif !important;
-            min-width: 54px !important;
-            max-width: 54px !important;
-            min-height: 54px !important;
-            max-height: 54px !important;
-            border: none !important;
-        }
-
-        /* Remove default Enhanced Chat icon */
-        .embeddedServiceHelpButton .embeddedServiceIcon::before,
-        .embedded-messaging .chatIcon::before {
-            content: none !important;
-        }
-
-        /* Focus styling for accessibility */
-        .embeddedServiceHelpButton .helpButton .uiButton:focus,
-        .embedded-messaging .chatButton:focus {
-            outline: 1px solid #C10016 !important;
-        }
-
-        /* Button positioning adjustments */
-        .embeddedServiceHelpButton .helpButton,
-        .embeddedServiceHelpButton.embeddedServiceBottomTabBar .helpButton {
-            bottom: 45px !important;
-        }
-
-        /* Hide default minimized message content only */
-        .embeddedServiceSidebarMinimizedDefaultUI .messageContent {
-            display: none !important;
-        }
-        
-        /* Enhanced Chat sidebar customization */
-        .embeddedServiceSidebar.layout-docked .dockableContainer,
-        .embedded-messaging .messagingContainer {
-            width: 400px !important;
-        }
-
-        /* Background color theme */
-        .embeddedServiceHelpButton .uiButton,
-        .embedded-messaging .messagingHeader,
-        body button {
-            background: #94B7BB !important;
-        }
-        
-        .sidebarHeader minimizedContainer .helpButton .embeddedServiceSidebarMinimizedDefaultUI {
-            background-color: #94B7BB !important;
-        }
-
-        /* Enhanced Chat specific overrides */
-        .embedded-messaging .conversationButton {
-            background: #94B7BB !important;
-            border-radius: 4px !important;
-        }
-
-        .embedded-messaging .messageInput {
-            border-color: #94B7BB !important;
-        }
-
-        /* Ensure chat button always visible */
-        .embeddedServiceHelpButton,
-        .embedded-messaging .chatButton {
+        /* Minimal CSS - Let chat widget show with default styling first */
+        .embeddedServiceHelpButton {
             visibility: visible !important;
             opacity: 1 !important;
+            display: block !important;
+        }
+        
+        .embeddedServiceHelpButton .helpButton .uiButton {
+            background: #94B7BB !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            display: block !important;
         }
     </style>
 </head>
@@ -124,28 +59,57 @@
         <p>Welcome! Look for the chat button in the bottom right corner to start a conversation with our visitor center agents.</p>
     </div>
 
-    <!-- Enhanced Chat JavaScript Implementation - Clean & Simple -->
+    <!-- Enhanced Chat JavaScript Implementation - Alternative Approach -->
     <script type='text/javascript'>
         function initEmbeddedMessaging() {
             try {
-                console.log('Initializing Enhanced Chat...');
+                console.log('Initializing Enhanced Chat - Testing different approach...');
                 
-                // Basic language setting
+                // Try with different settings
                 embeddedservice_bootstrap.settings.language = 'en_US';
-                
-                // Basic pre-chat form
-                embeddedservice_bootstrap.settings.extraPrechatFormDetails = [{
-                    "label": "Chat Source",
-                    "transcriptFields": ["Chat_Source__c"],
-                    "displayToAgent": true,
-                    "value": "ES_General"
-                }];
-
-                // Basic settings
                 embeddedservice_bootstrap.settings.displayHelpButton = true;
-                embeddedservice_bootstrap.settings.enableLogging = true;
                 
-                // Initialize Enhanced Chat
+                // Try without scrt2URL first to see if that's causing issues
+                console.log('Attempting initialization without scrt2URL...');
+                embeddedservice_bootstrap.init(
+                    '00DEc00000GfZ2M',
+                    'CU_Enhanced_Messaging_Visitor_Center_Agents',
+                    'https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983'
+                );
+
+                console.log('Enhanced Chat init called - waiting for widget...');
+                
+                // Check multiple times for the widget
+                let checkCount = 0;
+                const checkForWidget = setInterval(() => {
+                    checkCount++;
+                    const chatButton = document.querySelector('.embeddedServiceHelpButton');
+                    const allEmbedded = document.querySelectorAll('[class*="embedded"]');
+                    
+                    console.log(`Check ${checkCount}: Chat button:`, !!chatButton, 'All embedded elements:', allEmbedded.length);
+                    
+                    if (chatButton || checkCount >= 10) {
+                        clearInterval(checkForWidget);
+                        if (chatButton) {
+                            console.log('✅ Chat widget found!', chatButton);
+                        } else {
+                            console.log('❌ Chat widget never appeared after 10 checks');
+                            console.log('Final DOM state:', document.body.innerHTML.includes('embedded'));
+                        }
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Enhanced Chat initialization error:', error);
+                console.error('Error details:', error.stack);
+            }
+        }
+        
+        // Alternative initialization if first attempt fails
+        function fallbackInit() {
+            console.log('Trying fallback initialization...');
+            try {
+                // Try with scrt2URL
                 embeddedservice_bootstrap.init(
                     '00DEc00000GfZ2M',
                     'CU_Enhanced_Messaging_Visitor_Center_Agents',
@@ -154,13 +118,14 @@
                         scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
                     }
                 );
-
-                console.log('Enhanced Chat initialized successfully');
-                
+                console.log('Fallback initialization completed');
             } catch (error) {
-                console.error('Enhanced Chat initialization error:', error);
+                console.error('Fallback initialization also failed:', error);
             }
         }
+        
+        // Try fallback after 5 seconds if main init doesn't work
+        setTimeout(fallbackInit, 5000);
     </script>
 
     <!-- Load Enhanced Chat Bootstrap -->
@@ -170,9 +135,25 @@
             async>
     </script>
 
-    <!-- Simple monitoring script -->
+    <!-- Debug monitoring script -->
     <script type='text/javascript'>
-        console.log('Enhanced Chat page loaded');
+        console.log('Enhanced Chat page loaded - Debug mode');
+        
+        // Check if bootstrap loaded
+        setTimeout(() => {
+            console.log('Bootstrap check:', {
+                'embeddedservice_bootstrap exists': !!window.embeddedservice_bootstrap,
+                'embeddedservice_bootstrap.settings': !!window.embeddedservice_bootstrap?.settings,
+                'embeddedservice_bootstrap.init': !!window.embeddedservice_bootstrap?.init
+            });
+            
+            // Check DOM for any embedded service elements
+            const embeddedElements = document.querySelectorAll('[class*="embedded"], [id*="embedded"]');
+            console.log('Found embedded elements:', embeddedElements.length, embeddedElements);
+            
+            // Check if any errors in console
+            console.log('Current window.location:', window.location.href);
+        }, 3000);
     </script>
 </body>
 </html>
