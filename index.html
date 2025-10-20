@@ -1,120 +1,277 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Salesforce Chat Demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce Enhanced Chat Demo</title>
 </head>
 <body>
-  <h1>Welcome to Salesforce Messaging Test</h1>
-  <p>If the widget is set up correctly, you should see the chat bubble in the corner.</p>
+    <h1>Welcome to Salesforce Messaging Test</h1>
+    <p>If the widget is set up correctly, you should see the chat bubble in the corner.</p>
 
-  <!-- Salesforce Messaging Snippet -->
-<!-- Optional: your branded circular launcher (mirrors legacy look) -->
-<style>
-  #capellaChatBtn {
-    background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png");
-    background-color: transparent;
-    width: 54px; height: 54px; border-radius: 50%;
-    position: fixed; right: 50px; bottom: 35px; z-index: 3141591;
-    border: none; cursor: pointer; text-indent: -9999px; overflow: hidden;
-  }
-  #capellaChatBtn:focus { outline: 1px solid #C10016; }
-</style>
+    <!-- Capella Branded Chat Button -->
+    <style>
+        #capellaChatBtn {
+            background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png");
+            background-color: transparent;
+            background-size: cover;
+            width: 54px; 
+            height: 54px; 
+            border-radius: 50%;
+            position: fixed; 
+            right: 50px; 
+            bottom: 35px; 
+            z-index: 3141591;
+            border: none; 
+            cursor: pointer; 
+            text-indent: -9999px; 
+            overflow: hidden;
+            transition: opacity 0.3s ease;
+        }
+        
+        #capellaChatBtn:focus {
+            outline: 1px solid #C10016;
+        }
+        
+        #capellaChatBtn:hover {
+            opacity: 0.8;
+        }
+        
+        /* Offline state styling */
+        #capellaChatBtn.offline {
+            opacity: 0.5;
+            filter: grayscale(50%);
+        }
+    </style>
 
-<button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
+    <button id="capellaChatBtn" aria-label="Chat with us" title="Chat with us">Chat</button>
 
-<!-- Your MIAW (Enhanced Chat) deployment -->
-<script type="text/javascript">
-  // 1) Init with your sandbox deployment
-  function initEmbeddedMessaging() {
-    try {
-      embeddedservice_bootstrap.settings.language = 'en_US'; // e.g., 'en' or 'en-US'
+    <!-- Enhanced Chat (MIAW) Implementation -->
+    <script type="text/javascript">
+        // Global variables for chat state management
+        let chatInitialized = false;
+        let agentAvailabilityInterval = null;
 
-      embeddedservice_bootstrap.init(
-        '00DEc00000GfZ2M',                                                     // ORG ID
-        'test_embed',                                                          // Deployment name
-        'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724', // Enhanced Service URL
-        { scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com' }   // SCRT2
-      );
-    } catch (err) {
-      console.error('Error loading Embedded Messaging: ', err);
-    }
-  }
+        // 1) Initialize Enhanced Messaging
+        function initEmbeddedMessaging() {
+            try {
+                console.log('Initializing Enhanced Messaging...');
+                
+                // Basic settings
+                embeddedservice_bootstrap.settings.language = 'en_US';
+                embeddedservice_bootstrap.settings.displayHelpButton = true;
+                embeddedservice_bootstrap.settings.enableLogging = true;
 
-  // 2) Pre-Chat API: set hidden/visible fields once the client is ready
-  //    IMPORTANT: Use your *channel variable names* here (Messaging Settings → Parameter Mappings)
-  window.addEventListener('onEmbeddedMessagingReady', () => {
-    // Hidden fields (e.g., legacy "Chat Source")
-    embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-      // Replace "Chat_Source" with your Custom Parameter's **Channel Variable Name**
-      "Chat_Source": "ES_General"
-    });
+                // Initialize Enhanced Chat
+                embeddedservice_bootstrap.init(
+                    '00DEc00000GfZ2M',
+                    'CU_Enhanced_Messaging_Visitor_Center_Agents',
+                    'https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983',
+                    {
+                        scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
+                    }
+                );
+                
+                chatInitialized = true;
+                console.log('Enhanced Messaging initialized successfully');
+                
+            } catch (err) {
+                console.error('Error loading Embedded Messaging:', err);
+            }
+        }
 
-    // (Optional) Prefill visible fields
-    // embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields({
-    //   "_firstName": { value: "Visitor", isEditableByEndUser: true },
-    //   "_subject":   { value: "Web Chat", isEditableByEndUser: true }
-    // });
-  });
+        // 2) Agent availability checker
+        function checkAgentAvailability() {
+            const customBtn = document.getElementById('capellaChatBtn');
+            if (!customBtn || !chatInitialized) return;
 
-  // 3) Use your own branded launcher and hide Salesforce's default one (optional)
-  window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
-    // Hide default floating launcher if you prefer only your custom button
-    if (embeddedservice_bootstrap.utilAPI && embeddedservice_bootstrap.utilAPI.hideChatButton) {
-      embeddedservice_bootstrap.utilAPI.hideChatButton();
-    }
+            try {
+                if (embeddedservice_bootstrap.utilAPI && 
+                    typeof embeddedservice_bootstrap.utilAPI.isAgentAvailable === 'function') {
+                    
+                    embeddedservice_bootstrap.utilAPI.isAgentAvailable()
+                        .then(isAvailable => {
+                            updateButtonState(customBtn, isAvailable);
+                        })
+                        .catch(error => {
+                            console.warn('Could not check agent availability:', error);
+                            // Default to available if check fails
+                            updateButtonState(customBtn, true);
+                        });
+                } else {
+                    // Fallback: assume available if API not ready
+                    updateButtonState(customBtn, true);
+                }
+            } catch (error) {
+                console.warn('Agent availability check failed:', error);
+                updateButtonState(customBtn, true);
+            }
+        }
 
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.addEventListener('click', () => {
-        // Launch the chat with the window maximized
-        embeddedservice_bootstrap.utilAPI
-          .launchChat()
-          .catch((e) => console.error('Launch Chat failed:', e));
-      });
-    }
-  });
+        // 3) Update button visual state based on availability
+        function updateButtonState(button, isAvailable) {
+            if (!button) return;
 
-  // 4) Hide chat button once conversation starts
-  window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
-    console.log('Conversation started - hiding chat button');
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.style.display = 'none';
-    }
-  });
+            if (isAvailable) {
+                button.classList.remove('offline');
+                button.setAttribute('title', 'Chat with us - Agents Available');
+                button.setAttribute('aria-label', 'Chat with us - Agents Available');
+                console.log('Agents are available');
+            } else {
+                button.classList.add('offline');
+                button.setAttribute('title', 'Chat with us - Agents Offline');
+                button.setAttribute('aria-label', 'Chat with us - Agents may be offline');
+                console.log('Agents are offline');
+            }
+        }
 
-  // 5) Show chat button again when conversation ends (optional)
-  window.addEventListener('onEmbeddedMessagingConversationEnded', () => {
-    console.log('Conversation ended - showing chat button again');
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.style.display = 'block';
-    }
-  });
+        // 4) Enhanced chat launcher with availability check
+        function launchChatWithAvailabilityCheck() {
+            try {
+                if (!embeddedservice_bootstrap.utilAPI) {
+                    console.error('Enhanced Messaging not ready');
+                    return;
+                }
 
-  // 6) Hide chat button when chat window is maximized
-  window.addEventListener('onEmbeddedMessagingMaximized', () => {
-    console.log('Chat maximized - hiding chat button');
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.style.display = 'none';
-    }
-  });
+                // Check availability before launching
+                if (typeof embeddedservice_bootstrap.utilAPI.isAgentAvailable === 'function') {
+                    embeddedservice_bootstrap.utilAPI.isAgentAvailable()
+                        .then(isAvailable => {
+                            if (isAvailable) {
+                                console.log('Launching chat - agents available');
+                            } else {
+                                console.log('Launching chat - offline messaging mode');
+                            }
+                            
+                            return embeddedservice_bootstrap.utilAPI.launchChat();
+                        })
+                        .catch(error => {
+                            console.error('Failed to launch chat:', error);
+                        });
+                } else {
+                    // Fallback: launch chat without availability check
+                    embeddedservice_bootstrap.utilAPI.launchChat()
+                        .catch(error => {
+                            console.error('Failed to launch chat:', error);
+                        });
+                }
+            } catch (error) {
+                console.error('Error in chat launcher:', error);
+            }
+        }
 
-  // 7) Show chat button when chat window is minimized
-  window.addEventListener('onEmbeddedMessagingMinimized', () => {
-    console.log('Chat minimized - showing chat button again');
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.style.display = 'block';
-    }
-  });
-</script>
+        // Event Listeners
+        
+        // 5) Handle pre-chat form setup
+        window.addEventListener('onEmbeddedMessagingReady', () => {
+            console.log('Enhanced Messaging is ready');
+            
+            try {
+                // Set hidden pre-chat fields
+                if (embeddedservice_bootstrap.prechatAPI) {
+                    embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+                        "Chat_Source": "ES_General"
+                    });
+                    console.log('Pre-chat fields configured');
+                }
 
-<!-- Bootstrap (loader) for your deployment; keeps your onload init -->
-<script type="text/javascript"
-        src="https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js"
-        onload="initEmbeddedMessaging()"></script>
+                // Start checking agent availability
+                checkAgentAvailability();
+                
+                // Set up periodic availability checks
+                if (agentAvailabilityInterval) {
+                    clearInterval(agentAvailabilityInterval);
+                }
+                agentAvailabilityInterval = setInterval(checkAgentAvailability, 30000); // Check every 30 seconds
+                
+            } catch (error) {
+                console.error('Error in onEmbeddedMessagingReady:', error);
+            }
+        });
+
+        // 6) Handle custom button creation and setup
+        window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
+            console.log('Enhanced Messaging button created');
+            
+            try {
+                // Hide default Salesforce launcher
+                if (embeddedservice_bootstrap.utilAPI && 
+                    typeof embeddedservice_bootstrap.utilAPI.hideChatButton === 'function') {
+                    embeddedservice_bootstrap.utilAPI.hideChatButton();
+                }
+
+                // Set up custom button click handler
+                const customBtn = document.getElementById('capellaChatBtn');
+                if (customBtn) {
+                    customBtn.addEventListener('click', launchChatWithAvailabilityCheck);
+                    console.log('Custom chat button configured');
+                }
+                
+            } catch (error) {
+                console.error('Error in onEmbeddedMessagingButtonCreated:', error);
+            }
+        });
+
+        // 7) Handle conversation lifecycle events
+        window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
+            console.log('Conversation started - hiding chat button');
+            const customBtn = document.getElementById('capellaChatBtn');
+            if (customBtn) {
+                customBtn.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('onEmbeddedMessagingConversationEnded', () => {
+            console.log('Conversation ended - showing chat button again');
+            const customBtn = document.getElementById('capellaChatBtn');
+            if (customBtn) {
+                customBtn.style.display = 'block';
+                // Recheck availability after conversation ends
+                setTimeout(checkAgentAvailability, 1000);
+            }
+        });
+
+        window.addEventListener('onEmbeddedMessagingMaximized', () => {
+            console.log('Chat maximized - hiding chat button');
+            const customBtn = document.getElementById('capellaChatBtn');
+            if (customBtn) {
+                customBtn.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('onEmbeddedMessagingMinimized', () => {
+            console.log('Chat minimized - showing chat button again');
+            const customBtn = document.getElementById('capellaChatBtn');
+            if (customBtn) {
+                customBtn.style.display = 'block';
+                // Recheck availability when minimized
+                setTimeout(checkAgentAvailability, 1000);
+            }
+        });
+
+        // 8) Handle agent availability changes (if supported)
+        window.addEventListener('onEmbeddedMessagingAgentAvailabilityChanged', (event) => {
+            console.log('Agent availability changed:', event.detail);
+            const customBtn = document.getElementById('capellaChatBtn');
+            if (customBtn && event.detail) {
+                updateButtonState(customBtn, event.detail.isAvailable);
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (agentAvailabilityInterval) {
+                clearInterval(agentAvailabilityInterval);
+            }
+        });
+
+    </script>
+
+    <!-- Load Enhanced Chat Bootstrap -->
+    <script type='text/javascript' 
+            src='https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983/assets/js/bootstrap.min.js' 
+            onload='initEmbeddedMessaging()'>
+    </script>
 
 </body>
 </html>
