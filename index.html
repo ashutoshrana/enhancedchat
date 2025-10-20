@@ -29,19 +29,16 @@
     try {
       embeddedservice_bootstrap.settings.language = 'en_US'; // e.g., 'en' or 'en-US'
 
-      
-			embeddedservice_bootstrap.init(
-				'00DEc00000GfZ2M',
-				'CU_Enhanced_Messaging_Visitor_Center_Agents',
-				'https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983',
-				{
-					scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
-				}
-			);
-		} catch (err) {
-			console.error('Error loading Embedded Messaging: ', err);
-		}
-	};
+      embeddedservice_bootstrap.init(
+        '00DEc00000GfZ2M',                                                     // ORG ID
+        'test_embed',                                                          // Deployment name
+        'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724', // Enhanced Service URL
+        { scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com' }   // SCRT2
+      );
+    } catch (err) {
+      console.error('Error loading Embedded Messaging: ', err);
+    }
+  }
 
   // 2) Pre-Chat API: set hidden/visible fields once the client is ready
   //    IMPORTANT: Use your *channel variable names* here (Messaging Settings → Parameter Mappings)
@@ -115,8 +112,9 @@
 </script>
 
 <!-- Bootstrap (loader) for your deployment; keeps your onload init -->
-<script type='text/javascript' src='https://strategiced--qasf.sandbox.my.site.com/ESWCUEnhancedMessaging1759815402983/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
-
+<script type="text/javascript"
+        src="https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js"
+        onload="initEmbeddedMessaging()"></script>
 
 </body>
 </html>
