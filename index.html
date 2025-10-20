@@ -56,7 +56,7 @@
     // });
   });
 
-  // 3) Use your own branded launcher and hide Salesforce’s default one (optional)
+  // 3) Use your own branded launcher and hide Salesforce's default one (optional)
   window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
     // Hide default floating launcher if you prefer only your custom button
     if (embeddedservice_bootstrap.utilAPI && embeddedservice_bootstrap.utilAPI.hideChatButton) {
@@ -71,6 +71,42 @@
           .launchChat()
           .catch((e) => console.error('Launch Chat failed:', e));
       });
+    }
+  });
+
+  // 4) Hide chat button once conversation starts
+  window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
+    console.log('Conversation started - hiding chat button');
+    const customBtn = document.getElementById('capellaChatBtn');
+    if (customBtn) {
+      customBtn.style.display = 'none';
+    }
+  });
+
+  // 5) Show chat button again when conversation ends (optional)
+  window.addEventListener('onEmbeddedMessagingConversationEnded', () => {
+    console.log('Conversation ended - showing chat button again');
+    const customBtn = document.getElementById('capellaChatBtn');
+    if (customBtn) {
+      customBtn.style.display = 'block';
+    }
+  });
+
+  // 6) Hide chat button when chat window is maximized
+  window.addEventListener('onEmbeddedMessagingMaximized', () => {
+    console.log('Chat maximized - hiding chat button');
+    const customBtn = document.getElementById('capellaChatBtn');
+    if (customBtn) {
+      customBtn.style.display = 'none';
+    }
+  });
+
+  // 7) Show chat button when chat window is minimized
+  window.addEventListener('onEmbeddedMessagingMinimized', () => {
+    console.log('Chat minimized - showing chat button again');
+    const customBtn = document.getElementById('capellaChatBtn');
+    if (customBtn) {
+      customBtn.style.display = 'block';
     }
   });
 </script>
