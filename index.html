@@ -1,120 +1,210 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8" />
   <title>Salesforce Chat Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* Your branded circular launcher */
+    #capellaChatBtn {
+      background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png");
+      background-color: transparent;
+      width: 54px; height: 54px; border-radius: 50%;
+      position: fixed; right: 50px; bottom: 35px; z-index: 3141591;
+      border: none; cursor: pointer; text-indent: -9999px; overflow: hidden;
+    }
+    #capellaChatBtn:focus { outline: 1px solid #C10016; }
+
+    /* Fallback contact form (hidden until needed) */
+    #fallbackForm {
+      position: fixed; right: 20px; bottom: 100px; width: 320px; z-index: 3141592;
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.15); display: none; padding: 16px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    #fallbackForm h2 { font-size: 16px; margin: 0 0 8px; }
+    #fallbackForm small { color: #6b7280; display:block; margin-bottom: 8px; }
+    #fallbackForm label { display:block; font-size: 13px; margin: 10px 0 4px; }
+    #fallbackForm input, #fallbackForm textarea {
+      width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;
+    }
+    #fallbackForm textarea { min-height: 80px; resize: vertical; }
+    #fallbackForm .row { display:flex; gap: 8px; }
+    #fallbackForm .row > div { flex: 1; }
+    #fallbackForm .actions { display:flex; gap:8px; margin-top:12px; }
+    #fallbackForm button {
+      appearance: none; border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer;
+    }
+    #fallbackSubmit { background:#111827; color:#fff; }
+    #fallbackCancel { background:#e5e7eb; color:#111827; }
+    #fallbackBadge { display:inline-block; font-size:12px; padding:2px 6px; border-radius:999px; background:#fde68a; color:#92400e; }
+  </style>
 </head>
 <body>
   <h1>Welcome to Salesforce Messaging Test</h1>
   <p>If the widget is set up correctly, you should see the chat bubble in the corner.</p>
 
-  <!-- Salesforce Messaging Snippet -->
-<!-- Optional: your branded circular launcher (mirrors legacy look) -->
-<style>
-  #capellaChatBtn {
-    background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png");
-    background-color: transparent;
-    width: 54px; height: 54px; border-radius: 50%;
-    position: fixed; right: 50px; bottom: 35px; z-index: 3141591;
-    border: none; cursor: pointer; text-indent: -9999px; overflow: hidden;
-  }
-  #capellaChatBtn:focus { outline: 1px solid #C10016; }
-</style>
+  <!-- Your branded launcher -->
+  <button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
 
-<button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
+  <!-- Fallback form shown when no agent is available or outside business hours -->
+  <section id="fallbackForm" aria-live="polite" aria-labelledby="fallbackTitle">
+    <h2 id="fallbackTitle">We’re not available right now <span id="fallbackBadge">Fallback</span></h2>
+    <small id="fallbackReason">Reason: no agent available</small>
+    <form id="fallbackFormEl">
+      <div class="row">
+        <div>
+          <label for="ffName">Name</label>
+          <input id="ffName" name="name" autocomplete="name" required />
+        </div>
+        <div>
+          <label for="ffEmail">Email</label>
+          <input id="ffEmail" name="email" type="email" autocomplete="email" required />
+        </div>
+      </div>
+      <label for="ffSubject">Subject</label>
+      <input id="ffSubject" name="subject" placeholder="How can we help?" />
+      <label for="ffMsg">Message</label>
+      <textarea id="ffMsg" name="message" placeholder="Give us a few details…" required></textarea>
+      <div class="actions">
+        <button id="fallbackSubmit" type="submit">Send</button>
+        <button id="fallbackCancel" type="button">Cancel</button>
+      </div>
+    </form>
+  </section>
 
-<!-- Your MIAW (Enhanced Chat) deployment -->
-<script type="text/javascript">
-  // 1) Init with your sandbox deployment
-  function initEmbeddedMessaging() {
-    try {
-      embeddedservice_bootstrap.settings.language = 'en_US'; // e.g., 'en' or 'en-US'
+  <!-- Messaging bootstrap + your script -->
+  <script>
+    // --- helpers to show/hide the fallback form and launcher
+    function showFallback(reasonText) {
+      const f = document.getElementById('fallbackForm');
+      const r = document.getElementById('fallbackReason');
+      if (r && reasonText) r.textContent = 'Reason: ' + reasonText;
+      if (f) f.style.display = 'block';
 
-      embeddedservice_bootstrap.init(
-        '00DEc00000GfZ2M',                                                     // ORG ID
-        'test_embed',                                                          // Deployment name
-        'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724', // Enhanced Service URL
-        { scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com' }   // SCRT2
-      );
-    } catch (err) {
-      console.error('Error loading Embedded Messaging: ', err);
+      // Ensure your custom launcher is visible again so users can retry later
+      const btn = document.getElementById('capellaChatBtn');
+      if (btn) btn.style.display = 'block';
     }
-  }
+    function hideFallback() {
+      const f = document.getElementById('fallbackForm');
+      if (f) f.style.display = 'none';
+    }
 
-  // 2) Pre-Chat API: set hidden/visible fields once the client is ready
-  //    IMPORTANT: Use your *channel variable names* here (Messaging Settings → Parameter Mappings)
-  window.addEventListener('onEmbeddedMessagingReady', () => {
-    // Hidden fields (e.g., legacy "Chat Source")
-    embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-      // Replace "Chat_Source" with your Custom Parameter's **Channel Variable Name**
-      "Chat_Source": "ES_General"
+    // --- initialize Embedded Messaging
+    function initEmbeddedMessaging() {
+      try {
+        embeddedservice_bootstrap.settings.language = 'en_US';
+
+        embeddedservice_bootstrap.init(
+          '00DEc00000GfZ2M', // ORG ID
+          'test_embed',      // Deployment name
+          'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724', // Enhanced Service URL
+          { scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com' }
+        );
+      } catch (err) {
+        console.error('Error loading Embedded Messaging: ', err);
+        showFallback('client initialization error');
+      }
+    }
+
+    // --- Pre-chat (hidden/visible) once API is ready
+    window.addEventListener('onEmbeddedMessagingReady', () => {
+      embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+        "Chat_Source": "ES_General"
+      });
+      // If you always want Salesforce pre-chat, you can configure it in Setup (per session vs per conversation).
+      // This page-level fallback only appears when routing fails or outside hours.
     });
 
-    // (Optional) Prefill visible fields
-    // embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields({
-    //   "_firstName": { value: "Visitor", isEditableByEndUser: true },
-    //   "_subject":   { value: "Web Chat", isEditableByEndUser: true }
-    // });
-  });
+    // --- Use your branded launcher, hide Salesforce’s default one
+    window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
+      if (embeddedservice_bootstrap.utilAPI?.hideChatButton) {
+        embeddedservice_bootstrap.utilAPI.hideChatButton(); // hide default launcher
+      }
+      const customBtn = document.getElementById('capellaChatBtn');
+      if (customBtn) {
+        customBtn.addEventListener('click', () => {
+          hideFallback(); // if user tries again, hide the fallback
+          embeddedservice_bootstrap.utilAPI.launchChat()
+            .catch((e) => {
+              console.error('Launch Chat failed:', e);
+              showFallback('could not launch chat');
+            });
+        });
+      }
+    });
 
-  // 3) Use your own branded launcher and hide Salesforce's default one (optional)
-  window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
-    // Hide default floating launcher if you prefer only your custom button
-    if (embeddedservice_bootstrap.utilAPI && embeddedservice_bootstrap.utilAPI.hideChatButton) {
-      embeddedservice_bootstrap.utilAPI.hideChatButton();
-    }
+    // --- Conversation lifecycle: keep your launcher in sync
+    window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
+      const btn = document.getElementById('capellaChatBtn');
+      if (btn) btn.style.display = 'none';
+      hideFallback();
+    });
+    window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
+      const btn = document.getElementById('capellaChatBtn');
+      if (btn) btn.style.display = 'none';
+    });
+    window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
+      const btn = document.getElementById('capellaChatBtn');
+      if (btn) btn.style.display = 'block';
+    });
+    window.addEventListener('onEmbeddedMessagingConversationClosed', () => {
+      const btn = document.getElementById('capellaChatBtn');
+      if (btn) btn.style.display = 'block';
+    });
 
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.addEventListener('click', () => {
-        // Launch the chat with the window maximized
-        embeddedservice_bootstrap.utilAPI
-          .launchChat()
-          .catch((e) => console.error('Launch Chat failed:', e));
-      });
-    }
-  });
+    // --- Key bit #1: Outside business hours => show fallback
+    window.addEventListener('onEmbeddedMessagingBusinessHoursEnded', () => {
+      console.info('Outside business hours');
+      showFallback('outside business hours');
+    });
+    window.addEventListener('onEmbeddedMessagingWithinBusinessHours', () => {
+      console.info('Within business hours');
+      hideFallback();
+    });
 
-  // 4) Hide chat button once conversation starts
-  window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
-    console.log('Conversation started - hiding chat button');
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.style.display = 'none';
-    }
-  });
+    // --- Key bit #2: Routing failed (e.g., no agent available) => show fallback
+    window.addEventListener('onEmbeddedMessagingConversationRouted', (e) => {
+      // The event includes an SSE-style payload describing the routing result.
+      // We defensively inspect several likely fields to detect failure.
+      const payload = e?.detail || {};
+      console.debug('Routed event payload:', payload);
 
-  // 5) Show chat button again when conversation ends (optional)
-  window.addEventListener('onEmbeddedMessagingConversationEnded', () => {
-    console.log('Conversation ended - showing chat button again');
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.style.display = 'block';
-    }
-  });
+      const failed =
+        payload?.success === false ||
+        payload?.status === 'Failed' ||
+        payload?.routingResult?.isSuccessful === false ||
+        payload?.routingOutcome === 'UNSUCCESSFUL' ||
+        payload?.error?.type === 'NO_AGENT_AVAILABLE';
 
-  // 6) Hide chat button when chat window is maximized
-  window.addEventListener('onEmbeddedMessagingMaximized', () => {
-    console.log('Chat maximized - hiding chat button');
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.style.display = 'none';
-    }
-  });
+      if (failed) {
+        showFallback('no agent available');
+        try {
+          // Optional: clear any partial session so the user can retry later
+          embeddedservice_bootstrap.utilAPI?.clearSession?.();
+        } catch (_) {}
+      }
+    });
 
-  // 7) Show chat button when chat window is minimized
-  window.addEventListener('onEmbeddedMessagingMinimized', () => {
-    console.log('Chat minimized - showing chat button again');
-    const customBtn = document.getElementById('capellaChatBtn');
-    if (customBtn) {
-      customBtn.style.display = 'block';
-    }
-  });
-</script>
+    // --- Fallback form handlers (replace with your own submission endpoint)
+    document.getElementById('fallbackCancel').addEventListener('click', hideFallback);
+    document.getElementById('fallbackFormEl').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const data = Object.fromEntries(new FormData(ev.currentTarget).entries());
+      console.log('Fallback form submit:', data);
+      // TODO: POST to your endpoint (e.g., Salesforce Web-to-Case, Apex REST, or n8n)
+      // await fetch('/contact', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(data) });
+      ev.currentTarget.reset();
+      const badge = document.getElementById('fallbackBadge'); if (badge) { badge.textContent = 'Submitted'; badge.style.background='#dcfce7'; badge.style.color='#166534'; }
+      setTimeout(hideFallback, 1200);
+    });
+  </script>
 
-<!-- Bootstrap (loader) for your deployment; keeps your onload init -->
-<script type="text/javascript"
-        src="https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js"
-        onload="initEmbeddedMessaging()"></script>
-
+  <!-- Bootstrap (loader) for your deployment; keeps your onload init -->
+  <script
+    src="https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js"
+    onload="initEmbeddedMessaging()"
+  ></script>
 </body>
 </html>
