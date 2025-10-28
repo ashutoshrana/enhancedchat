@@ -4,40 +4,174 @@
   <meta charset="utf-8" />
   <title>Salesforce Chat Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
+    :root {
+      --capella-red: #C10016;
+      --capella-red-dark: #910012;
+      --capella-gray: #e5e7eb;
+    }
+
     /* Your branded circular launcher */
     #capellaChatBtn {
       background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png");
       background-color: transparent;
-      width: 54px; height: 54px; border-radius: 50%;
-      position: fixed; right: 50px; bottom: 35px; z-index: 3141591;
-      border: none; cursor: pointer; text-indent: -9999px; overflow: hidden;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      position: fixed;
+      right: 50px;
+      bottom: 35px;
+      z-index: 3141591;
+      border: none;
+      cursor: pointer;
+      text-indent: -9999px;
+      overflow: hidden;
     }
-    #capellaChatBtn:focus { outline: 1px solid #C10016; }
+    #capellaChatBtn:focus {
+      outline: 1px solid var(--capella-red);
+    }
 
     /* Fallback contact form (hidden until needed) */
     #fallbackForm {
-      position: fixed; right: 20px; bottom: 100px; width: 320px; z-index: 3141592;
-      background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.15); display: none; padding: 16px;
+      position: fixed;
+      right: 20px;
+      bottom: 100px;
+      width: 320px;
+      z-index: 3141592;
+      background: #fff;
+      border: 1px solid var(--capella-gray);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      display: none;
+      padding: 16px;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
-    #fallbackForm h2 { font-size: 16px; margin: 0 0 8px; }
-    #fallbackForm small { color: #6b7280; display:block; margin-bottom: 8px; }
-    #fallbackForm label { display:block; font-size: 13px; margin: 10px 0 4px; }
-    #fallbackForm input, #fallbackForm textarea {
-      width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;
+    #fallbackForm h2 {
+      font-size: 16px;
+      margin: 0 0 8px;
     }
-    #fallbackForm textarea { min-height: 80px; resize: vertical; }
-    #fallbackForm .row { display:flex; gap: 8px; }
-    #fallbackForm .row > div { flex: 1; }
-    #fallbackForm .actions { display:flex; gap:8px; margin-top:12px; }
+    #fallbackForm small {
+      color: #6b7280;
+      display: block;
+      margin-bottom: 8px;
+    }
+    #fallbackForm label {
+      display: block;
+      font-size: 13px;
+      margin: 10px 0 4px;
+    }
+    #fallbackForm input,
+    #fallbackForm textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    #fallbackForm textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    #fallbackForm .row {
+      display: flex;
+      gap: 8px;
+    }
+    #fallbackForm .row > div {
+      flex: 1;
+    }
+    #fallbackForm .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
     #fallbackForm button {
-      appearance: none; border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer;
+      appearance: none;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
     }
-    #fallbackSubmit { background:#111827; color:#fff; }
-    #fallbackCancel { background:#e5e7eb; color:#111827; }
-    #fallbackBadge { display:inline-block; font-size:12px; padding:2px 6px; border-radius:999px; background:#fde68a; color:#92400e; }
+    #fallbackSubmit {
+      background: var(--capella-red);
+      color: #fff;
+    }
+    #fallbackSubmit:hover {
+      background: var(--capella-red-dark);
+    }
+    #fallbackCancel {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    #fallbackBadge {
+      display: inline-block;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #fde68a;
+      color: #92400e;
+    }
+
+    /* Web-to-Case Capella themed form (hidden until needed) */
+    #caseFormWrapper {
+      display: none;
+      max-width: 360px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      padding: 20px 24px;
+      font-family: "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      position: fixed;
+      bottom: 110px;
+      right: 30px;
+      z-index: 3141593;
+    }
+    #caseFormWrapper h2 {
+      font-size: 16px;
+      color: var(--capella-red);
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+    #caseFormWrapper label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    #caseFormWrapper input,
+    #caseFormWrapper textarea {
+      width: 100%;
+      font-size: 15px;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    #caseFormWrapper input:focus,
+    #caseFormWrapper textarea:focus {
+      outline: none;
+      border-color: var(--capella-red);
+      box-shadow: 0 0 0 1px var(--capella-red);
+    }
+    #caseFormWrapper button[type="submit"] {
+      margin-top: 16px;
+      width: 100%;
+      background: var(--capella-red);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      padding: 10px 0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    #caseFormWrapper button[type="submit"]:hover {
+      background: var(--capella-red-dark);
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
@@ -47,9 +181,11 @@
   <!-- Your branded launcher -->
   <button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
 
-  <!-- Fallback form shown when no agent is available or outside business hours -->
+  <!-- Fallback form (original) -->
   <section id="fallbackForm" aria-live="polite" aria-labelledby="fallbackTitle">
-    <h2 id="fallbackTitle">We’re not available right now <span id="fallbackBadge">Fallback</span></h2>
+    <h2 id="fallbackTitle">
+      We’re not available right now <span id="fallbackBadge">Fallback</span>
+    </h2>
     <small id="fallbackReason">Reason: no agent available</small>
     <form id="fallbackFormEl">
       <div class="row">
@@ -73,19 +209,39 @@
     </form>
   </section>
 
-  <!-- Messaging bootstrap + your script -->
+  <!-- Capella Red Web-to-Case Form -->
+  <section id="caseFormWrapper">
+    <h2>Submit a Support Request</h2>
+    <form id="caseForm"
+      action="https://strategiced--qasf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8"
+      method="POST">
+      <input type="hidden" name="orgid" value="00DEc00000GfZ2M">
+      <input type="hidden" name="retURL" value="https://www.google.com/">
+
+      <label for="name">* Name</label>
+      <input id="name" name="name" type="text" maxlength="80" required />
+
+      <label for="email">* Web Email</label>
+      <input id="email" name="email" type="email" maxlength="80" required />
+
+      <label for="description">* Inquiry</label>
+      <textarea id="description" name="description" required></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+  </section>
+
   <script>
-    // --- helpers to show/hide the fallback form and launcher
+    // --- helpers to show/hide fallback and launcher
     function showFallback(reasonText) {
       const f = document.getElementById('fallbackForm');
       const r = document.getElementById('fallbackReason');
       if (r && reasonText) r.textContent = 'Reason: ' + reasonText;
       if (f) f.style.display = 'block';
-
-      // Ensure your custom launcher is visible again so users can retry later
       const btn = document.getElementById('capellaChatBtn');
       if (btn) btn.style.display = 'block';
     }
+
     function hideFallback() {
       const f = document.getElementById('fallbackForm');
       if (f) f.style.display = 'none';
@@ -95,11 +251,10 @@
     function initEmbeddedMessaging() {
       try {
         embeddedservice_bootstrap.settings.language = 'en_US';
-
         embeddedservice_bootstrap.init(
-          '00DEc00000GfZ2M', // ORG ID
-          'test_embed',      // Deployment name
-          'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724', // Enhanced Service URL
+          '00DEc00000GfZ2M',
+          'test_embed',
+          'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724',
           { scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com' }
         );
       } catch (err) {
@@ -108,25 +263,17 @@
       }
     }
 
-    // --- Pre-chat (hidden/visible) once API is ready
-    window.addEventListener('onEmbeddedMessagingReady', () => {
-      embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-        "Chat_Source": "ES_General"
-      });
-      // If you always want Salesforce pre-chat, you can configure it in Setup (per session vs per conversation).
-      // This page-level fallback only appears when routing fails or outside hours.
-    });
-
-    // --- Use your branded launcher, hide Salesforce’s default one
+    // --- Chat Lifecycle Events
     window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
       if (embeddedservice_bootstrap.utilAPI?.hideChatButton) {
-        embeddedservice_bootstrap.utilAPI.hideChatButton(); // hide default launcher
+        embeddedservice_bootstrap.utilAPI.hideChatButton();
       }
       const customBtn = document.getElementById('capellaChatBtn');
       if (customBtn) {
         customBtn.addEventListener('click', () => {
-          hideFallback(); // if user tries again, hide the fallback
-          embeddedservice_bootstrap.utilAPI.launchChat()
+          hideFallback();
+          embeddedservice_bootstrap.utilAPI
+            .launchChat()
             .catch((e) => {
               console.error('Launch Chat failed:', e);
               showFallback('could not launch chat');
@@ -135,73 +282,74 @@
       }
     });
 
-    // --- Conversation lifecycle: keep your launcher in sync
     window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
-      const btn = document.getElementById('capellaChatBtn');
-      if (btn) btn.style.display = 'none';
+      document.getElementById('capellaChatBtn').style.display = 'none';
       hideFallback();
     });
     window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
-      const btn = document.getElementById('capellaChatBtn');
-      if (btn) btn.style.display = 'none';
+      document.getElementById('capellaChatBtn').style.display = 'none';
     });
     window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
-      const btn = document.getElementById('capellaChatBtn');
-      if (btn) btn.style.display = 'block';
+      document.getElementById('capellaChatBtn').style.display = 'block';
     });
     window.addEventListener('onEmbeddedMessagingConversationClosed', () => {
-      const btn = document.getElementById('capellaChatBtn');
-      if (btn) btn.style.display = 'block';
+      document.getElementById('capellaChatBtn').style.display = 'block';
     });
 
-    // --- Key bit #1: Outside business hours => show fallback
-    window.addEventListener('onEmbeddedMessagingBusinessHoursEnded', () => {
-      console.info('Outside business hours');
-      showFallback('outside business hours');
-    });
-    window.addEventListener('onEmbeddedMessagingWithinBusinessHours', () => {
-      console.info('Within business hours');
-      hideFallback();
-    });
+    // --- Business hours / routing fallback
+    window.addEventListener('onEmbeddedMessagingBusinessHoursEnded', () => showFallback('outside business hours'));
+    window.addEventListener('onEmbeddedMessagingWithinBusinessHours', hideFallback);
 
-    // --- Key bit #2: Routing failed (e.g., no agent available) => show fallback
     window.addEventListener('onEmbeddedMessagingConversationRouted', (e) => {
-      // The event includes an SSE-style payload describing the routing result.
-      // We defensively inspect several likely fields to detect failure.
       const payload = e?.detail || {};
-      console.debug('Routed event payload:', payload);
-
       const failed =
         payload?.success === false ||
         payload?.status === 'Failed' ||
         payload?.routingResult?.isSuccessful === false ||
         payload?.routingOutcome === 'UNSUCCESSFUL' ||
         payload?.error?.type === 'NO_AGENT_AVAILABLE';
-
       if (failed) {
         showFallback('no agent available');
         try {
-          // Optional: clear any partial session so the user can retry later
           embeddedservice_bootstrap.utilAPI?.clearSession?.();
         } catch (_) {}
       }
     });
 
-    // --- Fallback form handlers (replace with your own submission endpoint)
+    // --- Watch for "No Agents Online" and replace chat with Web-to-Case form
+    const observer = new MutationObserver(() => {
+      const msg = document.body.innerText || '';
+      if (msg.includes('No Agents Online') || msg.includes('Please try Later')) {
+        showWebToCaseForm();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    function showWebToCaseForm() {
+      observer.disconnect();
+      const chatFrames = document.querySelectorAll(
+        '.embeddedMessagingFrame, .embeddedMessagingLauncher, #embeddedMessagingFrame'
+      );
+      chatFrames.forEach((el) => (el.style.display = 'none'));
+      document.getElementById('caseFormWrapper').style.display = 'block';
+    }
+
+    // --- Fallback form handlers
     document.getElementById('fallbackCancel').addEventListener('click', hideFallback);
-    document.getElementById('fallbackFormEl').addEventListener('submit', async (ev) => {
+    document.getElementById('fallbackFormEl').addEventListener('submit', (ev) => {
       ev.preventDefault();
-      const data = Object.fromEntries(new FormData(ev.currentTarget).entries());
-      console.log('Fallback form submit:', data);
-      // TODO: POST to your endpoint (e.g., Salesforce Web-to-Case, Apex REST, or n8n)
-      // await fetch('/contact', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(data) });
       ev.currentTarget.reset();
-      const badge = document.getElementById('fallbackBadge'); if (badge) { badge.textContent = 'Submitted'; badge.style.background='#dcfce7'; badge.style.color='#166534'; }
+      const badge = document.getElementById('fallbackBadge');
+      if (badge) {
+        badge.textContent = 'Submitted';
+        badge.style.background = '#dcfce7';
+        badge.style.color = '#166534';
+      }
       setTimeout(hideFallback, 1200);
     });
   </script>
 
-  <!-- Bootstrap (loader) for your deployment; keeps your onload init -->
+  <!-- Salesforce bootstrap -->
   <script
     src="https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js"
     onload="initEmbeddedMessaging()"
