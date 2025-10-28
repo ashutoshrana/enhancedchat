@@ -414,18 +414,21 @@
           { scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com' }
         );
         
-        // Timeout fallback - if chat doesn't initialize properly within 30 seconds
+        // Timeout fallback - if chat doesn't initialize properly within 45 seconds
         setTimeout(() => {
           if (!chatInitialized) {
-            console.log('⏰ Chat initialization timeout - checking if fallback needed');
+            console.warn('⏰ Chat initialization timeout after 45s');
             // Only show fallback if no chat button is visible
-            const chatButton = document.querySelector('.helpButtonEnabled');
-            if (!chatButton) {
-              console.log('⏰ No chat button found after timeout - showing fallback');
+            const chatButton = document.querySelector('.helpButtonEnabled, #capellaChatBtn');
+            const chatVisible = chatButton && window.getComputedStyle(chatButton).display !== 'none';
+            if (!chatVisible) {
+              console.log('⏰ No visible chat button found - showing fallback');
               showFallback('chat initialization timeout');
+            } else {
+              console.log('✅ Chat button is visible, no fallback needed');
             }
           }
-        }, 30000);
+        }, 45000);
         
       } catch (err) {
         console.error('Error loading Embedded Messaging: ', err);
@@ -435,31 +438,35 @@
 
     // --- Chat Lifecycle Events
     window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
-      console.log('✅ Chat button created - enabling offline detection');
-      
+      console.log('✅ Chat button created - ready to launch');
+
       if (embeddedservice_bootstrap.utilAPI?.hideChatButton) {
         embeddedservice_bootstrap.utilAPI.hideChatButton();
       }
-      
-      // Enable offline detection now that chat is initialized
-      enableOfflineDetection();
-      
+
+      // Mark chat as initialized but DON'T start detection yet
+      chatInitialized = true;
+
       const customBtn = document.getElementById('capellaChatBtn');
       if (customBtn) {
         customBtn.addEventListener('click', () => {
           hideFallback();
           hideCaseForm();
 
-          // Reset fallback trigger to allow detection for new chat session
-          fallbackTriggered = false;
-          detectionActive = true;
-
-          console.log('🖱️ Chat button clicked - launching chat with offline detection active');
+          console.log('🖱️ Chat button clicked - launching chat');
 
           embeddedservice_bootstrap.utilAPI
             .launchChat()
             .then(() => {
               console.log('✅ Chat launched successfully');
+
+              // ONLY NOW enable offline detection after chat is actually launched
+              fallbackTriggered = false;
+              detectionActive = true;
+
+              console.log('🔍 Starting offline detection after chat launch');
+              enableOfflineDetection();
+
               // Start immediate offline check after launch
               setTimeout(() => {
                 checkForOfflineMessage();
@@ -474,9 +481,14 @@
     });
 
     window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
+      console.log('💬 Conversation started - agent connected');
       document.getElementById('capellaChatBtn').style.display = 'none';
       hideFallback();
       hideCaseForm();
+
+      // Stop offline detection since conversation has started successfully
+      detectionActive = false;
+      fallbackTriggered = false;
     });
     window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
       document.getElementById('capellaChatBtn').style.display = 'none';
@@ -523,23 +535,20 @@
     });
 
     // --- Enhanced detection for "No Agents Online" message
-    let detectionActive = false; // Start as false, enable after chat initialization
+    let detectionActive = false; // Start as false, enable after chat LAUNCH (not just initialization)
     let chatInitialized = false;
     let fallbackTriggered = false; // Prevent duplicate triggers
 
-    // Enable detection only after chat system is initialized
+    // Enable detection only after user clicks chat button and chat is launched
     function enableOfflineDetection() {
-      if (chatInitialized) return;
-
       console.log('🔍 Enabling offline message detection...');
       detectionActive = true;
-      chatInitialized = true;
       fallbackTriggered = false; // Reset on re-enable
 
-      // Start monitoring after a short delay to ensure chat is fully loaded
+      // Start monitoring after a short delay to ensure chat window is fully loaded
       setTimeout(() => {
         startOfflineDetection();
-      }, 1000); // Reduced from 3000ms to 1000ms for faster detection
+      }, 1000);
     }
     
     function startOfflineDetection() {
@@ -589,9 +598,19 @@
     function checkForOfflineMessage() {
       if (!detectionActive || fallbackTriggered) return;
 
+      // First verify chat window is actually open/visible
+      const chatWindow = document.querySelector('.embeddedMessagingFrame, [class*="messaging"]');
+      if (!chatWindow || window.getComputedStyle(chatWindow).display === 'none') {
+        console.log('🔍 Chat window not visible, skipping offline check');
+        return;
+      }
+
       // Check in iframe content first (most reliable)
       const iframes = document.querySelectorAll('iframe[src*="salesforce"], iframe[title*="chat"], iframe[title*="messaging"], .embeddedMessagingFrame');
       for (let iframe of iframes) {
+        // Skip if iframe is not visible
+        if (window.getComputedStyle(iframe).display === 'none') continue;
+
         try {
           const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
           if (iframeDoc && iframeDoc.body) {
