@@ -16,6 +16,7 @@
     #capellaChatBtn {
       background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png");
       background-color: transparent;
+      background-size: cover;
       width: 54px;
       height: 54px;
       border-radius: 50%;
@@ -27,9 +28,14 @@
       cursor: pointer;
       text-indent: -9999px;
       overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+    #capellaChatBtn:hover {
+      transform: scale(1.05);
     }
     #capellaChatBtn:focus {
-      outline: 1px solid var(--capella-red);
+      outline: 2px solid var(--capella-red);
+      outline-offset: 2px;
     }
 
     /* Fallback contact form (hidden until needed) */
@@ -46,10 +52,18 @@
       display: none;
       padding: 16px;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      animation: slideInUp 0.3s ease-out;
     }
+    
+    @keyframes slideInUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
     #fallbackForm h2 {
       font-size: 16px;
       margin: 0 0 8px;
+      color: var(--capella-red);
     }
     #fallbackForm small {
       color: #6b7280;
@@ -60,6 +74,7 @@
       display: block;
       font-size: 13px;
       margin: 10px 0 4px;
+      font-weight: 500;
     }
     #fallbackForm input,
     #fallbackForm textarea {
@@ -68,6 +83,13 @@
       border: 1px solid #d1d5db;
       border-radius: 8px;
       font-size: 14px;
+      box-sizing: border-box;
+    }
+    #fallbackForm input:focus,
+    #fallbackForm textarea:focus {
+      outline: none;
+      border-color: var(--capella-red);
+      box-shadow: 0 0 0 2px rgba(193, 0, 22, 0.1);
     }
     #fallbackForm textarea {
       min-height: 80px;
@@ -91,10 +113,12 @@
       border-radius: 10px;
       padding: 10px 12px;
       cursor: pointer;
+      font-weight: 500;
     }
     #fallbackSubmit {
       background: var(--capella-red);
       color: #fff;
+      flex: 1;
     }
     #fallbackSubmit:hover {
       background: var(--capella-red-dark);
@@ -112,26 +136,49 @@
       color: #92400e;
     }
 
-    /* Web-to-Case Capella themed form (hidden until needed) */
+    /* Enhanced Web-to-Case Capella themed form */
     #caseFormWrapper {
       display: none;
-      max-width: 360px;
-      margin: 0 auto;
+      width: 360px;
       background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       padding: 20px 24px;
       font-family: "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       position: fixed;
       bottom: 110px;
       right: 30px;
       z-index: 3141593;
+      animation: slideInUp 0.3s ease-out;
+      border: 1px solid #e5e7eb;
     }
+    
+    #caseFormWrapper .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #999;
+      cursor: pointer;
+      padding: 4px;
+    }
+    #caseFormWrapper .close-btn:hover {
+      color: #666;
+    }
+    
     #caseFormWrapper h2 {
       font-size: 16px;
       color: var(--capella-red);
       margin-top: 0;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
+    }
+    #caseFormWrapper .subtitle {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 16px;
+      line-height: 1.4;
     }
     #caseFormWrapper label {
       display: block;
@@ -139,6 +186,7 @@
       color: #333;
       margin-top: 12px;
       margin-bottom: 4px;
+      font-size: 14px;
     }
     #caseFormWrapper input,
     #caseFormWrapper textarea {
@@ -148,12 +196,17 @@
       border: 1px solid #d1d5db;
       border-radius: 4px;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-sizing: border-box;
     }
     #caseFormWrapper input:focus,
     #caseFormWrapper textarea:focus {
       outline: none;
       border-color: var(--capella-red);
       box-shadow: 0 0 0 1px var(--capella-red);
+    }
+    #caseFormWrapper textarea {
+      min-height: 80px;
+      resize: vertical;
     }
     #caseFormWrapper button[type="submit"] {
       margin-top: 16px;
@@ -172,6 +225,33 @@
       background: var(--capella-red-dark);
       transform: translateY(-1px);
     }
+    #caseFormWrapper .cancel-btn {
+      margin-top: 8px;
+      width: 100%;
+      background: #f3f4f6;
+      color: #374151;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #caseFormWrapper .cancel-btn:hover {
+      background: #e5e7eb;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 480px) {
+      #fallbackForm,
+      #caseFormWrapper {
+        right: 10px;
+        left: 10px;
+        width: auto;
+      }
+      #capellaChatBtn {
+        right: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -184,7 +264,7 @@
   <!-- Fallback form (original) -->
   <section id="fallbackForm" aria-live="polite" aria-labelledby="fallbackTitle">
     <h2 id="fallbackTitle">
-      We’re not available right now <span id="fallbackBadge">Fallback</span>
+      We're not available right now <span id="fallbackBadge">Fallback</span>
     </h2>
     <small id="fallbackReason">Reason: no agent available</small>
     <form id="fallbackFormEl">
@@ -209,30 +289,37 @@
     </form>
   </section>
 
-  <!-- Capella Red Web-to-Case Form -->
+  <!-- Enhanced Web-to-Case Form -->
   <section id="caseFormWrapper">
+    <button type="button" class="close-btn" onclick="hideCaseForm()">×</button>
     <h2>Submit a Support Request</h2>
+    <p class="subtitle">Our agents are currently unavailable. Please fill out this form and we'll get back to you soon.</p>
     <form id="caseForm"
       action="https://strategiced--qasf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8"
-      method="POST">
+      method="POST"
+      onsubmit="return validateCaseForm()">
       <input type="hidden" name="orgid" value="00DEc00000GfZ2M">
       <input type="hidden" name="retURL" value="https://www.google.com/">
 
-      <label for="name">* Name</label>
-      <input id="name" name="name" type="text" maxlength="80" required />
+      <label for="case_name">* Name</label>
+      <input id="case_name" name="name" type="text" maxlength="80" required 
+             placeholder="Enter your full name" />
 
-      <label for="email">* Web Email</label>
-      <input id="email" name="email" type="email" maxlength="80" required />
+      <label for="case_email">* Email</label>
+      <input id="case_email" name="email" type="email" maxlength="80" required 
+             placeholder="your.email@example.com" />
 
-      <label for="description">* Inquiry</label>
-      <textarea id="description" name="description" required></textarea>
+      <label for="case_description">* Inquiry</label>
+      <textarea id="case_description" name="description" required 
+                placeholder="Please describe your inquiry or issue..."></textarea>
 
-      <button type="submit">Submit</button>
+      <button type="submit">Submit Request</button>
+      <button type="button" class="cancel-btn" onclick="hideCaseForm()">Cancel</button>
     </form>
   </section>
 
   <script>
-    // --- helpers to show/hide fallback and launcher
+    // --- Enhanced helpers to show/hide fallback and web-to-case form
     function showFallback(reasonText) {
       const f = document.getElementById('fallbackForm');
       const r = document.getElementById('fallbackReason');
@@ -245,6 +332,69 @@
     function hideFallback() {
       const f = document.getElementById('fallbackForm');
       if (f) f.style.display = 'none';
+    }
+
+    function showCaseForm() {
+      console.log('🔄 Activating Web-to-Case fallback - agents unavailable');
+      
+      // Hide all Salesforce chat elements
+      const chatElements = document.querySelectorAll(
+        '.embeddedMessagingFrame, .embeddedMessagingLauncher, #embeddedMessagingFrame, .helpButtonEnabled, .helpButtonDisabled'
+      );
+      chatElements.forEach((el) => {
+        el.style.display = 'none';
+        console.log('Hidden:', el.className || el.id);
+      });
+      
+      // Hide custom chat button
+      const customBtn = document.getElementById('capellaChatBtn');
+      if (customBtn) customBtn.style.display = 'none';
+      
+      // Hide fallback form if showing
+      hideFallback();
+      
+      // Show web-to-case form
+      const caseForm = document.getElementById('caseFormWrapper');
+      if (caseForm) {
+        caseForm.style.display = 'block';
+        // Focus first input for better UX
+        setTimeout(() => {
+          const firstInput = caseForm.querySelector('input');
+          if (firstInput) firstInput.focus();
+        }, 300);
+      }
+    }
+
+    function hideCaseForm() {
+      const caseForm = document.getElementById('caseFormWrapper');
+      if (caseForm) caseForm.style.display = 'none';
+      const customBtn = document.getElementById('capellaChatBtn');
+      if (customBtn) customBtn.style.display = 'block';
+    }
+
+    function validateCaseForm() {
+      const form = document.getElementById('caseForm');
+      const requiredFields = form.querySelectorAll('[required]');
+      
+      for (let field of requiredFields) {
+        if (!field.value.trim()) {
+          field.focus();
+          alert(`Please fill in: ${field.previousElementSibling.textContent}`);
+          return false;
+        }
+      }
+      
+      // Email validation
+      const email = document.getElementById('case_email');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.value)) {
+        email.focus();
+        alert('Please enter a valid email address.');
+        return false;
+      }
+      
+      console.log('✅ Form validated, submitting case...');
+      return true;
     }
 
     // --- initialize Embedded Messaging
@@ -272,6 +422,7 @@
       if (customBtn) {
         customBtn.addEventListener('click', () => {
           hideFallback();
+          hideCaseForm();
           embeddedservice_bootstrap.utilAPI
             .launchChat()
             .catch((e) => {
@@ -285,6 +436,7 @@
     window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
       document.getElementById('capellaChatBtn').style.display = 'none';
       hideFallback();
+      hideCaseForm();
     });
     window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
       document.getElementById('capellaChatBtn').style.display = 'none';
@@ -309,43 +461,126 @@
         payload?.routingOutcome === 'UNSUCCESSFUL' ||
         payload?.error?.type === 'NO_AGENT_AVAILABLE';
       if (failed) {
-        showFallback('no agent available');
+        console.log('Routing failed - showing web-to-case form');
+        showCaseForm();
         try {
           embeddedservice_bootstrap.utilAPI?.clearSession?.();
         } catch (_) {}
       }
     });
 
-    // --- Watch for "No Agents Online" and replace chat with Web-to-Case form
+    // --- Enhanced detection for "No Agents Online" message
+    let detectionActive = true;
+    
+    // Multiple detection strategies for better reliability
     const observer = new MutationObserver(() => {
-      const msg = document.body.innerText || '';
-      if (msg.includes('No Agents Online') || msg.includes('Please try Later')) {
-        showWebToCaseForm();
+      if (!detectionActive) return;
+      
+      const bodyText = document.body.innerText || '';
+      const offlineMessages = [
+        'No Agents Online',
+        'Please try Later', 
+        'No agents available',
+        'Currently unavailable',
+        'All agents are busy'
+      ];
+      
+      const foundOfflineMessage = offlineMessages.some(msg => 
+        bodyText.toLowerCase().includes(msg.toLowerCase())
+      );
+      
+      if (foundOfflineMessage) {
+        console.log('🔍 Detected offline message:', bodyText.match(new RegExp(offlineMessages.join('|'), 'i'))?.[0]);
+        detectionActive = false;
+        observer.disconnect();
+        showCaseForm();
       }
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    
+    observer.observe(document.body, { 
+      childList: true, 
+      subtree: true,
+      characterData: true 
+    });
 
-    function showWebToCaseForm() {
-      observer.disconnect();
-      const chatFrames = document.querySelectorAll(
-        '.embeddedMessagingFrame, .embeddedMessagingLauncher, #embeddedMessagingFrame'
-      );
-      chatFrames.forEach((el) => (el.style.display = 'none'));
-      document.getElementById('caseFormWrapper').style.display = 'block';
+    // Monitor iframes for offline messages (with cross-origin handling)
+    function monitorIframes() {
+      const checkInterval = setInterval(() => {
+        if (!detectionActive) {
+          clearInterval(checkInterval);
+          return;
+        }
+        
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+          try {
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            if (iframeDoc) {
+              const text = iframeDoc.body ? iframeDoc.body.innerText : '';
+              if (text && (text.includes('No Agents Online') || text.includes('Please try Later'))) {
+                console.log('🔍 Detected offline message in iframe');
+                detectionActive = false;
+                clearInterval(checkInterval);
+                showCaseForm();
+              }
+            }
+          } catch (e) {
+            // Cross-origin iframe - cannot access content
+            // This is expected for Salesforce iframes
+          }
+        });
+      }, 2000);
+      
+      // Stop monitoring after 2 minutes
+      setTimeout(() => clearInterval(checkInterval), 120000);
     }
+    
+    // Start iframe monitoring
+    monitorIframes();
 
     // --- Fallback form handlers
     document.getElementById('fallbackCancel').addEventListener('click', hideFallback);
     document.getElementById('fallbackFormEl').addEventListener('submit', (ev) => {
       ev.preventDefault();
-      ev.currentTarget.reset();
-      const badge = document.getElementById('fallbackBadge');
-      if (badge) {
-        badge.textContent = 'Submitted';
-        badge.style.background = '#dcfce7';
-        badge.style.color = '#166534';
+      
+      // Simple validation
+      const form = ev.currentTarget;
+      const required = form.querySelectorAll('[required]');
+      for (let field of required) {
+        if (!field.value.trim()) {
+          field.focus();
+          alert(`Please fill in: ${field.labels?.[0]?.textContent || field.name}`);
+          return;
+        }
       }
-      setTimeout(hideFallback, 1200);
+      
+      // Simulate submission
+      const submitBtn = document.getElementById('fallbackSubmit');
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+      
+      setTimeout(() => {
+        form.reset();
+        const badge = document.getElementById('fallbackBadge');
+        if (badge) {
+          badge.textContent = 'Submitted';
+          badge.style.background = '#dcfce7';
+          badge.style.color = '#166534';
+        }
+        setTimeout(() => {
+          hideFallback();
+          submitBtn.textContent = 'Send';
+          submitBtn.disabled = false;
+        }, 1200);
+      }, 1000);
+    });
+
+    // Global error handler for chat bootstrap failures
+    window.addEventListener('error', (event) => {
+      if (event.filename && event.filename.includes('bootstrap')) {
+        console.error('Chat bootstrap error - showing fallback');
+        showFallback('chat system error');
+      }
     });
   </script>
 
@@ -353,6 +588,7 @@
   <script
     src="https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js"
     onload="initEmbeddedMessaging()"
+    onerror="showFallback('bootstrap failed to load')"
   ></script>
 </body>
 </html>
