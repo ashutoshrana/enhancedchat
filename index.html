@@ -168,73 +168,27 @@ Expected /conversation POST payload:
         time: new Date().toISOString()
       });
 
-      // Check if prechatAPI is available
-      console.log('🔍 Checking prechatAPI availability...');
-      console.log('embeddedservice_bootstrap exists:', typeof embeddedservice_bootstrap !== 'undefined');
-      console.log('prechatAPI exists:', typeof embeddedservice_bootstrap?.prechatAPI !== 'undefined');
-      console.log('setHiddenPrechatFields exists:', typeof embeddedservice_bootstrap?.prechatAPI?.setHiddenPrechatFields === 'function');
-
-      // Try ALL possible field name variations
-      const prechatVariations = [
-        // Variation 1: Channel Variable Names (camelCase)
-        {
-          name: 'Channel Variable (camelCase)',
-          fields: {
-            _firstName: 'Chat',
-            _lastName: 'TestUser',
-            _email: 'dogz@mailinator.com',
-            _subject: 'Chat Inquiry from Website'
-          }
-        },
-        // Variation 2: Flow Variable Names (PascalCase)
-        {
-          name: 'Flow Variable (PascalCase)',
-          fields: {
-            FirstName: 'Chat',
-            LastName: 'TestUser',
-            Email: 'dogz@mailinator.com',
-            Subject: 'Chat Inquiry from Website'
-          }
-        }
-      ];
-
-      // CUSTOM HIDDEN PRECHAT FIELD: Channel Variable Name is "Email"
-      const prechatData = {
-        Email: 'dogz@mailinator.com'
-      };
-
-      console.log('📋 Prechat data to send:', JSON.stringify(prechatData, null, 2));
-      console.log('📋 Expected routingAttributes:', JSON.stringify({
-        routingAttributes: { Email: 'dogz@mailinator.com' },
-        conversationId: '...',
-        language: 'en_US'
-      }, null, 2));
+      // Set hidden prechat field (Channel Variable Name: "Email")
+      console.log('🔧 Setting hidden prechat fields...');
 
       try {
-        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatData);
+        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+          Email: 'dogz@mailinator.com'
+        });
 
-        console.log('✅ setHiddenPrechatFields called successfully!');
-        console.log('✅ Passing Email: dogz@mailinator.com');
+        console.log('✅ setHiddenPrechatFields({ Email: "dogz@mailinator.com" }) called');
 
         window.prechatDebug.attempts.push({
-          variation: 'routingAttributes format',
-          fields: prechatData,
-          expectedStructure: {
-            routingAttributes: prechatData,
-            language: 'en_US'
-          },
+          timing: 'onEmbeddedMessagingReady',
+          fields: { Email: 'dogz@mailinator.com' },
           success: true,
           time: new Date().toISOString()
         });
       } catch (err) {
         console.error('❌ Error setting prechat fields:', err);
-        console.error('Error details:', {
-          message: err.message,
-          stack: err.stack
-        });
         window.prechatDebug.attempts.push({
-          variation: 'routingAttributes format',
-          fields: prechatData,
+          timing: 'onEmbeddedMessagingReady',
+          fields: { Email: 'dogz@mailinator.com' },
           success: false,
           error: err.message,
           time: new Date().toISOString()
