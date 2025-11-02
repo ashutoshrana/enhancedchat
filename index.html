@@ -66,13 +66,24 @@
       <li>Event firing sequence</li>
       <li>Prechat API availability checks</li>
       <li>Field values being sent</li>
+      <li>Expected routingAttributes structure</li>
       <li>Success/error messages</li>
     </ul>
     <p style="background: #fff; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px;">
       <strong>After testing, run:</strong><br>
       <code>console.log(window.prechatDebug)</code>
     </p>
-    <p><strong>Testing Channel Variable Names:</strong> _firstName, _lastName, _email, _subject</p>
+    <p><strong>Data Structure:</strong> Fields wrapped in routingAttributes object</p>
+    <pre style="background: #fff; padding: 8px; border-radius: 4px; font-size: 11px; overflow-x: auto;">
+{
+  "routingAttributes": {
+    "_firstName": "Chat",
+    "_lastName": "TestUser",
+    "_email": "dogz@mailinator.com",
+    "_subject": "Chat Inquiry from Website"
+  },
+  "language": "en_US"
+}</pre>
   </div>
 
   <!-- Your branded launcher -->
@@ -150,18 +161,33 @@
         }
       ];
 
-      // Try the first variation
-      try {
-        const variation = prechatVariations[0];
-        console.log(`🔧 Attempting: ${variation.name}`);
-        console.log('📋 Fields:', JSON.stringify(variation.fields, null, 2));
+      // Prepare the correct structure matching Salesforce's expected format
+      const prechatData = {
+        _firstName: 'Chat',
+        _lastName: 'TestUser',
+        _email: 'dogz@mailinator.com',
+        _subject: 'Chat Inquiry from Website'
+      };
 
-        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(variation.fields);
+      console.log('📋 Prechat data to send:', JSON.stringify(prechatData, null, 2));
+      console.log('📋 Expected structure in routingAttributes:', JSON.stringify({
+        routingAttributes: prechatData,
+        language: 'en_US'
+      }, null, 2));
+
+      try {
+        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatData);
 
         console.log('✅ setHiddenPrechatFields called successfully!');
+        console.log('✅ Data will be wrapped in routingAttributes automatically');
+
         window.prechatDebug.attempts.push({
-          variation: variation.name,
-          fields: variation.fields,
+          variation: 'routingAttributes format',
+          fields: prechatData,
+          expectedStructure: {
+            routingAttributes: prechatData,
+            language: 'en_US'
+          },
           success: true,
           time: new Date().toISOString()
         });
@@ -172,8 +198,8 @@
           stack: err.stack
         });
         window.prechatDebug.attempts.push({
-          variation: prechatVariations[0].name,
-          fields: prechatVariations[0].fields,
+          variation: 'routingAttributes format',
+          fields: prechatData,
           success: false,
           error: err.message,
           time: new Date().toISOString()
