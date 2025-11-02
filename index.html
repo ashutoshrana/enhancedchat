@@ -59,19 +59,39 @@
     <li><strong>Last Name:</strong> TestUser</li>
     <li><strong>Subject:</strong> Chat Inquiry from Website</li>
   </ul>
-  <p style="background: #fff3cd; padding: 12px; border-left: 4px solid #ffc107; margin-top: 20px;">
-    <strong>Note:</strong> Fields use Parameter API Names with underscores (_FirstName, _LastName, _Email, _Subject)
-    to match Messaging Settings Parameter Mappings configuration.
-  </p>
+  <div style="background: #d1ecf1; padding: 16px; border-left: 4px solid #17a2b8; margin-top: 20px; border-radius: 4px;">
+    <h3 style="margin-top: 0; color: #0c5460;">🐛 Debugging Mode Active</h3>
+    <p><strong>Open Browser Console (F12) to see detailed logs:</strong></p>
+    <ul>
+      <li>Event firing sequence</li>
+      <li>Prechat API availability checks</li>
+      <li>Field values being sent</li>
+      <li>Success/error messages</li>
+    </ul>
+    <p style="background: #fff; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+      <strong>After testing, run:</strong><br>
+      <code>console.log(window.prechatDebug)</code>
+    </p>
+    <p><strong>Testing Channel Variable Names:</strong> _firstName, _lastName, _email, _subject</p>
+  </div>
 
   <!-- Your branded launcher -->
   <button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
 
   <script>
+    // DEBUG: Track all prechat attempts
+    window.prechatDebug = {
+      attempts: [],
+      events: []
+    };
+
     // Initialize Embedded Messaging
     function initEmbeddedMessaging() {
       try {
         console.log('🚀 Initializing Salesforce Embedded Messaging...');
+        console.log('📋 Org ID: 00DEc00000GfZ2M');
+        console.log('📋 Deployment: admission_github');
+
         embeddedservice_bootstrap.settings.language = 'en_US';
 
         embeddedservice_bootstrap.init(
@@ -83,34 +103,84 @@
           }
         );
 
+        console.log('✅ Init called successfully');
       } catch (err) {
-        console.error('Error loading Embedded Messaging:', err);
+        console.error('❌ Error loading Embedded Messaging:', err);
       }
     }
 
     // IMPORTANT: Set prechat fields EARLY when messaging is ready (before button creation)
     window.addEventListener('onEmbeddedMessagingReady', () => {
-      console.log('✅ Embedded Messaging Ready - setting prechat fields');
+      console.log('========================================');
+      console.log('✅ EVENT: onEmbeddedMessagingReady FIRED');
+      console.log('========================================');
 
-      // Configure hardcoded prechat fields
-      // CRITICAL: Must use Channel Variable Names (camelCase with underscore prefix)
-      // From Parameter Mappings: _firstName, _lastName, _email, _subject
+      window.prechatDebug.events.push({
+        event: 'onEmbeddedMessagingReady',
+        time: new Date().toISOString()
+      });
+
+      // Check if prechatAPI is available
+      console.log('🔍 Checking prechatAPI availability...');
+      console.log('embeddedservice_bootstrap exists:', typeof embeddedservice_bootstrap !== 'undefined');
+      console.log('prechatAPI exists:', typeof embeddedservice_bootstrap?.prechatAPI !== 'undefined');
+      console.log('setHiddenPrechatFields exists:', typeof embeddedservice_bootstrap?.prechatAPI?.setHiddenPrechatFields === 'function');
+
+      // Try ALL possible field name variations
+      const prechatVariations = [
+        // Variation 1: Channel Variable Names (camelCase)
+        {
+          name: 'Channel Variable (camelCase)',
+          fields: {
+            _firstName: 'Chat',
+            _lastName: 'TestUser',
+            _email: 'dogz@mailinator.com',
+            _subject: 'Chat Inquiry from Website'
+          }
+        },
+        // Variation 2: Flow Variable Names (PascalCase)
+        {
+          name: 'Flow Variable (PascalCase)',
+          fields: {
+            FirstName: 'Chat',
+            LastName: 'TestUser',
+            Email: 'dogz@mailinator.com',
+            Subject: 'Chat Inquiry from Website'
+          }
+        }
+      ];
+
+      // Try the first variation
       try {
-        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-          _firstName: 'Chat',
-          _lastName: 'TestUser',
-          _email: 'dogz@mailinator.com',
-          _subject: 'Chat Inquiry from Website'
-        });
-        console.log('✅ Prechat fields configured:', {
-          _email: 'dogz@mailinator.com',
-          _firstName: 'Chat',
-          _lastName: 'TestUser',
-          _subject: 'Chat Inquiry from Website'
+        const variation = prechatVariations[0];
+        console.log(`🔧 Attempting: ${variation.name}`);
+        console.log('📋 Fields:', JSON.stringify(variation.fields, null, 2));
+
+        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(variation.fields);
+
+        console.log('✅ setHiddenPrechatFields called successfully!');
+        window.prechatDebug.attempts.push({
+          variation: variation.name,
+          fields: variation.fields,
+          success: true,
+          time: new Date().toISOString()
         });
       } catch (err) {
         console.error('❌ Error setting prechat fields:', err);
+        console.error('Error details:', {
+          message: err.message,
+          stack: err.stack
+        });
+        window.prechatDebug.attempts.push({
+          variation: prechatVariations[0].name,
+          fields: prechatVariations[0].fields,
+          success: false,
+          error: err.message,
+          time: new Date().toISOString()
+        });
       }
+
+      console.log('========================================');
     });
 
     // Chat button created - set up custom launcher
@@ -140,8 +210,24 @@
     });
 
     // Conversation events
-    window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
-      console.log('💬 Conversation started - agent connected');
+    window.addEventListener('onEmbeddedMessagingConversationStarted', (event) => {
+      console.log('========================================');
+      console.log('💬 EVENT: onEmbeddedMessagingConversationStarted');
+      console.log('========================================');
+      console.log('Event details:', event.detail);
+
+      window.prechatDebug.events.push({
+        event: 'onEmbeddedMessagingConversationStarted',
+        time: new Date().toISOString(),
+        details: event.detail
+      });
+
+      // Log all prechat attempts for debugging
+      console.log('📊 PRECHAT DEBUG SUMMARY:');
+      console.log('Total attempts:', window.prechatDebug.attempts.length);
+      console.log('Attempts:', window.prechatDebug.attempts);
+      console.log('Events:', window.prechatDebug.events);
+
       document.getElementById('capellaChatBtn').style.display = 'none';
     });
 
