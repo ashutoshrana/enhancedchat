@@ -447,6 +447,17 @@
       try {
         console.log('🚀 Initializing Salesforce Embedded Messaging...');
         embeddedservice_bootstrap.settings.language = 'en_US';
+
+        // Configure hardcoded prechat fields (hidden from user)
+        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+          Email: 'dogz@mailinator.com',
+          FirstName: 'Test',
+          LastName: 'User',
+          Subject: 'Chat Inquiry from Website'
+        });
+
+        console.log('✅ Prechat fields configured: dogz@mailinator.com');
+
         embeddedservice_bootstrap.init(
           '00DEc00000GfZ2M',
           'admission_github',
