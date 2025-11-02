@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Direct Salesforce Chat Test (No Custom Logic)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 { color: #C10016; }
+    .status {
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 8px;
+      background: #f5f5f5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Direct Salesforce Chat Test</h1>
+  <p><strong>Purpose:</strong> Test if Salesforce chat button appears WITHOUT any custom logic</p>
+
+  <div class="status">
+    <h3>What to expect:</h3>
+    <ol>
+      <li>Salesforce chat button should appear in bottom-right corner automatically</li>
+      <li>NO custom "Leave a Message" button</li>
+      <li>NO custom show/hide logic</li>
+      <li>Pure Salesforce default behavior</li>
+    </ol>
+  </div>
+
+  <div class="status">
+    <h3>Console Logs:</h3>
+    <div id="logs" style="font-family: monospace; font-size: 12px;"></div>
+  </div>
+
+  <script>
+    function log(message) {
+      const logsDiv = document.getElementById('logs');
+      const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+      logsDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+      console.log(message);
+    }
+
+    // Track all Salesforce events
+    window.addEventListener('onEmbeddedMessagingReady', () => {
+      log('✅ onEmbeddedMessagingReady fired');
+    });
+
+    window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
+      log('✅ onEmbeddedMessagingButtonCreated fired');
+
+      // Check if button actually exists
+      setTimeout(() => {
+        const salesforceButton = document.querySelector('[data-embedded-messaging-button]');
+        if (salesforceButton) {
+          log('✅ Salesforce chat button found in DOM');
+          log('   Computed style display: ' + window.getComputedStyle(salesforceButton).display);
+          log('   Computed style visibility: ' + window.getComputedStyle(salesforceButton).visibility);
+        } else {
+          log('❌ Salesforce chat button NOT found in DOM');
+        }
+      }, 500);
+    });
+
+    // Initialize Embedded Messaging - MINIMAL configuration
+    function initEmbeddedMessaging() {
+      try {
+        log('🚀 Initializing Embedded Messaging...');
+
+        embeddedservice_bootstrap.settings.language = 'en_US';
+
+        embeddedservice_bootstrap.init(
+          '00DEc00000GfZ2M',
+          'admissiongithub',
+          'https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119',
+          {
+            scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
+          }
+        );
+
+        log('✅ embeddedservice_bootstrap.init() called');
+      } catch (err) {
+        log('❌ Error during init: ' + err.message);
+        console.error('Error loading Embedded Messaging: ', err);
+      }
+    }
+  </script>
+
+  <!-- Salesforce bootstrap -->
+  <script
+    src="https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119/assets/js/bootstrap.min.js"
+    onload="log('✅ Bootstrap script loaded'); initEmbeddedMessaging();"
+    onerror="log('❌ Bootstrap script failed to load');"
+  ></script>
+</body>
+</html>
