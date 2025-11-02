@@ -73,16 +73,19 @@
       <strong>After testing, run:</strong><br>
       <code>console.log(window.prechatDebug)</code>
     </p>
-    <p><strong>Data Structure:</strong> Fields wrapped in routingAttributes object</p>
+    <p><strong>NEW APPROACH:</strong> Prechat fields set at TWO points:</p>
+    <ol style="font-size: 14px;">
+      <li><strong>onEmbeddedMessagingReady</strong> - Early setup</li>
+      <li><strong>Before launchChat()</strong> - Mimics form submission (CRITICAL!)</li>
+    </ol>
     <pre style="background: #fff; padding: 8px; border-radius: 4px; font-size: 11px; overflow-x: auto;">
-{
-  "routingAttributes": {
-    "_firstName": "Chat",
-    "_lastName": "TestUser",
-    "_email": "dogz@mailinator.com",
-    "_subject": "Chat Inquiry from Website"
-  },
-  "language": "en_US"
+Timing: setHiddenPrechatFields() → 100ms delay → launchChat()
+
+Fields: {
+  "_firstName": "Chat",
+  "_lastName": "TestUser",
+  "_email": "dogz@mailinator.com",
+  "_subject": "Chat Inquiry from Website"
 }</pre>
   </div>
 
@@ -222,15 +225,50 @@
       const customBtn = document.getElementById('capellaChatBtn');
       if (customBtn) {
         customBtn.addEventListener('click', () => {
-          console.log('🖱️ Chat button clicked - launching chat');
-          embeddedservice_bootstrap.utilAPI
-            .launchChat()
-            .then(() => {
-              console.log('✅ Chat launched successfully');
-            })
-            .catch((e) => {
-              console.error('❌ Launch Chat failed:', e);
+          console.log('========================================');
+          console.log('🖱️ CHAT BUTTON CLICKED');
+          console.log('========================================');
+
+          // CRITICAL: Set prechat fields RIGHT BEFORE launching chat
+          // This mimics what happens when a user submits a pre-chat form
+          const prechatFields = {
+            _firstName: 'Chat',
+            _lastName: 'TestUser',
+            _email: 'dogz@mailinator.com',
+            _subject: 'Chat Inquiry from Website'
+          };
+
+          console.log('🔧 Setting prechat fields RIGHT BEFORE launch...');
+          console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
+
+          try {
+            // Set prechat fields immediately before launching
+            embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
+            console.log('✅ Prechat fields set successfully BEFORE launch');
+
+            window.prechatDebug.attempts.push({
+              timing: 'Before launchChat()',
+              fields: prechatFields,
+              success: true,
+              time: new Date().toISOString()
             });
+          } catch (err) {
+            console.error('❌ Error setting prechat before launch:', err);
+          }
+
+          // Small delay to ensure prechat data is processed
+          setTimeout(() => {
+            console.log('🚀 Now launching chat...');
+            embeddedservice_bootstrap.utilAPI
+              .launchChat()
+              .then(() => {
+                console.log('✅ Chat launched successfully');
+                console.log('📊 All prechat attempts:', window.prechatDebug.attempts);
+              })
+              .catch((e) => {
+                console.error('❌ Launch Chat failed:', e);
+              });
+          }, 100); // 100ms delay
         });
       }
     });
