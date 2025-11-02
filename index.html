@@ -198,15 +198,15 @@ Expected /conversation POST payload:
         }
       ];
 
-      // Prepare the correct structure matching Salesforce's expected format
+      // CUSTOM HIDDEN PRECHAT FIELD: User created "Email" field in Salesforce
+      // Trying multiple field name variations to find the correct one
       const prechatData = {
-        _firstName: 'Chat',
-        _lastName: 'TestUser',
-        _email: 'dogz@mailinator.com',
-        _subject: 'Chat Inquiry from Website'
+        Email: 'dogz@mailinator.com',           // Custom field (PascalCase)
+        email: 'dogz@mailinator.com',           // Lowercase variation
+        _email: 'dogz@mailinator.com'           // Standard field variation
       };
 
-      console.log('📋 Prechat data to send:', JSON.stringify(prechatData, null, 2));
+      console.log('📋 Prechat data to send (custom Email field):', JSON.stringify(prechatData, null, 2));
       console.log('📋 Expected structure in routingAttributes:', JSON.stringify({
         routingAttributes: prechatData,
         language: 'en_US'
@@ -216,7 +216,7 @@ Expected /conversation POST payload:
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatData);
 
         console.log('✅ setHiddenPrechatFields called successfully!');
-        console.log('✅ Data will be wrapped in routingAttributes automatically');
+        console.log('✅ Passing Email field with value: dogz@mailinator.com');
 
         window.prechatDebug.attempts.push({
           variation: 'routingAttributes format',
@@ -264,21 +264,21 @@ Expected /conversation POST payload:
           console.log('========================================');
 
           // CRITICAL: Set prechat fields RIGHT BEFORE launching chat
-          // This mimics what happens when a user submits a pre-chat form
+          // Using custom Email field configured in Salesforce
           const prechatFields = {
-            _firstName: 'Chat',
-            _lastName: 'TestUser',
-            _email: 'dogz@mailinator.com',
-            _subject: 'Chat Inquiry from Website'
+            Email: 'dogz@mailinator.com',
+            email: 'dogz@mailinator.com',
+            _email: 'dogz@mailinator.com'
           };
 
-          console.log('🔧 Setting prechat fields RIGHT BEFORE launch...');
+          console.log('🔧 Setting prechat Email field RIGHT BEFORE launch...');
+          console.log('📋 Email value: dogz@mailinator.com');
           console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
 
           try {
             // Set prechat fields immediately before launching
             embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
-            console.log('✅ Prechat fields set successfully BEFORE launch');
+            console.log('✅ Email field set successfully BEFORE launch');
 
             window.prechatDebug.attempts.push({
               timing: 'Before launchChat()',
