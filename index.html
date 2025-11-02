@@ -73,19 +73,28 @@
       <strong>After testing, run:</strong><br>
       <code>console.log(window.prechatDebug)</code>
     </p>
-    <p><strong>NEW APPROACH:</strong> Prechat fields set at TWO points:</p>
+    <p><strong>WHAT TO LOOK FOR IN CONSOLE:</strong></p>
     <ol style="font-size: 14px;">
-      <li><strong>onEmbeddedMessagingReady</strong> - Early setup</li>
-      <li><strong>Before launchChat()</strong> - Mimics form submission (CRITICAL!)</li>
+      <li>✅ <code>setHiddenPrechatFields called successfully</code></li>
+      <li>🌐 <code>NETWORK: POST /conversation detected</code></li>
+      <li>✅ <code>routingAttributes found in request!</code></li>
+      <li>📧 <code>Email value: dogz@mailinator.com</code></li>
     </ol>
-    <pre style="background: #fff; padding: 8px; border-radius: 4px; font-size: 11px; overflow-x: auto;">
-Timing: setHiddenPrechatFields() → 100ms delay → launchChat()
-
-Fields: {
-  "_firstName": "Chat",
-  "_lastName": "TestUser",
-  "_email": "dogz@mailinator.com",
-  "_subject": "Chat Inquiry from Website"
+    <div style="background: #fff3cd; padding: 8px; border-left: 3px solid #856404; margin-top: 8px;">
+      <strong>❌ If you see:</strong> <code>routingAttributes MISSING from request</code>
+      <br><strong>Then:</strong> setHiddenPrechatFields is not working correctly
+    </div>
+    <pre style="background: #fff; padding: 8px; border-radius: 4px; font-size: 11px; overflow-x: auto; margin-top: 8px;">
+Expected /conversation POST payload:
+{
+  "routingAttributes": {
+    "_firstName": "Chat",
+    "_lastName": "TestUser",
+    "_email": "dogz@mailinator.com",
+    "_subject": "Chat Inquiry from Website"
+  },
+  "conversationId": "...",
+  "language": "en_US"
 }</pre>
   </div>
 
@@ -96,7 +105,44 @@ Fields: {
     // DEBUG: Track all prechat attempts
     window.prechatDebug = {
       attempts: [],
-      events: []
+      events: [],
+      networkRequests: []
+    };
+
+    // Monitor network requests to verify routingAttributes are sent
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const url = args[0];
+      const options = args[1];
+
+      // Log conversation requests
+      if (url && url.includes('/conversation')) {
+        console.log('🌐 NETWORK: POST /conversation detected');
+
+        if (options && options.body) {
+          try {
+            const body = JSON.parse(options.body);
+            console.log('📤 Request payload:', JSON.stringify(body, null, 2));
+
+            if (body.routingAttributes) {
+              console.log('✅ routingAttributes found in request!');
+              console.log('📧 Email value:', body.routingAttributes._email);
+            } else {
+              console.error('❌ routingAttributes MISSING from request!');
+            }
+
+            window.prechatDebug.networkRequests.push({
+              url: url,
+              body: body,
+              time: new Date().toISOString()
+            });
+          } catch (e) {
+            console.log('Could not parse request body:', e);
+          }
+        }
+      }
+
+      return originalFetch.apply(this, args);
     };
 
     // Initialize Embedded Messaging
