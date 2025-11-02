@@ -109,66 +109,28 @@ Expected /conversation POST payload:
       networkRequests: []
     };
 
-    // CRITICAL: Intercept and inject prechat data into conversation request
+    // Network monitoring for debugging (read-only)
     const originalFetch = window.fetch;
     window.fetch = function(...args) {
       const url = args[0];
-      let options = args[1];
+      const options = args[1];
 
-      // Inject prechat data into /conversation request
-      if (url && url.includes('/conversation')) {
-        console.log('🌐 NETWORK: POST /conversation detected');
+      // Just log, don't modify
+      if (url && url.includes('/conversation') && options && options.body) {
+        try {
+          const body = JSON.parse(options.body);
+          console.log('🌐 NETWORK: POST /conversation');
+          console.log('📤 Payload:', JSON.stringify(body, null, 2));
 
-        if (options && options.body) {
-          try {
-            const body = JSON.parse(options.body);
-            console.log('📤 Original request payload:', JSON.stringify(body, null, 2));
-
-            // CRITICAL: Only inject into conversation CREATION requests (not queries)
-            // Conversation creation requests have: conversationId, language, routingAttributes
-            if (body.conversationId && body.language) {
-              console.log('✅ This is a conversation CREATION request');
-
-              // Check if routingAttributes is empty or missing
-              if (!body.routingAttributes || Object.keys(body.routingAttributes).length === 0) {
-                console.log('⚠️ routingAttributes is empty - INJECTING prechat data!');
-
-                // Inject our prechat data
-                body.routingAttributes = {
-                  _firstName: 'Chat',
-                  _lastName: 'TestUser',
-                  _email: 'dogz@mailinator.com',
-                  _subject: 'Chat Inquiry from Website'
-                };
-
-                // Update the request body with injected data
-                options = {
-                  ...options,
-                  body: JSON.stringify(body)
-                };
-
-                console.log('✅ INJECTED routingAttributes:', JSON.stringify(body.routingAttributes, null, 2));
-                console.log('📤 Modified request payload:', JSON.stringify(body, null, 2));
-              } else {
-                console.log('✅ routingAttributes already populated!');
-                console.log('📧 Email value:', body.routingAttributes._email);
-              }
-
-              window.prechatDebug.networkRequests.push({
-                url: url,
-                body: body,
-                time: new Date().toISOString()
-              });
-            } else {
-              console.log('ℹ️ This is a conversation QUERY request (not creation) - ignoring');
-            }
-          } catch (e) {
-            console.log('Could not parse request body:', e);
+          if (body.routingAttributes && Object.keys(body.routingAttributes).length > 0) {
+            console.log('✅ routingAttributes FOUND:', body.routingAttributes);
+          } else if (body.conversationId) {
+            console.log('❌ routingAttributes EMPTY in conversation creation request');
           }
-        }
+        } catch (e) {}
       }
 
-      return originalFetch.apply(this, [url, options]);
+      return originalFetch.apply(this, args);
     };
 
     // Initialize Embedded Messaging
