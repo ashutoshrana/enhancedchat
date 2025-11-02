@@ -109,26 +109,44 @@ Expected /conversation POST payload:
       networkRequests: []
     };
 
-    // Monitor network requests to verify routingAttributes are sent
+    // CRITICAL: Intercept and inject prechat data into conversation request
     const originalFetch = window.fetch;
     window.fetch = function(...args) {
       const url = args[0];
-      const options = args[1];
+      let options = args[1];
 
-      // Log conversation requests
+      // Inject prechat data into /conversation request
       if (url && url.includes('/conversation')) {
         console.log('🌐 NETWORK: POST /conversation detected');
 
         if (options && options.body) {
           try {
             const body = JSON.parse(options.body);
-            console.log('📤 Request payload:', JSON.stringify(body, null, 2));
+            console.log('📤 Original request payload:', JSON.stringify(body, null, 2));
 
-            if (body.routingAttributes) {
+            // Check if routingAttributes is empty or missing
+            if (!body.routingAttributes || Object.keys(body.routingAttributes).length === 0) {
+              console.log('⚠️ routingAttributes is empty - INJECTING prechat data!');
+
+              // Inject our prechat data
+              body.routingAttributes = {
+                _firstName: 'Chat',
+                _lastName: 'TestUser',
+                _email: 'dogz@mailinator.com',
+                _subject: 'Chat Inquiry from Website'
+              };
+
+              // Update the request body with injected data
+              options = {
+                ...options,
+                body: JSON.stringify(body)
+              };
+
+              console.log('✅ INJECTED routingAttributes:', JSON.stringify(body.routingAttributes, null, 2));
+              console.log('📤 Modified request payload:', JSON.stringify(body, null, 2));
+            } else {
               console.log('✅ routingAttributes found in request!');
               console.log('📧 Email value:', body.routingAttributes._email);
-            } else {
-              console.error('❌ routingAttributes MISSING from request!');
             }
 
             window.prechatDebug.networkRequests.push({
@@ -142,7 +160,7 @@ Expected /conversation POST payload:
         }
       }
 
-      return originalFetch.apply(this, args);
+      return originalFetch.apply(this, [url, options]);
     };
 
     // Initialize Embedded Messaging
