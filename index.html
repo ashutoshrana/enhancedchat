@@ -93,19 +93,20 @@
       console.log('✅ Embedded Messaging Ready - setting prechat fields');
 
       // Configure hardcoded prechat fields
-      // Field names must match Parameter Names from Messaging Settings
+      // CRITICAL: Must use Channel Variable Names (camelCase with underscore prefix)
+      // From Parameter Mappings: _firstName, _lastName, _email, _subject
       try {
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-          'First Name': 'Chat',
-          'Last Name': 'TestUser',
-          'Email': 'dogz@mailinator.com',
-          'Subject': 'Chat Inquiry from Website'
+          _firstName: 'Chat',
+          _lastName: 'TestUser',
+          _email: 'dogz@mailinator.com',
+          _subject: 'Chat Inquiry from Website'
         });
         console.log('✅ Prechat fields configured:', {
-          'Email': 'dogz@mailinator.com',
-          'First Name': 'Chat',
-          'Last Name': 'TestUser',
-          'Subject': 'Chat Inquiry from Website'
+          _email: 'dogz@mailinator.com',
+          _firstName: 'Chat',
+          _lastName: 'TestUser',
+          _subject: 'Chat Inquiry from Website'
         });
       } catch (err) {
         console.error('❌ Error setting prechat fields:', err);
