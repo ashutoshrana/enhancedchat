@@ -124,36 +124,44 @@ Expected /conversation POST payload:
             const body = JSON.parse(options.body);
             console.log('📤 Original request payload:', JSON.stringify(body, null, 2));
 
-            // Check if routingAttributes is empty or missing
-            if (!body.routingAttributes || Object.keys(body.routingAttributes).length === 0) {
-              console.log('⚠️ routingAttributes is empty - INJECTING prechat data!');
+            // CRITICAL: Only inject into conversation CREATION requests (not queries)
+            // Conversation creation requests have: conversationId, language, routingAttributes
+            if (body.conversationId && body.language) {
+              console.log('✅ This is a conversation CREATION request');
 
-              // Inject our prechat data
-              body.routingAttributes = {
-                _firstName: 'Chat',
-                _lastName: 'TestUser',
-                _email: 'dogz@mailinator.com',
-                _subject: 'Chat Inquiry from Website'
-              };
+              // Check if routingAttributes is empty or missing
+              if (!body.routingAttributes || Object.keys(body.routingAttributes).length === 0) {
+                console.log('⚠️ routingAttributes is empty - INJECTING prechat data!');
 
-              // Update the request body with injected data
-              options = {
-                ...options,
-                body: JSON.stringify(body)
-              };
+                // Inject our prechat data
+                body.routingAttributes = {
+                  _firstName: 'Chat',
+                  _lastName: 'TestUser',
+                  _email: 'dogz@mailinator.com',
+                  _subject: 'Chat Inquiry from Website'
+                };
 
-              console.log('✅ INJECTED routingAttributes:', JSON.stringify(body.routingAttributes, null, 2));
-              console.log('📤 Modified request payload:', JSON.stringify(body, null, 2));
+                // Update the request body with injected data
+                options = {
+                  ...options,
+                  body: JSON.stringify(body)
+                };
+
+                console.log('✅ INJECTED routingAttributes:', JSON.stringify(body.routingAttributes, null, 2));
+                console.log('📤 Modified request payload:', JSON.stringify(body, null, 2));
+              } else {
+                console.log('✅ routingAttributes already populated!');
+                console.log('📧 Email value:', body.routingAttributes._email);
+              }
+
+              window.prechatDebug.networkRequests.push({
+                url: url,
+                body: body,
+                time: new Date().toISOString()
+              });
             } else {
-              console.log('✅ routingAttributes found in request!');
-              console.log('📧 Email value:', body.routingAttributes._email);
+              console.log('ℹ️ This is a conversation QUERY request (not creation) - ignoring');
             }
-
-            window.prechatDebug.networkRequests.push({
-              url: url,
-              body: body,
-              time: new Date().toISOString()
-            });
           } catch (e) {
             console.log('Could not parse request body:', e);
           }
