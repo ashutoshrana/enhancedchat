@@ -9,7 +9,17 @@
     :root {
       --capella-red: #C10016;
       --capella-red-dark: #910012;
-      --capella-gray: #e5e7eb;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: var(--capella-red);
     }
 
     /* Your branded circular launcher */
@@ -37,412 +47,24 @@
       outline: 2px solid var(--capella-red);
       outline-offset: 2px;
     }
-
-    /* Contact Us button (shown when agents offline) */
-    #contactUsBtn {
-      background: var(--capella-red);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 12px 24px;
-      border-radius: 25px;
-      position: fixed;
-      right: 50px;
-      bottom: 35px;
-      z-index: 3141591;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(193, 0, 22, 0.3);
-      transition: all 0.2s ease;
-      display: none;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    }
-    #contactUsBtn:hover {
-      background: var(--capella-red-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(193, 0, 22, 0.4);
-    }
-    #contactUsBtn:focus {
-      outline: 2px solid var(--capella-red);
-      outline-offset: 2px;
-    }
-
-    /* Fallback contact form (hidden until needed) */
-    #fallbackForm {
-      position: fixed;
-      right: 20px;
-      bottom: 100px;
-      width: 320px;
-      z-index: 3141592;
-      background: #fff;
-      border: 1px solid var(--capella-gray);
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      display: none;
-      padding: 16px;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      animation: slideInUp 0.3s ease-out;
-    }
-    
-    @keyframes slideInUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    
-    #fallbackForm h2 {
-      font-size: 16px;
-      margin: 0 0 8px;
-      color: var(--capella-red);
-    }
-    #fallbackForm small {
-      color: #6b7280;
-      display: block;
-      margin-bottom: 8px;
-    }
-    #fallbackForm label {
-      display: block;
-      font-size: 13px;
-      margin: 10px 0 4px;
-      font-weight: 500;
-    }
-    #fallbackForm input,
-    #fallbackForm textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-    #fallbackForm input:focus,
-    #fallbackForm textarea:focus {
-      outline: none;
-      border-color: var(--capella-red);
-      box-shadow: 0 0 0 2px rgba(193, 0, 22, 0.1);
-    }
-    #fallbackForm textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-    #fallbackForm .row {
-      display: flex;
-      gap: 8px;
-    }
-    #fallbackForm .row > div {
-      flex: 1;
-    }
-    #fallbackForm .actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    #fallbackForm button {
-      appearance: none;
-      border: 0;
-      border-radius: 10px;
-      padding: 10px 12px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    #fallbackSubmit {
-      background: var(--capella-red);
-      color: #fff;
-      flex: 1;
-    }
-    #fallbackSubmit:hover {
-      background: var(--capella-red-dark);
-    }
-    #fallbackCancel {
-      background: #e5e7eb;
-      color: #111827;
-    }
-    #fallbackBadge {
-      display: inline-block;
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #fde68a;
-      color: #92400e;
-    }
-
-    /* Enhanced Web-to-Case Capella themed form */
-    #caseFormWrapper {
-      display: none;
-      width: 360px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-      padding: 20px 24px;
-      font-family: "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      position: fixed;
-      bottom: 110px;
-      right: 30px;
-      z-index: 3141593;
-      animation: slideInUp 0.3s ease-out;
-      border: 1px solid #e5e7eb;
-    }
-    
-    #caseFormWrapper .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      background: none;
-      border: none;
-      font-size: 18px;
-      color: #999;
-      cursor: pointer;
-      padding: 4px;
-    }
-    #caseFormWrapper .close-btn:hover {
-      color: #666;
-    }
-    
-    #caseFormWrapper h2 {
-      font-size: 16px;
-      color: var(--capella-red);
-      margin-top: 0;
-      margin-bottom: 8px;
-    }
-    #caseFormWrapper .subtitle {
-      color: #666;
-      font-size: 13px;
-      margin-bottom: 16px;
-      line-height: 1.4;
-    }
-    #caseFormWrapper label {
-      display: block;
-      font-weight: 600;
-      color: #333;
-      margin-top: 12px;
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-    #caseFormWrapper input,
-    #caseFormWrapper textarea {
-      width: 100%;
-      font-size: 15px;
-      padding: 8px 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 4px;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      box-sizing: border-box;
-    }
-    #caseFormWrapper input:focus,
-    #caseFormWrapper textarea:focus {
-      outline: none;
-      border-color: var(--capella-red);
-      box-shadow: 0 0 0 1px var(--capella-red);
-    }
-    #caseFormWrapper textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-    #caseFormWrapper button[type="submit"] {
-      margin-top: 16px;
-      width: 100%;
-      background: var(--capella-red);
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      padding: 10px 0;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.2s ease;
-    }
-    #caseFormWrapper button[type="submit"]:hover {
-      background: var(--capella-red-dark);
-      transform: translateY(-1px);
-    }
-    #caseFormWrapper .cancel-btn {
-      margin-top: 8px;
-      width: 100%;
-      background: #f3f4f6;
-      color: #374151;
-      border: none;
-      border-radius: 4px;
-      padding: 8px 0;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    #caseFormWrapper .cancel-btn:hover {
-      background: #e5e7eb;
-    }
-    
-    /* Mobile responsive */
-    @media (max-width: 480px) {
-      #fallbackForm,
-      #caseFormWrapper {
-        right: 10px;
-        left: 10px;
-        width: auto;
-      }
-      #capellaChatBtn {
-        right: 20px;
-      }
-    }
   </style>
 </head>
 <body>
   <h1>Welcome to Salesforce Messaging Test</h1>
-  <p>If the widget is set up correctly, you should see the chat bubble in the corner.</p>
+  <p>Click the chat button in the bottom right corner to start a conversation.</p>
+  <p><strong>Prechat information is automatically configured:</strong></p>
+  <ul>
+    <li>Email: dogz@mailinator.com</li>
+    <li>First Name: Test</li>
+    <li>Last Name: User</li>
+    <li>Subject: Chat Inquiry from Website</li>
+  </ul>
 
   <!-- Your branded launcher -->
   <button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
 
-  <!-- Contact Us button (shown when agents offline) -->
-  <button id="contactUsBtn" aria-label="Contact us">Contact Us</button>
-
-  <!-- Fallback form (original) -->
-  <section id="fallbackForm" aria-live="polite" aria-labelledby="fallbackTitle">
-    <h2 id="fallbackTitle">
-      We're not available right now <span id="fallbackBadge">Fallback</span>
-    </h2>
-    <small id="fallbackReason">Reason: no agent available</small>
-    <form id="fallbackFormEl">
-      <div class="row">
-        <div>
-          <label for="ffName">Name</label>
-          <input id="ffName" name="name" autocomplete="name" required />
-        </div>
-        <div>
-          <label for="ffEmail">Email</label>
-          <input id="ffEmail" name="email" type="email" autocomplete="email" required />
-        </div>
-      </div>
-      <label for="ffSubject">Subject</label>
-      <input id="ffSubject" name="subject" placeholder="How can we help?" />
-      <label for="ffMsg">Message</label>
-      <textarea id="ffMsg" name="message" placeholder="Give us a few details…" required></textarea>
-      <div class="actions">
-        <button id="fallbackSubmit" type="submit">Send</button>
-        <button id="fallbackCancel" type="button">Cancel</button>
-      </div>
-    </form>
-  </section>
-
-  <!-- Enhanced Web-to-Case Form -->
-  <section id="caseFormWrapper">
-    <button type="button" class="close-btn" onclick="hideCaseForm()">×</button>
-    <h2>Submit a Support Request</h2>
-    <p class="subtitle">Our agents are currently unavailable. Please fill out this form and we'll get back to you soon.</p>
-    <form id="caseForm"
-      action="https://strategiced--qasf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8"
-      method="POST"
-      onsubmit="return validateCaseForm()">
-      <input type="hidden" name="orgid" value="00DEc00000GfZ2M">
-      <input type="hidden" name="retURL" value="https://www.google.com/">
-
-      <label for="case_name">* Name</label>
-      <input id="case_name" name="name" type="text" maxlength="80" required 
-             placeholder="Enter your full name" />
-
-      <label for="case_email">* Email</label>
-      <input id="case_email" name="email" type="email" maxlength="80" required 
-             placeholder="your.email@example.com" />
-
-      <label for="case_description">* Inquiry</label>
-      <textarea id="case_description" name="description" required 
-                placeholder="Please describe your inquiry or issue..."></textarea>
-
-      <button type="submit">Submit Request</button>
-      <button type="button" class="cancel-btn" onclick="hideCaseForm()">Cancel</button>
-    </form>
-  </section>
-
   <script>
-    // --- Enhanced helpers to show/hide fallback and web-to-case form
-    function showFallback(reasonText) {
-      const f = document.getElementById('fallbackForm');
-      const r = document.getElementById('fallbackReason');
-      if (r && reasonText) r.textContent = 'Reason: ' + reasonText;
-      if (f) f.style.display = 'block';
-
-      // Hide chat button and show Contact Us button when offline
-      const chatBtn = document.getElementById('capellaChatBtn');
-      const contactBtn = document.getElementById('contactUsBtn');
-      if (chatBtn) chatBtn.style.display = 'none';
-      if (contactBtn) contactBtn.style.display = 'block';
-    }
-
-    function hideFallback() {
-      const f = document.getElementById('fallbackForm');
-      if (f) f.style.display = 'none';
-    }
-
-    function showCaseForm() {
-      console.log('🔄 Activating Web-to-Case fallback - agents unavailable');
-
-      // Hide all Salesforce chat elements
-      const chatElements = document.querySelectorAll(
-        '.embeddedMessagingFrame, .embeddedMessagingLauncher, #embeddedMessagingFrame, .helpButtonEnabled, .helpButtonDisabled'
-      );
-      chatElements.forEach((el) => {
-        el.style.display = 'none';
-        console.log('Hidden:', el.className || el.id);
-      });
-
-      // Hide custom chat button and show Contact Us button
-      const chatBtn = document.getElementById('capellaChatBtn');
-      const contactBtn = document.getElementById('contactUsBtn');
-      if (chatBtn) chatBtn.style.display = 'none';
-      if (contactBtn) contactBtn.style.display = 'block';
-
-      // Hide fallback form if showing
-      hideFallback();
-
-      // Show web-to-case form
-      const caseForm = document.getElementById('caseFormWrapper');
-      if (caseForm) {
-        caseForm.style.display = 'block';
-        // Focus first input for better UX
-        setTimeout(() => {
-          const firstInput = caseForm.querySelector('input');
-          if (firstInput) firstInput.focus();
-        }, 300);
-      }
-    }
-
-    function hideCaseForm() {
-      const caseForm = document.getElementById('caseFormWrapper');
-      if (caseForm) caseForm.style.display = 'none';
-
-      // Show Contact Us button, keep chat button hidden
-      const contactBtn = document.getElementById('contactUsBtn');
-      if (contactBtn) contactBtn.style.display = 'block';
-
-      // Re-enable detection when form is closed
-      fallbackTriggered = false;
-      detectionActive = true;
-      console.log('🔄 Re-enabled offline detection after form close');
-    }
-
-    function validateCaseForm() {
-      const form = document.getElementById('caseForm');
-      const requiredFields = form.querySelectorAll('[required]');
-      
-      for (let field of requiredFields) {
-        if (!field.value.trim()) {
-          field.focus();
-          alert(`Please fill in: ${field.previousElementSibling.textContent}`);
-          return false;
-        }
-      }
-      
-      // Email validation
-      const email = document.getElementById('case_email');
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email.value)) {
-        email.focus();
-        alert('Please enter a valid email address.');
-        return false;
-      }
-      
-      console.log('✅ Form validated, submitting case...');
-      return true;
-    }
-
-    // --- initialize Embedded Messaging
+    // Initialize Embedded Messaging with prechat fields
     function initEmbeddedMessaging() {
       try {
         console.log('🚀 Initializing Salesforce Embedded Messaging...');
@@ -467,376 +89,53 @@
           }
         );
 
-        // Timeout fallback - if chat doesn't initialize properly within 45 seconds
-        setTimeout(() => {
-          if (!chatInitialized) {
-            console.warn('⏰ Chat initialization timeout after 45s');
-            // Only show Contact Us button if no chat button is visible
-            const chatButton = document.querySelector('.helpButtonEnabled, #capellaChatBtn');
-            const chatVisible = chatButton && window.getComputedStyle(chatButton).display !== 'none';
-            if (!chatVisible) {
-              console.log('⏰ No visible chat button found - showing Contact Us button');
-              const chatBtn = document.getElementById('capellaChatBtn');
-              const contactBtn = document.getElementById('contactUsBtn');
-              if (chatBtn) chatBtn.style.display = 'none';
-              if (contactBtn) contactBtn.style.display = 'block';
-            } else {
-              console.log('✅ Chat button is visible');
-            }
-          }
-        }, 45000);
-
       } catch (err) {
-        console.error('Error loading Embedded Messaging: ', err);
-        showFallback('client initialization error');
+        console.error('Error loading Embedded Messaging:', err);
       }
     }
 
-    // --- Chat Lifecycle Events
+    // Chat button created - set up custom launcher
     window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
       console.log('✅ Chat button created - ready to launch');
 
+      // Hide default Salesforce button
       if (embeddedservice_bootstrap.utilAPI?.hideChatButton) {
         embeddedservice_bootstrap.utilAPI.hideChatButton();
       }
 
-      // Mark chat as initialized but DON'T start detection yet
-      chatInitialized = true;
-
+      // Set up custom button click handler
       const customBtn = document.getElementById('capellaChatBtn');
       if (customBtn) {
         customBtn.addEventListener('click', () => {
-          hideFallback();
-          hideCaseForm();
-
           console.log('🖱️ Chat button clicked - launching chat');
-
           embeddedservice_bootstrap.utilAPI
             .launchChat()
             .then(() => {
               console.log('✅ Chat launched successfully');
-
-              // ONLY NOW enable offline detection after chat is actually launched
-              fallbackTriggered = false;
-              detectionActive = true;
-
-              console.log('🔍 Starting offline detection after chat launch');
-              enableOfflineDetection();
-
-              // Start immediate offline check after launch
-              setTimeout(() => {
-                checkForOfflineMessage();
-              }, 1500);
             })
             .catch((e) => {
               console.error('❌ Launch Chat failed:', e);
-              showFallback('could not launch chat');
             });
         });
       }
-
-      // Contact Us button click handler
-      const contactUsBtn = document.getElementById('contactUsBtn');
-      if (contactUsBtn) {
-        contactUsBtn.addEventListener('click', () => {
-          console.log('🖱️ Contact Us button clicked - showing case form');
-          showCaseForm();
-        });
-      }
     });
 
+    // Conversation events
     window.addEventListener('onEmbeddedMessagingConversationStarted', () => {
       console.log('💬 Conversation started - agent connected');
       document.getElementById('capellaChatBtn').style.display = 'none';
-      hideFallback();
-      hideCaseForm();
-
-      // Stop offline detection since conversation has started successfully
-      detectionActive = false;
-      fallbackTriggered = false;
     });
+
     window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
       document.getElementById('capellaChatBtn').style.display = 'none';
     });
+
     window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
       document.getElementById('capellaChatBtn').style.display = 'block';
     });
+
     window.addEventListener('onEmbeddedMessagingConversationClosed', () => {
       document.getElementById('capellaChatBtn').style.display = 'block';
-    });
-
-    // --- Business hours / routing fallback
-    window.addEventListener('onEmbeddedMessagingBusinessHoursEnded', () => showFallback('outside business hours'));
-    window.addEventListener('onEmbeddedMessagingWithinBusinessHours', hideFallback);
-
-    window.addEventListener('onEmbeddedMessagingConversationRouted', (e) => {
-      console.log('📋 Conversation routing event:', e.detail);
-
-      const payload = e?.detail || {};
-      const failed =
-        payload?.success === false ||
-        payload?.status === 'Failed' ||
-        payload?.routingResult?.isSuccessful === false ||
-        payload?.routingOutcome === 'UNSUCCESSFUL' ||
-        payload?.error?.type === 'NO_AGENT_AVAILABLE' ||
-        payload?.error?.message?.toLowerCase()?.includes('no agent');
-
-      if (failed) {
-        console.log('❌ Routing failed - showing web-to-case form');
-        console.log('Failed routing details:', JSON.stringify(payload, null, 2));
-        triggerOfflineFallback();
-        try {
-          embeddedservice_bootstrap.utilAPI?.clearSession?.();
-        } catch (_) {}
-      } else {
-        console.log('✅ Routing successful - agent available');
-        // Ensure fallback is hidden if routing succeeds
-        fallbackTriggered = false;
-        const caseForm = document.getElementById('caseFormWrapper');
-        if (caseForm && caseForm.style.display === 'block') {
-          hideCaseForm();
-        }
-      }
-    });
-
-    // --- Enhanced detection for "No Agents Online" message
-    let detectionActive = false; // Start as false, enable after chat LAUNCH (not just initialization)
-    let chatInitialized = false;
-    let fallbackTriggered = false; // Prevent duplicate triggers
-
-    // Enable detection only after user clicks chat button and chat is launched
-    function enableOfflineDetection() {
-      console.log('🔍 Enabling offline message detection...');
-      detectionActive = true;
-      fallbackTriggered = false; // Reset on re-enable
-
-      // Start monitoring after a short delay to ensure chat window is fully loaded
-      setTimeout(() => {
-        startOfflineDetection();
-      }, 1000);
-    }
-    
-    function startOfflineDetection() {
-      if (!detectionActive) return;
-
-      const observer = new MutationObserver((mutations) => {
-        if (!detectionActive || fallbackTriggered) return;
-
-        // Only check mutations in specific areas likely to contain chat content
-        let shouldCheck = false;
-        mutations.forEach(mutation => {
-          if (mutation.target && (
-            mutation.target.classList?.contains('embeddedMessaging') ||
-            mutation.target.classList?.contains('messaging') ||
-            mutation.target.classList?.contains('slds') ||
-            mutation.target.classList?.contains('chasitor') ||
-            mutation.target.tagName === 'IFRAME' ||
-            mutation.target.closest('iframe') ||
-            mutation.target.closest('.embeddedMessaging')
-          )) {
-            shouldCheck = true;
-          }
-        });
-
-        if (!shouldCheck) return;
-
-        // Add small delay to ensure content is fully rendered
-        setTimeout(() => {
-          if (!fallbackTriggered) {
-            checkForOfflineMessage();
-          }
-        }, 500);
-      });
-
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        characterData: true
-      });
-
-      console.log('🔍 Started monitoring for offline messages');
-
-      // Also start interval-based monitoring
-      monitorIframeChanges();
-    }
-    
-    function checkForOfflineMessage() {
-      if (!detectionActive || fallbackTriggered) return;
-
-      // First verify chat window is actually open/visible
-      const chatWindow = document.querySelector('.embeddedMessagingFrame, [class*="messaging"]');
-      if (!chatWindow || window.getComputedStyle(chatWindow).display === 'none') {
-        console.log('🔍 Chat window not visible, skipping offline check');
-        return;
-      }
-
-      // Check in iframe content first (most reliable)
-      const iframes = document.querySelectorAll('iframe[src*="salesforce"], iframe[title*="chat"], iframe[title*="messaging"], .embeddedMessagingFrame');
-      for (let iframe of iframes) {
-        // Skip if iframe is not visible
-        if (window.getComputedStyle(iframe).display === 'none') continue;
-
-        try {
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          if (iframeDoc && iframeDoc.body) {
-            const iframeText = iframeDoc.body.innerText || iframeDoc.body.textContent || '';
-            if (
-              iframeText.includes('No Agents Online') ||
-              iframeText.includes('No agents are available') ||
-              iframeText.includes('Please try Later') ||
-              iframeText.includes('currently unavailable') ||
-              iframeText.toLowerCase().includes('no agent')
-            ) {
-              console.log('🔍 Detected offline message in iframe:', iframeText.substring(0, 100));
-              triggerOfflineFallback();
-              return;
-            }
-          }
-        } catch (e) {
-          // Cross-origin iframe - expected, continue checking
-        }
-      }
-
-      // Check in messaging containers
-      const messagingContainers = document.querySelectorAll(
-        '.embeddedMessaging, [class*="messaging"], [id*="messaging"], [class*="slds"], [class*="chasitor"]'
-      );
-      for (let container of messagingContainers) {
-        const containerText = container.innerText || container.textContent || '';
-        if (
-          containerText.includes('No Agents Online') ||
-          containerText.includes('No agents are available') ||
-          containerText.includes('Please try Later') ||
-          containerText.includes('currently unavailable') ||
-          containerText.toLowerCase().includes('no agent')
-        ) {
-          console.log('🔍 Detected offline message in messaging container:', containerText.substring(0, 100));
-          triggerOfflineFallback();
-          return;
-        }
-      }
-
-      // Check for hidden status messages or data attributes
-      const statusElements = document.querySelectorAll('[data-status], [aria-live], [role="status"]');
-      for (let element of statusElements) {
-        const statusText = element.innerText || element.textContent || '';
-        const dataStatus = element.getAttribute('data-status') || '';
-        if (
-          statusText.toLowerCase().includes('no agent') ||
-          statusText.toLowerCase().includes('unavailable') ||
-          dataStatus.toLowerCase().includes('offline') ||
-          dataStatus.toLowerCase().includes('unavailable')
-        ) {
-          console.log('🔍 Detected offline status in status element');
-          triggerOfflineFallback();
-          return;
-        }
-      }
-    }
-    
-    function triggerOfflineFallback() {
-      if (fallbackTriggered) {
-        console.log('⚠️ Fallback already triggered, skipping duplicate');
-        return;
-      }
-
-      console.log('🚨 Triggering offline fallback');
-      fallbackTriggered = true;
-      detectionActive = false;
-      showCaseForm();
-    }
-
-    // Additional monitoring for iframe content changes
-    function monitorIframeChanges() {
-      if (!detectionActive) return;
-
-      const checkInterval = setInterval(() => {
-        if (!detectionActive || fallbackTriggered) {
-          clearInterval(checkInterval);
-          return;
-        }
-
-        checkForOfflineMessage();
-      }, 2000); // Check every 2 seconds (increased frequency)
-
-      // Stop monitoring after 3 minutes (reduced from 5 minutes)
-      setTimeout(() => {
-        clearInterval(checkInterval);
-        if (detectionActive) {
-          console.log('🔍 Stopped iframe monitoring after timeout');
-        }
-      }, 180000);
-    }
-
-    // --- Fallback form handlers
-    document.getElementById('fallbackCancel').addEventListener('click', hideFallback);
-    document.getElementById('fallbackFormEl').addEventListener('submit', (ev) => {
-      ev.preventDefault();
-      
-      // Simple validation
-      const form = ev.currentTarget;
-      const required = form.querySelectorAll('[required]');
-      for (let field of required) {
-        if (!field.value.trim()) {
-          field.focus();
-          alert(`Please fill in: ${field.labels?.[0]?.textContent || field.name}`);
-          return;
-        }
-      }
-      
-      // Simulate submission
-      const submitBtn = document.getElementById('fallbackSubmit');
-      submitBtn.textContent = 'Sending...';
-      submitBtn.disabled = true;
-      
-      setTimeout(() => {
-        form.reset();
-        const badge = document.getElementById('fallbackBadge');
-        if (badge) {
-          badge.textContent = 'Submitted';
-          badge.style.background = '#dcfce7';
-          badge.style.color = '#166534';
-        }
-        setTimeout(() => {
-          hideFallback();
-          submitBtn.textContent = 'Send';
-          submitBtn.disabled = false;
-        }, 1200);
-      }, 1000);
-    });
-
-    // Global error handler for chat bootstrap failures
-    window.addEventListener('error', (event) => {
-      if (event.filename && event.filename.includes('bootstrap')) {
-        console.error('Chat bootstrap error - showing fallback');
-        showFallback('chat system error');
-      }
-    });
-
-    // Manual trigger for testing (remove in production)
-    window.testShowCaseForm = function() {
-      console.log('🧪 Manual trigger: showing case form for testing');
-      showCaseForm();
-    };
-    
-    window.testHideCaseForm = function() {
-      console.log('🧪 Manual trigger: hiding case form');
-      hideCaseForm();
-    };
-    
-    // Listen for PostMessage events from iframe (alternative detection method)
-    window.addEventListener('message', (event) => {
-      if (!detectionActive) return;
-      
-      // Check if message indicates offline status
-      const data = event.data;
-      if (typeof data === 'string' && data.toLowerCase().includes('no agents')) {
-        console.log('🔍 Detected offline status via postMessage:', data);
-        triggerOfflineFallback();
-      } else if (typeof data === 'object' && data.type === 'chat_offline') {
-        console.log('🔍 Received chat offline notification');
-        triggerOfflineFallback();
-      }
     });
   </script>
 
@@ -844,7 +143,6 @@
   <script
     src="https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119/assets/js/bootstrap.min.js"
     onload="initEmbeddedMessaging()"
-    onerror="showFallback('bootstrap failed to load')"
   ></script>
 </body>
 </html>
