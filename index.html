@@ -409,11 +409,13 @@
         embeddedservice_bootstrap.settings.language = 'en_US';
         embeddedservice_bootstrap.init(
           '00DEc00000GfZ2M',
-          'test_embed',
-          'https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724',
-          { scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com' }
+          'Embedded_Deployment_admission_for_Github',
+          'https://strategiced--qasf.sandbox.my.site.com/ESWEmbeddedDeploymentad1761917017154',
+          {
+            scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
+          }
         );
-        
+
         // Timeout fallback - if chat doesn't initialize properly within 45 seconds
         setTimeout(() => {
           if (!chatInitialized) {
@@ -429,7 +431,7 @@
             }
           }
         }, 45000);
-        
+
       } catch (err) {
         console.error('Error loading Embedded Messaging: ', err);
         showFallback('client initialization error');
@@ -777,7 +779,7 @@
 
   <!-- Salesforce bootstrap -->
   <script
-    src="https://strategiced--qasf.sandbox.my.site.com/ESWtestembed1760850249724/assets/js/bootstrap.min.js"
+    src="https://strategiced--qasf.sandbox.my.site.com/ESWEmbeddedDeploymentad1761917017154/assets/js/bootstrap.min.js"
     onload="initEmbeddedMessaging()"
     onerror="showFallback('bootstrap failed to load')"
   ></script>
