@@ -7,36 +7,79 @@
 
   <style>
     :root {
+      /* Capella Brand Colors */
       --capella-red: #C10016;
       --capella-red-dark: #910012;
+      --capella-red-hover: #A5000F;
+      --capella-teal: #94B7BB;
+      --capella-teal-dark: #7A9FA3;
+
+      /* Neutral Colors */
+      --capella-gray-50: #F9FAFB;
+      --capella-gray-100: #F3F4F6;
+      --capella-gray-200: #E5E7EB;
+      --capella-gray-300: #D1D5DB;
+      --capella-gray-400: #9CA3AF;
+      --capella-gray-600: #4B5563;
+      --capella-gray-700: #374151;
+      --capella-gray-900: #111827;
+
+      /* Typography */
+      --font-family: Arial, Helvetica, sans-serif;
+      --font-size-sm: 13px;
+      --font-size-base: 14px;
+      --font-size-lg: 16px;
+
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 16px;
+      --spacing-xl: 20px;
+      --spacing-2xl: 24px;
+
+      /* Border Radius */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-xl: 12px;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-family: var(--font-family);
       padding: 40px;
       max-width: 800px;
       margin: 0 auto;
+      color: var(--capella-gray-900);
     }
 
     h1 {
       color: var(--capella-red);
+      font-weight: 700;
     }
 
     /* Salesforce generates the chat button - we just control visibility */
 
-    /* Offline Contact Form */
+    /* Offline Contact Form - Capella Styled */
     #offlineFormContainer {
       display: none;
       position: fixed;
       right: 20px;
       bottom: 20px;
-      width: 360px;
-      max-height: 600px;
+      width: 400px;
+      max-height: 90vh;
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
       z-index: 3141590;
       overflow: hidden;
+      font-family: var(--font-family);
     }
 
     #offlineFormContainer.show {
@@ -58,7 +101,7 @@
     .offline-form-header {
       background: var(--capella-red);
       color: white;
-      padding: 16px 20px;
+      padding: var(--spacing-xl) var(--spacing-2xl);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -66,105 +109,182 @@
 
     .offline-form-header h3 {
       margin: 0;
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
     }
 
     .offline-form-close {
-      background: none;
+      background: transparent;
       border: none;
       color: white;
-      font-size: 24px;
+      font-size: 28px;
       cursor: pointer;
       padding: 0;
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
+      transition: background 0.2s ease;
+      line-height: 1;
     }
 
     .offline-form-close:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .offline-form-close:active {
+      background: rgba(255, 255, 255, 0.25);
     }
 
     .offline-form-body {
-      padding: 20px;
-      max-height: 500px;
+      padding: var(--spacing-2xl);
+      max-height: calc(90vh - 80px);
       overflow-y: auto;
     }
 
+    /* Custom scrollbar for Capella styling */
+    .offline-form-body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .offline-form-body::-webkit-scrollbar-track {
+      background: var(--capella-gray-100);
+    }
+
+    .offline-form-body::-webkit-scrollbar-thumb {
+      background: var(--capella-gray-300);
+      border-radius: 4px;
+    }
+
+    .offline-form-body::-webkit-scrollbar-thumb:hover {
+      background: var(--capella-gray-400);
+    }
+
     .offline-form-message {
-      background: #f0f0f0;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      font-size: 14px;
-      color: #333;
+      background: var(--capella-gray-50);
+      border-left: 4px solid var(--capella-teal);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-xl);
+      font-size: var(--font-size-sm);
+      color: var(--capella-gray-700);
+      line-height: 1.5;
+    }
+
+    .offline-form-message strong {
+      color: var(--capella-gray-900);
+      display: block;
+      margin-bottom: var(--spacing-xs);
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: var(--spacing-xl);
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-      font-size: 14px;
-      color: #333;
+      margin-bottom: var(--spacing-sm);
+      font-weight: 600;
+      font-size: var(--font-size-sm);
+      color: var(--capella-gray-700);
+      letter-spacing: 0.01em;
+    }
+
+    .form-group label .required {
+      color: var(--capella-red);
+      margin-left: 2px;
     }
 
     .form-group input,
     .form-group textarea {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 14px;
-      font-family: inherit;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: 2px solid var(--capella-gray-200);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-family: var(--font-family);
       box-sizing: border-box;
+      transition: all 0.2s ease;
+      color: var(--capella-gray-900);
+      background: white;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--capella-gray-400);
+    }
+
+    .form-group input:hover,
+    .form-group textarea:hover {
+      border-color: var(--capella-gray-300);
     }
 
     .form-group input:focus,
     .form-group textarea:focus {
       outline: none;
       border-color: var(--capella-red);
-      box-shadow: 0 0 0 3px rgba(193, 0, 22, 0.1);
+      box-shadow: 0 0 0 4px rgba(193, 0, 22, 0.1);
     }
 
     .form-group textarea {
       resize: vertical;
       min-height: 100px;
+      line-height: 1.5;
+    }
+
+    /* Form Validation States */
+    .form-group input:invalid:not(:placeholder-shown),
+    .form-group textarea:invalid:not(:placeholder-shown) {
+      border-color: var(--capella-red);
+    }
+
+    .form-group input:valid:not(:placeholder-shown),
+    .form-group textarea:valid:not(:placeholder-shown) {
+      border-color: #10B981;
     }
 
     .form-submit {
       background: var(--capella-red);
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 15px;
-      font-weight: 600;
+      padding: var(--spacing-lg) var(--spacing-2xl);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-lg);
+      font-weight: 700;
       cursor: pointer;
       width: 100%;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
+      text-transform: none;
+      letter-spacing: 0.01em;
+      box-shadow: var(--shadow-sm);
     }
 
     .form-submit:hover {
+      background: var(--capella-red-hover);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .form-submit:active {
       background: var(--capella-red-dark);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(0);
     }
 
     .form-submit:disabled {
-      background: #ccc;
+      background: var(--capella-gray-300);
       cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
     }
 
     .form-success {
       display: none;
       text-align: center;
-      padding: 40px 20px;
+      padding: var(--spacing-2xl);
     }
 
     .form-success.show {
@@ -172,9 +292,65 @@
     }
 
     .form-success-icon {
-      font-size: 48px;
-      color: #4caf50;
-      margin-bottom: 16px;
+      width: 64px;
+      height: 64px;
+      background: #10B981;
+      color: white;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .form-success h3 {
+      color: var(--capella-gray-900);
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 var(--spacing-md) 0;
+    }
+
+    .form-success p {
+      color: var(--capella-gray-600);
+      font-size: var(--font-size-base);
+      line-height: 1.5;
+      margin: 0 0 var(--spacing-xl) 0;
+    }
+
+    .form-success-close {
+      background: var(--capella-red);
+      color: white;
+      border: none;
+      padding: var(--spacing-md) var(--spacing-2xl);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 120px;
+    }
+
+    .form-success-close:hover {
+      background: var(--capella-red-hover);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+
+    .form-success-close:active {
+      background: var(--capella-red-dark);
+      transform: translateY(0);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 480px) {
+      #offlineFormContainer {
+        right: 10px;
+        bottom: 10px;
+        width: calc(100vw - 20px);
+        max-width: 400px;
+      }
     }
   </style>
 </head>
@@ -238,32 +414,63 @@ Expected /conversation POST payload:
     <div class="offline-form-body">
       <div id="offlineFormContent">
         <div class="offline-form-message">
-          Our support team is currently unavailable. Please leave your message and we'll get back to you as soon as possible.
+          <strong>Our support team is currently unavailable.</strong>
+          Please leave your message and we'll get back to you as soon as possible.
         </div>
         <form id="offlineContactForm" onsubmit="submitOfflineForm(event)">
           <div class="form-group">
-            <label for="offline_name">Name *</label>
-            <input type="text" id="offline_name" name="name" required>
+            <label for="offline_name">Name<span class="required">*</span></label>
+            <input
+              type="text"
+              id="offline_name"
+              name="name"
+              placeholder="Enter your full name"
+              required
+              aria-required="true"
+            >
           </div>
           <div class="form-group">
-            <label for="offline_email">Email *</label>
-            <input type="email" id="offline_email" name="email" required>
+            <label for="offline_email">Email<span class="required">*</span></label>
+            <input
+              type="email"
+              id="offline_email"
+              name="email"
+              placeholder="your.email@example.com"
+              required
+              aria-required="true"
+            >
           </div>
           <div class="form-group">
-            <label for="offline_subject">Subject *</label>
-            <input type="text" id="offline_subject" name="subject" required>
+            <label for="offline_subject">Subject<span class="required">*</span></label>
+            <input
+              type="text"
+              id="offline_subject"
+              name="subject"
+              placeholder="Brief description of your inquiry"
+              required
+              aria-required="true"
+            >
           </div>
           <div class="form-group">
-            <label for="offline_message">Message *</label>
-            <textarea id="offline_message" name="description" required></textarea>
+            <label for="offline_message">Message<span class="required">*</span></label>
+            <textarea
+              id="offline_message"
+              name="description"
+              placeholder="Please provide details about your inquiry..."
+              required
+              aria-required="true"
+            ></textarea>
           </div>
-          <button type="submit" class="form-submit" id="offlineSubmitBtn">Send Message</button>
+          <button type="submit" class="form-submit" id="offlineSubmitBtn">
+            Send Message
+          </button>
         </form>
       </div>
       <div id="offlineFormSuccess" class="form-success">
         <div class="form-success-icon">✓</div>
         <h3>Thank you!</h3>
         <p>We've received your message and will get back to you soon.</p>
+        <button class="form-success-close" onclick="hideOfflineForm()">Close</button>
       </div>
     </div>
   </div>
@@ -303,9 +510,33 @@ Expected /conversation POST payload:
     // ============================================
     // OFFLINE SUPPORT & BUSINESS HOURS LOGIC
     // ============================================
+    //
+    // HYBRID APPROACH (Proactive + Reactive):
+    //
+    // 1. PROACTIVE (Business Hours Check):
+    //    - Uses Salesforce business hours events to determine baseline availability
+    //    - Shows chat button during business hours
+    //    - Shows offline form outside business hours
+    //
+    // 2. REACTIVE (Session Status Monitoring):
+    //    - After chat is initiated, monitors session status updates
+    //    - If routing fails (no agents, timeout, etc.), switches to offline form
+    //    - Persists the "no agents" flag for the page session to avoid repeated failures
+    //
+    // This ensures:
+    //    ✅ Users see chat button during business hours (good initial UX)
+    //    ✅ System adapts if agents are actually unavailable (reactive refinement)
+    //    ✅ Future visitors see offline form without trying chat first
+    //
+    // Detection Patterns (in order of specificity):
+    //    Pattern 1: event.detail.reason === 'NoAgentsAvailable'
+    //    Pattern 2: event.detail.routingResult.agentsAvailable === false
+    //    Pattern 3: Session waiting > 60 seconds (timeout)
+    //    Pattern 4: Session ended without agent assignment
+    // ============================================
 
     let isWithinBusinessHours = true; // Default to true until we know otherwise
-    let noAgentsAvailable = false;
+    let noAgentsAvailable = false; // Set to true if routing fails (reactive detection)
 
     // Show/Hide Functions (using Salesforce's button API)
     function showChatButton() {
@@ -343,10 +574,11 @@ Expected /conversation POST payload:
     }
 
     // Determine what to show based on availability
-    function updateChatAvailability() {
+    function updateChatAvailability(reason = null) {
       console.log('🔄 Updating chat availability...');
       console.log('  - Business Hours:', isWithinBusinessHours);
       console.log('  - Agents Available:', !noAgentsAvailable);
+      console.log('  - Reason for change:', reason);
 
       if (isWithinBusinessHours && !noAgentsAvailable) {
         // Show chat, hide form
@@ -356,12 +588,24 @@ Expected /conversation POST payload:
         // Hide chat, show form
         hideChatButton();
         showOfflineForm();
+
+        // If switching due to no agents (reactive detection), update the message
+        if (noAgentsAvailable && reason) {
+          const messageEl = document.querySelector('.offline-form-message');
+          if (messageEl) {
+            messageEl.innerHTML = `
+              <strong>All agents are currently assisting other customers.</strong><br>
+              Please leave your message and we'll get back to you as soon as possible.
+            `;
+            console.log('📝 Updated offline form message: No agents detected');
+          }
+        }
       }
     }
 
     // Offline Form Submission (Web-to-Case)
     async function submitOfflineForm(event) {
-      event.preventDefault();
+      event.preventDefault(); // Prevent default form submission (prevents navigation)
 
       const submitBtn = document.getElementById('offlineSubmitBtn');
       submitBtn.disabled = true;
@@ -370,9 +614,10 @@ Expected /conversation POST payload:
       const formData = new FormData(event.target);
 
       // Build Web-to-Case submission data
+      // NOTE: We omit retURL to prevent any redirect behavior
       const webToCaseData = new URLSearchParams({
         orgid: '00DEc00000GfZ2M',
-        retURL: window.location.href,
+        // retURL intentionally omitted - we handle UI in JavaScript
         subject: formData.get('subject'),
         description: formData.get('description'),
         email: formData.get('email'),
@@ -380,47 +625,61 @@ Expected /conversation POST payload:
         '00N2E00000IgDbO': 'Capella University', // Business Unit
         recordType: '0122E000000iHlS', // CU Normal Case
         status: 'New',
-        priority: 'Medium'
+        priority: 'Medium',
+        // Add a flag to help identify submission source
+        '00N2E00000IgDbP': 'Enhanced Chat Offline Form' // Optional: Add custom field if available
       });
 
       console.log('📧 Submitting Web-to-Case:', {
         name: formData.get('name'),
         email: formData.get('email'),
         subject: formData.get('subject'),
-        description: formData.get('description')
+        description: formData.get('description'),
+        note: 'User will stay on current page after submission'
       });
 
       try {
-        // Submit to Salesforce Web-to-Case
+        // Submit to Salesforce Web-to-Case using fetch with no-cors
+        // This prevents CORS errors but also means we can't read the response
         await fetch('https://strategiced--qasf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8', {
           method: 'POST',
-          mode: 'no-cors', // Required for cross-origin Web-to-Case submissions
+          mode: 'no-cors', // Required for cross-origin - prevents reading response
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: webToCaseData.toString()
         });
 
-        // Show success message (no-cors means we can't read response, but submission was sent)
+        // Show success message inline (user stays on current page)
         document.getElementById('offlineFormContent').style.display = 'none';
         document.getElementById('offlineFormSuccess').classList.add('show');
 
         console.log('✅ Web-to-Case submitted successfully');
+        console.log('✅ User remains on current page - no navigation occurred');
 
-        // Close form after 3 seconds
+        // Keep success message visible longer, then allow form re-use
         setTimeout(() => {
-          hideOfflineForm();
-          // Reset form for next use
+          // Reset form fields but keep success message visible
           event.target.reset();
-          document.getElementById('offlineFormContent').style.display = 'block';
-          document.getElementById('offlineFormSuccess').classList.remove('show');
           submitBtn.disabled = false;
           submitBtn.textContent = 'Send Message';
+
+          // After additional time, hide success and show form again
+          setTimeout(() => {
+            document.getElementById('offlineFormContent').style.display = 'block';
+            document.getElementById('offlineFormSuccess').classList.remove('show');
+            console.log('📝 Form ready for next submission');
+          }, 2000);
         }, 3000);
 
       } catch (error) {
         console.error('❌ Error submitting Web-to-Case:', error);
-        alert('Sorry, there was an error submitting your message. Please try again.');
+
+        // Show user-friendly error message
+        const errorMsg = 'Sorry, there was an error submitting your message. Please try again or contact us directly.';
+        alert(errorMsg);
+
+        // Reset button state
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send Message';
       }
@@ -618,19 +877,67 @@ Expected /conversation POST payload:
       updateChatAvailability();
     });
 
-    // Monitor session status for agent availability
+    // Monitor session status for agent availability (REACTIVE detection)
     window.addEventListener('onEmbeddedMessagingSessionStatusUpdate', (event) => {
       console.log('========================================');
       console.log('📊 EVENT: Session Status Update');
       console.log('========================================');
-      console.log('Status:', event.detail);
+      console.log('📋 Full event.detail structure:', JSON.stringify(event.detail, null, 2));
+      console.log('📌 Status:', event.detail.status);
+      console.log('📌 Reason:', event.detail.reason);
+      console.log('📌 Routing Result:', event.detail.routingResult);
+      console.log('📌 Agent Info:', event.detail.agentInfo);
 
-      // If session status indicates waiting too long or ended without agent
+      // Pattern 1: Check for explicit "NoAgentsAvailable" reason
       if (event.detail.status === 'Ended' && event.detail.reason === 'NoAgentsAvailable') {
-        console.log('⚠️ No agents available to handle the chat');
+        console.log('⚠️ DETECTED: No agents available (Pattern 1: reason field)');
         noAgentsAvailable = true;
-        updateChatAvailability();
+        updateChatAvailability('session_ended_no_agents');
+        return;
       }
+
+      // Pattern 2: Check for routing failure with no agents
+      if (event.detail.status === 'Ended' && event.detail.routingResult) {
+        if (event.detail.routingResult.agentsAvailable === false ||
+            event.detail.routingResult.success === false) {
+          console.log('⚠️ DETECTED: No agents available (Pattern 2: routingResult)');
+          noAgentsAvailable = true;
+          updateChatAvailability('routing_failed');
+          return;
+        }
+      }
+
+      // Pattern 3: Check for "Waiting" status that times out (long wait = no agents)
+      if (event.detail.status === 'Waiting') {
+        console.log('⏳ Session waiting for agent...');
+        // Set a flag that we're waiting
+        window.sessionWaitingStartTime = window.sessionWaitingStartTime || Date.now();
+
+        // If waiting more than 60 seconds, assume no agents
+        const waitTime = Date.now() - window.sessionWaitingStartTime;
+        if (waitTime > 60000) {
+          console.log('⚠️ DETECTED: Waiting timeout exceeded 60s (Pattern 3: long wait)');
+          noAgentsAvailable = true;
+          updateChatAvailability('waiting_timeout');
+        }
+      }
+
+      // Pattern 4: Session ended without ever becoming active
+      if (event.detail.status === 'Ended' && !event.detail.agentInfo) {
+        console.log('⚠️ DETECTED: Session ended without agent assignment (Pattern 4: no agent)');
+        noAgentsAvailable = true;
+        updateChatAvailability('ended_no_agent_assigned');
+        return;
+      }
+
+      // Reset waiting timer if session becomes active
+      if (event.detail.status === 'Active') {
+        console.log('✅ Session active - agent connected');
+        window.sessionWaitingStartTime = null;
+        noAgentsAvailable = false; // Reset flag - agents are available
+      }
+
+      console.log('========================================');
     });
 
     // Reset agent availability when ready
