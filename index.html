@@ -93,19 +93,19 @@
       console.log('✅ Chat button created - ready to launch');
 
       // Configure hardcoded prechat fields (NOW that prechatAPI is available)
-      // Field names must match Parameter API Names from Messaging Settings Parameter Mappings
+      // Field names must match Parameter Names from Messaging Settings (NOT Parameter API Names)
       try {
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-          _FirstName: 'Chat',
-          _LastName: 'TestUser',
-          _Email: 'dogz@mailinator.com',
-          _Subject: 'Chat Inquiry from Website'
+          'First Name': 'Chat',
+          'Last Name': 'TestUser',
+          'Email': 'dogz@mailinator.com',
+          'Subject': 'Chat Inquiry from Website'
         });
         console.log('✅ Prechat fields configured:', {
-          _Email: 'dogz@mailinator.com',
-          _FirstName: 'Chat',
-          _LastName: 'TestUser',
-          _Subject: 'Chat Inquiry from Website'
+          'Email': 'dogz@mailinator.com',
+          'First Name': 'Chat',
+          'Last Name': 'TestUser',
+          'Subject': 'Chat Inquiry from Website'
         });
       } catch (err) {
         console.error('Error setting prechat fields:', err);
