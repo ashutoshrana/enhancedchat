@@ -604,6 +604,10 @@ Expected /conversation POST payload:
       if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
         embeddedservice_bootstrap.utilAPI.showChatButton();
         console.log('✅ Chat button shown (Salesforce API)');
+      } else {
+        console.warn('⚠️ Cannot show chat button - embeddedservice_bootstrap.utilAPI not available yet');
+        console.log('   embeddedservice_bootstrap exists:', typeof embeddedservice_bootstrap !== 'undefined');
+        console.log('   utilAPI exists:', typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI);
       }
     }
 
@@ -611,6 +615,8 @@ Expected /conversation POST payload:
       if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
         embeddedservice_bootstrap.utilAPI.hideChatButton();
         console.log('❌ Chat button hidden (Salesforce API)');
+      } else {
+        console.warn('⚠️ Cannot hide chat button - embeddedservice_bootstrap.utilAPI not available yet');
       }
     }
 
@@ -858,10 +864,10 @@ Expected /conversation POST payload:
     window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
       console.log('✅ Chat button created - ready to launch');
 
-      // Hide default Salesforce button
-      if (embeddedservice_bootstrap.utilAPI?.hideChatButton) {
-        embeddedservice_bootstrap.utilAPI.hideChatButton();
-      }
+      // NOW that button is created, update visibility based on availability
+      // This ensures the button shows/hides correctly based on business hours and agent availability
+      console.log('📍 Button created - checking availability and updating visibility');
+      updateChatAvailability('button_created');
 
       // Set up custom button click handler
       const customBtn = document.getElementById('capellaChatBtn');
