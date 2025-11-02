@@ -38,6 +38,35 @@
       outline-offset: 2px;
     }
 
+    /* Contact Us button (shown when agents offline) */
+    #contactUsBtn {
+      background: var(--capella-red);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 25px;
+      position: fixed;
+      right: 50px;
+      bottom: 35px;
+      z-index: 3141591;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(193, 0, 22, 0.3);
+      transition: all 0.2s ease;
+      display: none;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    #contactUsBtn:hover {
+      background: var(--capella-red-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(193, 0, 22, 0.4);
+    }
+    #contactUsBtn:focus {
+      outline: 2px solid var(--capella-red);
+      outline-offset: 2px;
+    }
+
     /* Fallback contact form (hidden until needed) */
     #fallbackForm {
       position: fixed;
@@ -261,6 +290,9 @@
   <!-- Your branded launcher -->
   <button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
 
+  <!-- Contact Us button (shown when agents offline) -->
+  <button id="contactUsBtn" aria-label="Contact us">Contact Us</button>
+
   <!-- Fallback form (original) -->
   <section id="fallbackForm" aria-live="polite" aria-labelledby="fallbackTitle">
     <h2 id="fallbackTitle">
@@ -325,8 +357,12 @@
       const r = document.getElementById('fallbackReason');
       if (r && reasonText) r.textContent = 'Reason: ' + reasonText;
       if (f) f.style.display = 'block';
-      const btn = document.getElementById('capellaChatBtn');
-      if (btn) btn.style.display = 'block';
+
+      // Hide chat button and show Contact Us button when offline
+      const chatBtn = document.getElementById('capellaChatBtn');
+      const contactBtn = document.getElementById('contactUsBtn');
+      if (chatBtn) chatBtn.style.display = 'none';
+      if (contactBtn) contactBtn.style.display = 'block';
     }
 
     function hideFallback() {
@@ -336,7 +372,7 @@
 
     function showCaseForm() {
       console.log('🔄 Activating Web-to-Case fallback - agents unavailable');
-      
+
       // Hide all Salesforce chat elements
       const chatElements = document.querySelectorAll(
         '.embeddedMessagingFrame, .embeddedMessagingLauncher, #embeddedMessagingFrame, .helpButtonEnabled, .helpButtonDisabled'
@@ -345,14 +381,16 @@
         el.style.display = 'none';
         console.log('Hidden:', el.className || el.id);
       });
-      
-      // Hide custom chat button
-      const customBtn = document.getElementById('capellaChatBtn');
-      if (customBtn) customBtn.style.display = 'none';
-      
+
+      // Hide custom chat button and show Contact Us button
+      const chatBtn = document.getElementById('capellaChatBtn');
+      const contactBtn = document.getElementById('contactUsBtn');
+      if (chatBtn) chatBtn.style.display = 'none';
+      if (contactBtn) contactBtn.style.display = 'block';
+
       // Hide fallback form if showing
       hideFallback();
-      
+
       // Show web-to-case form
       const caseForm = document.getElementById('caseFormWrapper');
       if (caseForm) {
@@ -368,8 +406,10 @@
     function hideCaseForm() {
       const caseForm = document.getElementById('caseFormWrapper');
       if (caseForm) caseForm.style.display = 'none';
-      const customBtn = document.getElementById('capellaChatBtn');
-      if (customBtn) customBtn.style.display = 'block';
+
+      // Show Contact Us button, keep chat button hidden
+      const contactBtn = document.getElementById('contactUsBtn');
+      if (contactBtn) contactBtn.style.display = 'block';
 
       // Re-enable detection when form is closed
       fallbackTriggered = false;
@@ -420,14 +460,17 @@
         setTimeout(() => {
           if (!chatInitialized) {
             console.warn('⏰ Chat initialization timeout after 45s');
-            // Only show fallback if no chat button is visible
+            // Only show Contact Us button if no chat button is visible
             const chatButton = document.querySelector('.helpButtonEnabled, #capellaChatBtn');
             const chatVisible = chatButton && window.getComputedStyle(chatButton).display !== 'none';
             if (!chatVisible) {
-              console.log('⏰ No visible chat button found - showing fallback');
-              showFallback('chat initialization timeout');
+              console.log('⏰ No visible chat button found - showing Contact Us button');
+              const chatBtn = document.getElementById('capellaChatBtn');
+              const contactBtn = document.getElementById('contactUsBtn');
+              if (chatBtn) chatBtn.style.display = 'none';
+              if (contactBtn) contactBtn.style.display = 'block';
             } else {
-              console.log('✅ Chat button is visible, no fallback needed');
+              console.log('✅ Chat button is visible');
             }
           }
         }, 45000);
@@ -478,6 +521,15 @@
               console.error('❌ Launch Chat failed:', e);
               showFallback('could not launch chat');
             });
+        });
+      }
+
+      // Contact Us button click handler
+      const contactUsBtn = document.getElementById('contactUsBtn');
+      if (contactUsBtn) {
+        contactUsBtn.addEventListener('click', () => {
+          console.log('🖱️ Contact Us button clicked - showing case form');
+          showCaseForm();
         });
       }
     });
