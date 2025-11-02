@@ -88,12 +88,12 @@
       }
     }
 
-    // Chat button created - set up custom launcher and prechat fields
-    window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
-      console.log('✅ Chat button created - ready to launch');
+    // IMPORTANT: Set prechat fields EARLY when messaging is ready (before button creation)
+    window.addEventListener('onEmbeddedMessagingReady', () => {
+      console.log('✅ Embedded Messaging Ready - setting prechat fields');
 
-      // Configure hardcoded prechat fields (NOW that prechatAPI is available)
-      // Field names must match Parameter Names from Messaging Settings (NOT Parameter API Names)
+      // Configure hardcoded prechat fields
+      // Field names must match Parameter Names from Messaging Settings
       try {
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
           'First Name': 'Chat',
@@ -108,8 +108,13 @@
           'Subject': 'Chat Inquiry from Website'
         });
       } catch (err) {
-        console.error('Error setting prechat fields:', err);
+        console.error('❌ Error setting prechat fields:', err);
       }
+    });
+
+    // Chat button created - set up custom launcher
+    window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
+      console.log('✅ Chat button created - ready to launch');
 
       // Hide default Salesforce button
       if (embeddedservice_bootstrap.utilAPI?.hideChatButton) {
