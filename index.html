@@ -964,7 +964,16 @@ Expected /conversation POST payload:
       console.log('Within Business Hours:', event.detail.withinBusinessHours);
 
       businessHoursEventFired = true; // Mark that business hours are configured
-      isWithinBusinessHours = event.detail.withinBusinessHours;
+
+      // Handle undefined as true (chat available by default)
+      // Salesforce may return undefined if business hours not properly configured
+      if (event.detail.withinBusinessHours === undefined) {
+        console.log('⚠️ Business hours value is undefined - treating as TRUE (chat available)');
+        isWithinBusinessHours = true;
+      } else {
+        isWithinBusinessHours = event.detail.withinBusinessHours;
+      }
+
       updateChatAvailability('business_hours_event');
     });
 
