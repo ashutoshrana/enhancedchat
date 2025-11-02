@@ -54,11 +54,15 @@
   <p>Click the chat button in the bottom right corner to start a conversation.</p>
   <p><strong>Prechat information is automatically configured:</strong></p>
   <ul>
-    <li>Email: dogz@mailinator.com</li>
-    <li>First Name: Test</li>
-    <li>Last Name: User</li>
-    <li>Subject: Chat Inquiry from Website</li>
+    <li><strong>Email:</strong> dogz@mailinator.com</li>
+    <li><strong>First Name:</strong> Chat</li>
+    <li><strong>Last Name:</strong> TestUser</li>
+    <li><strong>Subject:</strong> Chat Inquiry from Website</li>
   </ul>
+  <p style="background: #fff3cd; padding: 12px; border-left: 4px solid #ffc107; margin-top: 20px;">
+    <strong>Note:</strong> Fields use Parameter API Names with underscores (_FirstName, _LastName, _Email, _Subject)
+    to match Messaging Settings Parameter Mappings configuration.
+  </p>
 
   <!-- Your branded launcher -->
   <button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
@@ -89,14 +93,20 @@
       console.log('✅ Chat button created - ready to launch');
 
       // Configure hardcoded prechat fields (NOW that prechatAPI is available)
+      // Field names must match Parameter API Names from Messaging Settings Parameter Mappings
       try {
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-          Email: 'dogz@mailinator.com',
-          FirstName: 'Test',
-          LastName: 'User',
-          Subject: 'Chat Inquiry from Website'
+          _FirstName: 'Chat',
+          _LastName: 'TestUser',
+          _Email: 'dogz@mailinator.com',
+          _Subject: 'Chat Inquiry from Website'
         });
-        console.log('✅ Prechat fields configured: dogz@mailinator.com');
+        console.log('✅ Prechat fields configured:', {
+          _Email: 'dogz@mailinator.com',
+          _FirstName: 'Chat',
+          _LastName: 'TestUser',
+          _Subject: 'Chat Inquiry from Website'
+        });
       } catch (err) {
         console.error('Error setting prechat fields:', err);
       }
