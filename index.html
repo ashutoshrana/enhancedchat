@@ -64,21 +64,11 @@
   <button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
 
   <script>
-    // Initialize Embedded Messaging with prechat fields
+    // Initialize Embedded Messaging
     function initEmbeddedMessaging() {
       try {
         console.log('🚀 Initializing Salesforce Embedded Messaging...');
         embeddedservice_bootstrap.settings.language = 'en_US';
-
-        // Configure hardcoded prechat fields (hidden from user)
-        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-          Email: 'dogz@mailinator.com',
-          FirstName: 'Test',
-          LastName: 'User',
-          Subject: 'Chat Inquiry from Website'
-        });
-
-        console.log('✅ Prechat fields configured: dogz@mailinator.com');
 
         embeddedservice_bootstrap.init(
           '00DEc00000GfZ2M',
@@ -94,9 +84,22 @@
       }
     }
 
-    // Chat button created - set up custom launcher
+    // Chat button created - set up custom launcher and prechat fields
     window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
       console.log('✅ Chat button created - ready to launch');
+
+      // Configure hardcoded prechat fields (NOW that prechatAPI is available)
+      try {
+        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+          Email: 'dogz@mailinator.com',
+          FirstName: 'Test',
+          LastName: 'User',
+          Subject: 'Chat Inquiry from Website'
+        });
+        console.log('✅ Prechat fields configured: dogz@mailinator.com');
+      } catch (err) {
+        console.error('Error setting prechat fields:', err);
+      }
 
       // Hide default Salesforce button
       if (embeddedservice_bootstrap.utilAPI?.hideChatButton) {
