@@ -343,6 +343,54 @@
       transform: translateY(0);
     }
 
+    /* Leave a Message Button */
+    /* NOTE: Positioned at same location as Salesforce chat button (right: 20px, bottom: 20px)
+       This is intentional - they are mutually exclusive and never show at the same time.
+       The updateChatAvailability() function ensures only one is visible at any time. */
+    #leaveMessageButton {
+      display: none;
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: var(--capella-red);
+      color: white;
+      border: none;
+      border-radius: 28px;
+      padding: 16px 24px;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+      z-index: 3141589; /* Same z-index as Salesforce chat button - they never overlap */
+      animation: slideIn 0.3s ease-out;
+      min-height: 56px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #leaveMessageButton.show {
+      display: flex;
+    }
+
+    #leaveMessageButton:hover {
+      background: var(--capella-red-hover);
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-2px);
+    }
+
+    #leaveMessageButton:active {
+      background: var(--capella-red-dark);
+      transform: translateY(0);
+    }
+
+    #leaveMessageButton::before {
+      content: '✉';
+      font-size: 20px;
+      line-height: 1;
+    }
+
     /* Mobile Responsive */
     @media (max-width: 480px) {
       #offlineFormContainer {
@@ -350,6 +398,13 @@
         bottom: 10px;
         width: calc(100vw - 20px);
         max-width: 400px;
+      }
+
+      #leaveMessageButton {
+        right: 10px;
+        bottom: 10px;
+        padding: 14px 20px;
+        font-size: 13px;
       }
     }
   </style>
@@ -475,6 +530,11 @@ Expected /conversation POST payload:
     </div>
   </div>
 
+  <!-- Leave a Message Button (shown when chat is unavailable) -->
+  <button id="leaveMessageButton" onclick="openOfflineForm()" aria-label="Leave a message">
+    Leave a Message
+  </button>
+
   <script>
     // DEBUG: Track all prechat attempts
     window.prechatDebug = {
@@ -553,14 +613,35 @@ Expected /conversation POST payload:
       }
     }
 
-    function showOfflineForm() {
-      const container = document.getElementById('offlineFormContainer');
-      if (container) {
-        container.classList.add('show');
-        console.log('📝 Offline form shown');
+    // Show the "Leave a Message" button (when chat is unavailable)
+    function showOfflineButton() {
+      const button = document.getElementById('leaveMessageButton');
+      if (button) {
+        button.classList.add('show');
+        console.log('📝 Leave a Message button shown');
       }
     }
 
+    // Hide the "Leave a Message" button
+    function hideOfflineButton() {
+      const button = document.getElementById('leaveMessageButton');
+      if (button) {
+        button.classList.remove('show');
+        console.log('❌ Leave a Message button hidden');
+      }
+    }
+
+    // Open the expanded offline form (called when button is clicked)
+    function openOfflineForm() {
+      hideOfflineButton();
+      const container = document.getElementById('offlineFormContainer');
+      if (container) {
+        container.classList.add('show');
+        console.log('📝 Offline form expanded');
+      }
+    }
+
+    // Hide/close the expanded offline form
     function hideOfflineForm() {
       const container = document.getElementById('offlineFormContainer');
       if (container) {
@@ -570,10 +651,16 @@ Expected /conversation POST payload:
         document.getElementById('offlineFormContent').style.display = 'block';
         document.getElementById('offlineFormSuccess').classList.remove('show');
         console.log('❌ Offline form hidden');
+
+        // Show the button again if chat is still unavailable
+        if (!isWithinBusinessHours || noAgentsAvailable) {
+          showOfflineButton();
+        }
       }
     }
 
     // Determine what to show based on availability
+    // IMPORTANT: This function ensures chat button and "Leave a Message" button are NEVER shown simultaneously
     function updateChatAvailability(reason = null) {
       console.log('🔄 Updating chat availability...');
       console.log('  - Business Hours:', isWithinBusinessHours);
@@ -581,13 +668,29 @@ Expected /conversation POST payload:
       console.log('  - Reason for change:', reason);
 
       if (isWithinBusinessHours && !noAgentsAvailable) {
-        // Show chat, hide form
-        showChatButton();
-        hideOfflineForm();
+        // Chat is available: Show chat button, hide all offline options
+        hideOfflineButton(); // Ensure "Leave a Message" button is hidden
+
+        // Also hide expanded form if it's open
+        const container = document.getElementById('offlineFormContainer');
+        if (container && container.classList.contains('show')) {
+          container.classList.remove('show');
+        }
+
+        showChatButton(); // Show chat button
+        console.log('✅ Chat available - showing chat button only');
       } else {
-        // Hide chat, show form
-        hideChatButton();
-        showOfflineForm();
+        // Chat is unavailable: Show "Leave a Message" button, hide chat and form
+        hideChatButton(); // Ensure chat button is hidden
+
+        // Hide expanded form if it's open
+        const container = document.getElementById('offlineFormContainer');
+        if (container && container.classList.contains('show')) {
+          container.classList.remove('show');
+        }
+
+        showOfflineButton(); // Show last for smooth transition
+        console.log('📝 Chat unavailable - showing Leave a Message button only');
 
         // If switching due to no agents (reactive detection), update the message
         if (noAgentsAvailable && reason) {
@@ -950,7 +1053,7 @@ Expected /conversation POST payload:
     // User clicked offline form button instead of chat
     function showOfflineFormManually() {
       hideChatButton();
-      showOfflineForm();
+      openOfflineForm();
     }
   </script>
 
