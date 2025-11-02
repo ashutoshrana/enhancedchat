@@ -597,6 +597,7 @@ Expected /conversation POST payload:
 
     let isWithinBusinessHours = true; // Default to true until we know otherwise
     let noAgentsAvailable = false; // Set to true if routing fails (reactive detection)
+    let businessHoursEventFired = false; // Track if business hours events have fired
 
     // Show/Hide Functions (using Salesforce's button API)
     function showChatButton() {
@@ -956,8 +957,9 @@ Expected /conversation POST payload:
       console.log('========================================');
       console.log('Within Business Hours:', event.detail.withinBusinessHours);
 
+      businessHoursEventFired = true; // Mark that business hours are configured
       isWithinBusinessHours = event.detail.withinBusinessHours;
-      updateChatAvailability();
+      updateChatAvailability('business_hours_event');
     });
 
     // Business hours started
@@ -966,8 +968,9 @@ Expected /conversation POST payload:
       console.log('✅ EVENT: Business Hours STARTED');
       console.log('========================================');
 
+      businessHoursEventFired = true; // Mark that business hours are configured
       isWithinBusinessHours = true;
-      updateChatAvailability();
+      updateChatAvailability('business_hours_started');
     });
 
     // Business hours ended
@@ -976,8 +979,9 @@ Expected /conversation POST payload:
       console.log('❌ EVENT: Business Hours ENDED');
       console.log('========================================');
 
+      businessHoursEventFired = true; // Mark that business hours are configured
       isWithinBusinessHours = false;
-      updateChatAvailability();
+      updateChatAvailability('business_hours_ended');
     });
 
     // Monitor session status for agent availability (REACTIVE detection)
@@ -1047,7 +1051,24 @@ Expected /conversation POST payload:
     window.addEventListener('onEmbeddedMessagingReady', () => {
       console.log('📍 Messaging Ready - resetting agent availability');
       noAgentsAvailable = false;
-      // Don't call updateChatAvailability yet - wait for business hours event
+
+      // If business hours are not configured, the business hours events will never fire
+      // So we need to call updateChatAvailability here to show the chat button
+      // We'll wait a short time for business hours event to fire, and if it doesn't, show chat
+      setTimeout(() => {
+        if (!businessHoursEventFired) {
+          // Business hours are NOT configured - no event fired
+          // Default to showing chat button (isWithinBusinessHours = true by default)
+          console.log('⚠️ No business hours events fired - assuming business hours not configured');
+          console.log('  - isWithinBusinessHours:', isWithinBusinessHours);
+          console.log('  - noAgentsAvailable:', noAgentsAvailable);
+          console.log('  - Calling updateChatAvailability to show chat button');
+
+          updateChatAvailability('no_business_hours_configured');
+        } else {
+          console.log('✅ Business hours events fired - availability already set');
+        }
+      }, 2000); // Wait 2 seconds for business hours events
     });
 
     // User clicked offline form button instead of chat
