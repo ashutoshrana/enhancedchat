@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Chat Button Diagnostic</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .log-entry {
+      padding: 8px;
+      margin: 4px 0;
+      border-left: 3px solid #ccc;
+      background: #f5f5f5;
+    }
+    .log-entry.success { border-color: #10B981; background: #ecfdf5; }
+    .log-entry.warning { border-color: #F59E0B; background: #fffbeb; }
+    .log-entry.error { border-color: #EF4444; background: #fef2f2; }
+    .status-box {
+      padding: 16px;
+      margin: 16px 0;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+    }
+    h1 { color: #C10016; }
+    h2 { color: #333; margin-top: 24px; }
+    pre { background: #f5f5f5; padding: 12px; border-radius: 4px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Chat Button Diagnostic Tool</h1>
+  <p><strong>Purpose:</strong> Diagnose why the Salesforce chat button is not appearing</p>
+
+  <div id="diagnosticLogs"></div>
+
+  <h2>📊 Current State</h2>
+  <div id="currentState" class="status-box"></div>
+
+  <h2>🎯 Expected Behavior</h2>
+  <div class="status-box">
+    <ol>
+      <li>Page loads → Salesforce script initializes</li>
+      <li><code>onEmbeddedMessagingReady</code> fires</li>
+      <li><code>onEmbeddedMessagingButtonCreated</code> fires</li>
+      <li><code>updateChatAvailability('button_created')</code> called</li>
+      <li><code>showChatButton()</code> called</li>
+      <li><code>embeddedservice_bootstrap.utilAPI.showChatButton()</code> executed</li>
+      <li>✅ Chat button appears</li>
+    </ol>
+  </div>
+
+  <h2>📝 Console Instructions</h2>
+  <div class="status-box">
+    <p>Open browser console (F12) and run these commands:</p>
+    <pre>// Check Salesforce objects
+console.log('embeddedservice_bootstrap:', typeof embeddedservice_bootstrap);
+console.log('utilAPI:', embeddedservice_bootstrap?.utilAPI);
+
+// Check state variables
+console.log('isWithinBusinessHours:', isWithinBusinessHours);
+console.log('noAgentsAvailable:', noAgentsAvailable);
+console.log('businessHoursEventFired:', businessHoursEventFired);
+
+// Try to manually show button
+embeddedservice_bootstrap?.utilAPI?.showChatButton();</pre>
+  </div>
+
+  <script>
+    const logs = [];
+
+    function addLog(message, type = 'info') {
+      const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+      logs.push({ timestamp, message, type });
+      renderLogs();
+    }
+
+    function renderLogs() {
+      const container = document.getElementById('diagnosticLogs');
+      container.innerHTML = '<h2>📋 Event Log</h2>' + logs.map(log =>
+        `<div class="log-entry ${log.type}">[${log.timestamp}] ${log.message}</div>`
+      ).join('');
+    }
+
+    function updateState() {
+      const stateDiv = document.getElementById('currentState');
+      stateDiv.innerHTML = `
+        <strong>Salesforce Objects:</strong><br>
+        • embeddedservice_bootstrap: ${typeof embeddedservice_bootstrap !== 'undefined' ? '✅ Loaded' : '❌ Not loaded'}<br>
+        • utilAPI: ${typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI ? '✅ Available' : '❌ Not available'}<br>
+        <br>
+        <strong>State Variables:</strong><br>
+        • isWithinBusinessHours: ${typeof isWithinBusinessHours !== 'undefined' ? isWithinBusinessHours : 'undefined'}<br>
+        • noAgentsAvailable: ${typeof noAgentsAvailable !== 'undefined' ? noAgentsAvailable : 'undefined'}<br>
+        • businessHoursEventFired: ${typeof businessHoursEventFired !== 'undefined' ? businessHoursEventFired : 'undefined'}<br>
+      `;
+    }
+
+    // Initial state
+    addLog('Diagnostic page loaded', 'success');
+    updateState();
+    setInterval(updateState, 1000);
+
+    // Monitor Salesforce events
+    window.addEventListener('onEmbeddedMessagingReady', () => {
+      addLog('✅ onEmbeddedMessagingReady fired', 'success');
+      updateState();
+    });
+
+    window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
+      addLog('✅ onEmbeddedMessagingButtonCreated fired', 'success');
+      updateState();
+
+      // Check if utilAPI is available NOW
+      setTimeout(() => {
+        if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
+          addLog('✅ utilAPI is available after ButtonCreated', 'success');
+
+          // Try to show the button manually
+          try {
+            embeddedservice_bootstrap.utilAPI.showChatButton();
+            addLog('✅ Called utilAPI.showChatButton() manually', 'success');
+          } catch (e) {
+            addLog('❌ Error calling showChatButton(): ' + e.message, 'error');
+          }
+        } else {
+          addLog('⚠️ utilAPI still not available after ButtonCreated', 'warning');
+        }
+      }, 100);
+    });
+
+    window.addEventListener('onEmbeddedMessagingWithinBusinessHours', (event) => {
+      addLog(`⏰ Business Hours event: ${event.detail.withinBusinessHours}`, 'success');
+    });
+
+    // Log any errors
+    window.addEventListener('error', (event) => {
+      addLog(`❌ Error: ${event.message}`, 'error');
+    });
+
+    // Check script loading
+    const script = document.querySelector('script[src*="bootstrap.min.js"]');
+    if (script) {
+      addLog('✅ Salesforce bootstrap script tag found', 'success');
+
+      script.addEventListener('load', () => {
+        addLog('✅ Salesforce bootstrap script loaded', 'success');
+        updateState();
+      });
+
+      script.addEventListener('error', () => {
+        addLog('❌ Salesforce bootstrap script failed to load', 'error');
+      });
+    } else {
+      addLog('❌ Salesforce bootstrap script tag NOT found', 'error');
+    }
+  </script>
+
+  <!-- Same Salesforce bootstrap as main page -->
+  <script
+    src="https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119/assets/js/bootstrap.min.js"
+    onload="addLog('✅ Bootstrap onload fired', 'success'); typeof initEmbeddedMessaging === 'function' && initEmbeddedMessaging();"
+  ></script>
+</body>
+</html>
