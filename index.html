@@ -22,31 +22,7 @@
       color: var(--capella-red);
     }
 
-    /* Your branded circular launcher */
-    #capellaChatBtn {
-      background-image: url("https://www.capella.edu/content/dam/capella/chat/chat_btn_hover.png");
-      background-color: transparent;
-      background-size: cover;
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      position: fixed;
-      right: 50px;
-      bottom: 35px;
-      z-index: 3141591;
-      border: none;
-      cursor: pointer;
-      text-indent: -9999px;
-      overflow: hidden;
-      transition: transform 0.2s ease;
-    }
-    #capellaChatBtn:hover {
-      transform: scale(1.05);
-    }
-    #capellaChatBtn:focus {
-      outline: 2px solid var(--capella-red);
-      outline-offset: 2px;
-    }
+    /* Salesforce generates the chat button - we just control visibility */
 
     /* Offline Contact Form */
     #offlineFormContainer {
@@ -251,8 +227,7 @@ Expected /conversation POST payload:
 }</pre>
   </div>
 
-  <!-- Your branded launcher -->
-  <button id="capellaChatBtn" aria-label="Chat with us">Chat</button>
+  <!-- Salesforce generates the chat button automatically -->
 
   <!-- Offline Contact Form -->
   <div id="offlineFormContainer">
@@ -332,20 +307,18 @@ Expected /conversation POST payload:
     let isWithinBusinessHours = true; // Default to true until we know otherwise
     let noAgentsAvailable = false;
 
-    // Show/Hide Functions
+    // Show/Hide Functions (using Salesforce's button API)
     function showChatButton() {
-      const btn = document.getElementById('capellaChatBtn');
-      if (btn) {
-        btn.style.display = 'block';
-        console.log('✅ Chat button shown');
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
+        embeddedservice_bootstrap.utilAPI.showChatButton();
+        console.log('✅ Chat button shown (Salesforce API)');
       }
     }
 
     function hideChatButton() {
-      const btn = document.getElementById('capellaChatBtn');
-      if (btn) {
-        btn.style.display = 'none';
-        console.log('❌ Chat button hidden');
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
+        embeddedservice_bootstrap.utilAPI.hideChatButton();
+        console.log('❌ Chat button hidden (Salesforce API)');
       }
     }
 
@@ -395,34 +368,58 @@ Expected /conversation POST payload:
       submitBtn.textContent = 'Sending...';
 
       const formData = new FormData(event.target);
-      const data = {
+
+      // Build Web-to-Case submission data
+      const webToCaseData = new URLSearchParams({
+        orgid: '00DEc00000GfZ2M',
+        retURL: window.location.href,
+        subject: formData.get('subject'),
+        description: formData.get('description'),
+        email: formData.get('email'),
+        name: formData.get('name'),
+        '00N2E00000IgDbO': 'Capella University', // Business Unit
+        recordType: '0122E000000iHlS', // CU Normal Case
+        status: 'New',
+        priority: 'Medium'
+      });
+
+      console.log('📧 Submitting Web-to-Case:', {
         name: formData.get('name'),
         email: formData.get('email'),
         subject: formData.get('subject'),
-        description: formData.get('description'),
-        orgid: '00DEc00000GfZ2M' // Your Salesforce Org ID
-      };
-
-      console.log('📧 Submitting offline form:', data);
+        description: formData.get('description')
+      });
 
       try {
-        // TODO: Replace with your Web-to-Case endpoint or create Case via API
-        // For now, just log and show success
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Submit to Salesforce Web-to-Case
+        await fetch('https://strategiced--qasf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8', {
+          method: 'POST',
+          mode: 'no-cors', // Required for cross-origin Web-to-Case submissions
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: webToCaseData.toString()
+        });
 
-        // Show success message
+        // Show success message (no-cors means we can't read response, but submission was sent)
         document.getElementById('offlineFormContent').style.display = 'none';
         document.getElementById('offlineFormSuccess').classList.add('show');
 
-        console.log('✅ Form submitted successfully');
+        console.log('✅ Web-to-Case submitted successfully');
 
         // Close form after 3 seconds
         setTimeout(() => {
           hideOfflineForm();
+          // Reset form for next use
+          event.target.reset();
+          document.getElementById('offlineFormContent').style.display = 'block';
+          document.getElementById('offlineFormSuccess').classList.remove('show');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send Message';
         }, 3000);
 
       } catch (error) {
-        console.error('❌ Error submitting form:', error);
+        console.error('❌ Error submitting Web-to-Case:', error);
         alert('Sorry, there was an error submitting your message. Please try again.');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send Message';
