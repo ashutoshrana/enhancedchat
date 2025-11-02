@@ -168,17 +168,15 @@ Expected /conversation POST payload:
         time: new Date().toISOString()
       });
 
-      // Set hidden prechat field (Channel Variable Name: "Email")
-      // Also trying lowercase "email" in case Flow expects that
+      // Set hidden prechat field (Channel Variable Name: "email_custom")
       console.log('🔧 Setting hidden prechat fields...');
 
       try {
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-          Email: 'dogz@mailinator.com',
-          email: 'dogz@mailinator.com'
+          email_custom: 'dogz@mailinator.com'
         });
 
-        console.log('✅ setHiddenPrechatFields called with Email AND email');
+        console.log('✅ setHiddenPrechatFields({ email_custom: "dogz@mailinator.com" }) called');
 
         window.prechatDebug.attempts.push({
           timing: 'onEmbeddedMessagingReady',
@@ -218,19 +216,18 @@ Expected /conversation POST payload:
           console.log('========================================');
 
           // CRITICAL: Set prechat fields RIGHT BEFORE launching chat
-          // Trying both Email and email in case of case-sensitivity
+          // Channel Variable Name: "email_custom" (lowercase)
           const prechatFields = {
-            Email: 'dogz@mailinator.com',
-            email: 'dogz@mailinator.com'
+            email_custom: 'dogz@mailinator.com'
           };
 
-          console.log('🔧 Setting Email field RIGHT BEFORE launch...');
+          console.log('🔧 Setting email_custom field RIGHT BEFORE launch...');
           console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
 
           try {
             // Set prechat fields immediately before launching
             embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
-            console.log('✅ setHiddenPrechatFields called with Email AND email');
+            console.log('✅ setHiddenPrechatFields({ email_custom: "dogz@mailinator.com" }) called');
 
             window.prechatDebug.attempts.push({
               timing: 'Before launchChat()',
