@@ -735,7 +735,7 @@
         Authentication Mode
         <span id="authModeBadge" class="auth-mode-badge unauthenticated">Unauthenticated</span>
       </strong>
-      <small id="authModeDescription">Sending all fields (email, email_custom, FirstName, LastName, Subject, chat_source__c)</small>
+      <small id="authModeDescription">Sending only chat_source__c (guest user)</small>
     </div>
     <label class="auth-toggle-switch">
       <input type="checkbox" id="authModeToggle" onchange="toggleAuthMode()">
@@ -1224,13 +1224,13 @@ Expected /conversation POST payload:
       if (isAuthenticatedMode) {
         badge.textContent = 'Authenticated';
         badge.className = 'auth-mode-badge authenticated';
-        description.textContent = 'Sending only chat_source__c (user already authenticated)';
-        console.log('🔐 Authentication Mode: AUTHENTICATED - Only chat_source__c will be sent');
+        description.textContent = 'Sending all fields (email, email_custom, FirstName, LastName, Subject, chat_source__c)';
+        console.log('🔐 Authentication Mode: AUTHENTICATED - All prechat fields will be sent');
       } else {
         badge.textContent = 'Unauthenticated';
         badge.className = 'auth-mode-badge unauthenticated';
-        description.textContent = 'Sending all fields (email, email_custom, FirstName, LastName, Subject, chat_source__c)';
-        console.log('🔓 Authentication Mode: UNAUTHENTICATED - All prechat fields will be sent');
+        description.textContent = 'Sending only chat_source__c (guest user)';
+        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only chat_source__c will be sent');
       }
 
       // Update prechat fields immediately if Salesforce is already loaded
@@ -1248,18 +1248,18 @@ Expected /conversation POST payload:
     // Get hidden fields based on authentication mode
     function getHiddenFieldsForMode() {
       if (isAuthenticatedMode) {
-        // Authenticated: Only send chat_source__c
-        return {
-          chat_source__c: prechatData.chat_source__c
-        };
-      } else {
-        // Unauthenticated: Send all fields
+        // Authenticated: Send all fields (user is logged in, we have their data)
         return {
           email: prechatData.email,
           email_custom: prechatData.email,
           FirstName: prechatData.firstName,
           LastName: prechatData.lastName,
           Subject: prechatData.subject,
+          chat_source__c: prechatData.chat_source__c
+        };
+      } else {
+        // Unauthenticated: Only send chat_source__c (guest user)
+        return {
           chat_source__c: prechatData.chat_source__c
         };
       }
@@ -1317,7 +1317,7 @@ Expected /conversation POST payload:
           const hiddenFields = getHiddenFieldsForMode();
           embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
           console.log('✅ Updated hidden prechat fields:', hiddenFields);
-          console.log('   Mode:', isAuthenticatedMode ? 'Authenticated (chat_source__c only)' : 'Unauthenticated (all fields)');
+          console.log('   Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (chat_source__c only)');
         } catch (e) {
           console.warn('⚠️ Could not update hidden prechat fields:', e);
         }
@@ -1384,10 +1384,10 @@ Expected /conversation POST payload:
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
 
         console.log('✅ setHiddenPrechatFields() called:');
-        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (chat_source__c only)' : 'Unauthenticated (all fields)');
+        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (chat_source__c only)');
         console.log('   📋 Fields sent:', hiddenFields);
 
-        if (!isAuthenticatedMode) {
+        if (isAuthenticatedMode) {
           console.log('   📧 email:', prechatData.email);
           console.log('   📧 email_custom:', prechatData.email);
           console.log('   👤 FirstName:', prechatData.firstName);
