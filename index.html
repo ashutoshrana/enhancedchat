@@ -591,6 +591,107 @@
         border-radius: var(--radius-md);
       }
     }
+
+    /* Authentication Mode Toggle */
+    .auth-toggle-container {
+      background: var(--capella-gray-50);
+      border: 2px solid var(--capella-gray-200);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      margin: var(--spacing-lg) 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-md);
+    }
+
+    .auth-toggle-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .auth-toggle-label strong {
+      color: var(--capella-gray-900);
+      font-size: var(--font-size-base);
+    }
+
+    .auth-toggle-label small {
+      color: var(--capella-gray-600);
+      font-size: var(--font-size-sm);
+    }
+
+    .auth-toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+
+    .auth-toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .auth-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--capella-gray-300);
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .auth-toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    .auth-toggle-switch input:checked + .auth-toggle-slider {
+      background-color: var(--capella-red);
+    }
+
+    .auth-toggle-switch input:checked + .auth-toggle-slider:before {
+      transform: translateX(26px);
+    }
+
+    .auth-mode-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .auth-mode-badge.authenticated {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .auth-mode-badge.unauthenticated {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    @media (max-width: 768px) {
+      .auth-toggle-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
@@ -626,6 +727,22 @@
       </div>
     </div>
   </div>
+
+  <!-- Authentication Mode Toggle -->
+  <div class="auth-toggle-container">
+    <div class="auth-toggle-label">
+      <strong>
+        Authentication Mode
+        <span id="authModeBadge" class="auth-mode-badge unauthenticated">Unauthenticated</span>
+      </strong>
+      <small id="authModeDescription">Sending all fields (email, email_custom, FirstName, LastName, Subject, chat_source__c)</small>
+    </div>
+    <label class="auth-toggle-switch">
+      <input type="checkbox" id="authModeToggle" onchange="toggleAuthMode()">
+      <span class="auth-toggle-slider"></span>
+    </label>
+  </div>
+
   <div style="background: #d1ecf1; padding: 16px; border-left: 4px solid #17a2b8; margin-top: 20px; border-radius: 4px;">
     <h3 style="margin-top: 0; color: #0c5460;">🐛 Debugging Mode Active</h3>
     <p><strong>Open Browser Console (F12) to see detailed logs:</strong></p>
@@ -1094,6 +1211,60 @@ Expected /conversation POST payload:
       chat_source__c: 'Website' // Custom field for tracking chat source
     };
 
+    // Authentication mode: false = unauthenticated (send all fields), true = authenticated (send only chat_source__c)
+    let isAuthenticatedMode = false;
+
+    // Toggle authentication mode
+    function toggleAuthMode() {
+      isAuthenticatedMode = document.getElementById('authModeToggle').checked;
+
+      const badge = document.getElementById('authModeBadge');
+      const description = document.getElementById('authModeDescription');
+
+      if (isAuthenticatedMode) {
+        badge.textContent = 'Authenticated';
+        badge.className = 'auth-mode-badge authenticated';
+        description.textContent = 'Sending only chat_source__c (user already authenticated)';
+        console.log('🔐 Authentication Mode: AUTHENTICATED - Only chat_source__c will be sent');
+      } else {
+        badge.textContent = 'Unauthenticated';
+        badge.className = 'auth-mode-badge unauthenticated';
+        description.textContent = 'Sending all fields (email, email_custom, FirstName, LastName, Subject, chat_source__c)';
+        console.log('🔓 Authentication Mode: UNAUTHENTICATED - All prechat fields will be sent');
+      }
+
+      // Update prechat fields immediately if Salesforce is already loaded
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.prechatAPI) {
+        try {
+          const hiddenFields = getHiddenFieldsForMode();
+          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+          console.log('✅ Updated hidden prechat fields based on authentication mode:', hiddenFields);
+        } catch (e) {
+          console.warn('⚠️ Could not update hidden prechat fields:', e);
+        }
+      }
+    }
+
+    // Get hidden fields based on authentication mode
+    function getHiddenFieldsForMode() {
+      if (isAuthenticatedMode) {
+        // Authenticated: Only send chat_source__c
+        return {
+          chat_source__c: prechatData.chat_source__c
+        };
+      } else {
+        // Unauthenticated: Send all fields
+        return {
+          email: prechatData.email,
+          email_custom: prechatData.email,
+          FirstName: prechatData.firstName,
+          LastName: prechatData.lastName,
+          Subject: prechatData.subject,
+          chat_source__c: prechatData.chat_source__c
+        };
+      }
+    }
+
     // Open prechat editor modal
     function openPrechatEditor() {
       const modal = document.getElementById('prechatEditorModal');
@@ -1143,16 +1314,10 @@ Expected /conversation POST payload:
       // Update hidden prechat fields if Salesforce is already loaded
       if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.prechatAPI) {
         try {
-          const hiddenFields = {
-            email: prechatData.email,
-            email_custom: prechatData.email,
-            FirstName: prechatData.firstName,
-            LastName: prechatData.lastName,
-            Subject: prechatData.subject,
-            chat_source__c: prechatData.chat_source__c
-          };
+          const hiddenFields = getHiddenFieldsForMode();
           embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
-          console.log('✅ Updated ALL hidden prechat fields:', hiddenFields);
+          console.log('✅ Updated hidden prechat fields:', hiddenFields);
+          console.log('   Mode:', isAuthenticatedMode ? 'Authenticated (chat_source__c only)' : 'Unauthenticated (all fields)');
         } catch (e) {
           console.warn('⚠️ Could not update hidden prechat fields:', e);
         }
@@ -1213,30 +1378,29 @@ Expected /conversation POST payload:
       console.log('📋 Using prechat data:', prechatData);
 
       try {
-        // Send ALL prechat fields as hidden fields
-        const hiddenFields = {
-          email: prechatData.email,
-          email_custom: prechatData.email,
-          FirstName: prechatData.firstName,
-          LastName: prechatData.lastName,
-          Subject: prechatData.subject,
-          chat_source__c: prechatData.chat_source__c
-        };
+        // Get hidden fields based on authentication mode
+        const hiddenFields = getHiddenFieldsForMode();
 
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
 
-        console.log('✅ setHiddenPrechatFields() called with ALL fields:');
-        console.log('   📧 email:', prechatData.email);
-        console.log('   📧 email_custom:', prechatData.email);
-        console.log('   👤 FirstName:', prechatData.firstName);
-        console.log('   👤 LastName:', prechatData.lastName);
-        console.log('   📝 Subject:', prechatData.subject);
+        console.log('✅ setHiddenPrechatFields() called:');
+        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (chat_source__c only)' : 'Unauthenticated (all fields)');
+        console.log('   📋 Fields sent:', hiddenFields);
+
+        if (!isAuthenticatedMode) {
+          console.log('   📧 email:', prechatData.email);
+          console.log('   📧 email_custom:', prechatData.email);
+          console.log('   👤 FirstName:', prechatData.firstName);
+          console.log('   👤 LastName:', prechatData.lastName);
+          console.log('   📝 Subject:', prechatData.subject);
+        }
         console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
 
         window.prechatDebug.attempts.push({
           timing: 'onEmbeddedMessagingReady',
           fields: hiddenFields,
           prechatData: { ...prechatData },
+          authMode: isAuthenticatedMode ? 'authenticated' : 'unauthenticated',
           success: true,
           time: new Date().toISOString()
         });
@@ -1244,7 +1408,8 @@ Expected /conversation POST payload:
         console.error('❌ Error setting prechat fields:', err);
         window.prechatDebug.attempts.push({
           timing: 'onEmbeddedMessagingReady',
-          fields: { Email: 'dogz@mailinator.com' },
+          fields: {},
+          authMode: isAuthenticatedMode ? 'authenticated' : 'unauthenticated',
           success: false,
           error: err.message,
           time: new Date().toISOString()
