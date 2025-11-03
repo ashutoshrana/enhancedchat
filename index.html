@@ -795,18 +795,14 @@ Expected /conversation POST payload:
           </div>
           <div class="form-group">
             <label for="edit_chat_source">Chat Source (chat_source__c)<span class="required">*</span></label>
-            <select
+            <input
+              type="text"
               id="edit_chat_source"
               name="chat_source"
+              placeholder="e.g., Website, Mobile App, Email, etc."
               required
               aria-required="true"
             >
-              <option value="Website">Website</option>
-              <option value="Mobile App">Mobile App</option>
-              <option value="Email">Email</option>
-              <option value="Social Media">Social Media</option>
-              <option value="Other">Other</option>
-            </select>
             <small style="color: var(--capella-gray-600); font-size: 12px; margin-top: 4px; display: block;">
               This tracks where the chat originated from
             </small>
@@ -1148,6 +1144,7 @@ Expected /conversation POST payload:
       if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.prechatAPI) {
         try {
           const hiddenFields = {
+            email: prechatData.email,
             email_custom: prechatData.email,
             FirstName: prechatData.firstName,
             LastName: prechatData.lastName,
@@ -1218,6 +1215,7 @@ Expected /conversation POST payload:
       try {
         // Send ALL prechat fields as hidden fields
         const hiddenFields = {
+          email: prechatData.email,
           email_custom: prechatData.email,
           FirstName: prechatData.firstName,
           LastName: prechatData.lastName,
@@ -1228,6 +1226,7 @@ Expected /conversation POST payload:
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
 
         console.log('✅ setHiddenPrechatFields() called with ALL fields:');
+        console.log('   📧 email:', prechatData.email);
         console.log('   📧 email_custom:', prechatData.email);
         console.log('   👤 FirstName:', prechatData.firstName);
         console.log('   👤 LastName:', prechatData.lastName);
