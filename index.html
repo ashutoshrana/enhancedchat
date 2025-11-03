@@ -199,7 +199,8 @@
     }
 
     .form-group input,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
       width: 100%;
       padding: var(--spacing-md) var(--spacing-lg);
       border: 2px solid var(--capella-gray-200);
@@ -218,12 +219,14 @@
     }
 
     .form-group input:hover,
-    .form-group textarea:hover {
+    .form-group textarea:hover,
+    .form-group select:hover {
       border-color: var(--capella-gray-300);
     }
 
     .form-group input:focus,
-    .form-group textarea:focus {
+    .form-group textarea:focus,
+    .form-group select:focus {
       outline: none;
       border-color: var(--capella-red);
       box-shadow: 0 0 0 4px rgba(193, 0, 22, 0.1);
@@ -617,6 +620,10 @@
         <div class="prechat-value-label">Subject</div>
         <div class="prechat-value-text" id="display_subject">Chat Inquiry from Website</div>
       </div>
+      <div class="prechat-value-item">
+        <div class="prechat-value-label">Chat Source (chat_source__c)</div>
+        <div class="prechat-value-text" id="display_chat_source">Website</div>
+      </div>
     </div>
   </div>
   <div style="background: #d1ecf1; padding: 16px; border-left: 4px solid #17a2b8; margin-top: 20px; border-radius: 4px;">
@@ -785,6 +792,24 @@ Expected /conversation POST payload:
               required
               aria-required="true"
             >
+          </div>
+          <div class="form-group">
+            <label for="edit_chat_source">Chat Source (chat_source__c)<span class="required">*</span></label>
+            <select
+              id="edit_chat_source"
+              name="chat_source"
+              required
+              aria-required="true"
+            >
+              <option value="Website">Website</option>
+              <option value="Mobile App">Mobile App</option>
+              <option value="Email">Email</option>
+              <option value="Social Media">Social Media</option>
+              <option value="Other">Other</option>
+            </select>
+            <small style="color: var(--capella-gray-600); font-size: 12px; margin-top: 4px; display: block;">
+              This tracks where the chat originated from
+            </small>
           </div>
         </form>
       </div>
@@ -1069,7 +1094,8 @@ Expected /conversation POST payload:
       email: 'dogz@mailinator.com',
       firstName: 'Chat',
       lastName: 'TestUser',
-      subject: 'Chat Inquiry from Website'
+      subject: 'Chat Inquiry from Website',
+      chat_source__c: 'Website' // Custom field for tracking chat source
     };
 
     // Open prechat editor modal
@@ -1081,6 +1107,7 @@ Expected /conversation POST payload:
       document.getElementById('edit_firstName').value = prechatData.firstName;
       document.getElementById('edit_lastName').value = prechatData.lastName;
       document.getElementById('edit_subject').value = prechatData.subject;
+      document.getElementById('edit_chat_source').value = prechatData.chat_source__c;
 
       modal.classList.add('show');
       console.log('📝 Prechat editor opened');
@@ -1108,20 +1135,27 @@ Expected /conversation POST payload:
       prechatData.firstName = document.getElementById('edit_firstName').value;
       prechatData.lastName = document.getElementById('edit_lastName').value;
       prechatData.subject = document.getElementById('edit_subject').value;
+      prechatData.chat_source__c = document.getElementById('edit_chat_source').value;
 
       // Update display
       document.getElementById('display_email').textContent = prechatData.email;
       document.getElementById('display_firstName').textContent = prechatData.firstName;
       document.getElementById('display_lastName').textContent = prechatData.lastName;
       document.getElementById('display_subject').textContent = prechatData.subject;
+      document.getElementById('display_chat_source').textContent = prechatData.chat_source__c;
 
       // Update hidden prechat fields if Salesforce is already loaded
       if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.prechatAPI) {
         try {
-          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-            email_custom: prechatData.email
-          });
-          console.log('✅ Updated hidden prechat fields:', { email_custom: prechatData.email });
+          const hiddenFields = {
+            email_custom: prechatData.email,
+            FirstName: prechatData.firstName,
+            LastName: prechatData.lastName,
+            Subject: prechatData.subject,
+            chat_source__c: prechatData.chat_source__c
+          };
+          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+          console.log('✅ Updated ALL hidden prechat fields:', hiddenFields);
         } catch (e) {
           console.warn('⚠️ Could not update hidden prechat fields:', e);
         }
@@ -1182,15 +1216,27 @@ Expected /conversation POST payload:
       console.log('📋 Using prechat data:', prechatData);
 
       try {
-        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-          email_custom: prechatData.email
-        });
+        // Send ALL prechat fields as hidden fields
+        const hiddenFields = {
+          email_custom: prechatData.email,
+          FirstName: prechatData.firstName,
+          LastName: prechatData.lastName,
+          Subject: prechatData.subject,
+          chat_source__c: prechatData.chat_source__c
+        };
 
-        console.log(`✅ setHiddenPrechatFields({ email_custom: "${prechatData.email}" }) called`);
+        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+
+        console.log('✅ setHiddenPrechatFields() called with ALL fields:');
+        console.log('   📧 email_custom:', prechatData.email);
+        console.log('   👤 FirstName:', prechatData.firstName);
+        console.log('   👤 LastName:', prechatData.lastName);
+        console.log('   📝 Subject:', prechatData.subject);
+        console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
 
         window.prechatDebug.attempts.push({
           timing: 'onEmbeddedMessagingReady',
-          fields: { email_custom: prechatData.email },
+          fields: hiddenFields,
           prechatData: { ...prechatData },
           success: true,
           time: new Date().toISOString()
