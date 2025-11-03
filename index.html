@@ -797,6 +797,12 @@ Expected /conversation POST payload:
           Please leave your message and we'll get back to you as soon as possible.
         </div>
         <form id="offlineContactForm" onsubmit="submitOfflineForm(event)">
+          <!-- Hidden fields -->
+          <input type="hidden" name="subject" value="Chat Unavailable Form">
+          <input type="hidden" name="00NEc00000jTA0T" value="Admission Center">
+          <input type="hidden" name="external" value="1">
+
+          <!-- Visible field 1: Name -->
           <div class="form-group">
             <label for="offline_name">Name<span class="required">*</span></label>
             <input
@@ -808,8 +814,10 @@ Expected /conversation POST payload:
               aria-required="true"
             >
           </div>
+
+          <!-- Visible field 2: Web Email -->
           <div class="form-group">
-            <label for="offline_email">Email<span class="required">*</span></label>
+            <label for="offline_email">Web Email<span class="required">*</span></label>
             <input
               type="email"
               id="offline_email"
@@ -819,29 +827,22 @@ Expected /conversation POST payload:
               aria-required="true"
             >
           </div>
+
+          <!-- Visible field 3: Inquiry (Description) -->
           <div class="form-group">
-            <label for="offline_subject">Subject<span class="required">*</span></label>
-            <input
-              type="text"
-              id="offline_subject"
-              name="subject"
-              placeholder="Brief description of your inquiry"
-              required
-              aria-required="true"
-            >
-          </div>
-          <div class="form-group">
-            <label for="offline_message">Message<span class="required">*</span></label>
+            <label for="offline_message">Inquiry<span class="required">*</span></label>
             <textarea
               id="offline_message"
               name="description"
               placeholder="Please provide details about your inquiry..."
               required
               aria-required="true"
+              rows="5"
             ></textarea>
           </div>
+
           <button type="submit" class="form-submit" id="offlineSubmitBtn">
-            Send Message
+            Submit
           </button>
         </form>
       </div>
@@ -1126,28 +1127,26 @@ Expected /conversation POST payload:
 
       const formData = new FormData(event.target);
 
-      // Build Web-to-Case submission data
-      // NOTE: We omit retURL to prevent any redirect behavior
+      // Build Web-to-Case submission data matching new Salesforce configuration
+      // Hidden fields from form: subject="Chat Unavailable Form", 00NEc00000jTA0T="Admission Center"
       const webToCaseData = new URLSearchParams({
         orgid: '00DEc00000GfZ2M',
         // retURL intentionally omitted - we handle UI in JavaScript
-        subject: formData.get('subject'),
-        description: formData.get('description'),
-        email: formData.get('email'),
         name: formData.get('name'),
-        '00N2E00000IgDbO': 'Capella University', // Business Unit
-        recordType: '0122E000000iHlS', // CU Normal Case
-        status: 'New',
-        priority: 'Medium',
-        // Add a flag to help identify submission source
-        '00N2E00000IgDbP': 'Enhanced Chat Offline Form' // Optional: Add custom field if available
+        email: formData.get('email'),
+        subject: formData.get('subject'), // "Chat Unavailable Form" (hidden field)
+        description: formData.get('description'),
+        '00NEc00000jTA0T': formData.get('00NEc00000jTA0T'), // Chat Source: "Admission Center" (hidden field)
+        external: formData.get('external') // "1" (hidden field)
       });
 
-      console.log('📧 Submitting Web-to-Case:', {
+      console.log('📧 Submitting Web-to-Case (Leave a Message Form):', {
         name: formData.get('name'),
         email: formData.get('email'),
-        subject: formData.get('subject'),
+        subject: formData.get('subject'), // Will be "Chat Unavailable Form"
         description: formData.get('description'),
+        chatSource: formData.get('00NEc00000jTA0T'), // Will be "Admission Center"
+        external: formData.get('external'), // Will be "1"
         note: 'User will stay on current page after submission'
       });
 
@@ -1175,7 +1174,7 @@ Expected /conversation POST payload:
           // Reset form fields but keep success message visible
           event.target.reset();
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Send Message';
+          submitBtn.textContent = 'Submit';
 
           // After additional time, hide success and show form again
           setTimeout(() => {
@@ -1194,7 +1193,7 @@ Expected /conversation POST payload:
 
         // Reset button state
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Message';
+        submitBtn.textContent = 'Submit';
       }
     }
 
