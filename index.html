@@ -736,7 +736,7 @@
         Authentication Mode
         <span id="authModeBadge" class="auth-mode-badge unauthenticated">Unauthenticated</span>
       </strong>
-      <small id="authModeDescription">Sending only chat_source__c (guest user)</small>
+      <small id="authModeDescription">Sending only email_custom (guest user)</small>
     </div>
     <label class="auth-toggle-switch">
       <input type="checkbox" id="authModeToggle" onchange="toggleAuthMode()">
@@ -1224,13 +1224,13 @@ Expected /conversation POST payload:
       if (isAuthenticatedMode) {
         badge.textContent = 'Authenticated';
         badge.className = 'auth-mode-badge authenticated';
-        description.textContent = 'Sending all fields (email, email_custom, FirstName, LastName, Subject, chat_source__c)';
+        description.textContent = 'Sending all fields (_email, email_custom, _firstName, _lastName, subject)';
         console.log('🔐 Authentication Mode: AUTHENTICATED - All prechat fields will be sent');
       } else {
         badge.textContent = 'Unauthenticated';
         badge.className = 'auth-mode-badge unauthenticated';
-        description.textContent = 'Sending only chat_source__c (guest user)';
-        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only chat_source__c will be sent');
+        description.textContent = 'Sending only email_custom (guest user)';
+        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only email_custom will be sent');
       }
 
       // Update prechat fields immediately if Salesforce is already loaded
@@ -1249,18 +1249,19 @@ Expected /conversation POST payload:
     function getHiddenFieldsForMode() {
       if (isAuthenticatedMode) {
         // Authenticated: Send all fields (user is logged in, we have their data)
+        // Field names MUST match Salesforce Channel Variable Names exactly
         return {
-          email: prechatData.email,
-          email_custom: prechatData.email,
-          FirstName: prechatData.firstName,
-          LastName: prechatData.lastName,
-          Subject: prechatData.subject,
-          chat_source__c: prechatData.chat_source__c
+          _email: prechatData.email,           // Salesforce expects: _email
+          email_custom: prechatData.email,     // Salesforce expects: email_custom
+          _firstName: prechatData.firstName,   // Salesforce expects: _firstName
+          _lastName: prechatData.lastName,     // Salesforce expects: _lastName
+          subject: prechatData.subject         // Salesforce expects: subject (lowercase)
         };
       } else {
-        // Unauthenticated: Only send chat_source__c (guest user)
+        // Unauthenticated: Only send email_custom (guest user)
+        // Note: chat_source__c not configured in Salesforce, removed for now
         return {
-          chat_source__c: prechatData.chat_source__c
+          email_custom: prechatData.email
         };
       }
     }
@@ -1384,17 +1385,18 @@ Expected /conversation POST payload:
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
 
         console.log('✅ setHiddenPrechatFields() called:');
-        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (chat_source__c only)');
+        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom only)');
         console.log('   📋 Fields sent:', hiddenFields);
 
         if (isAuthenticatedMode) {
-          console.log('   📧 email:', prechatData.email);
+          console.log('   📧 _email:', prechatData.email);
           console.log('   📧 email_custom:', prechatData.email);
-          console.log('   👤 FirstName:', prechatData.firstName);
-          console.log('   👤 LastName:', prechatData.lastName);
-          console.log('   📝 Subject:', prechatData.subject);
+          console.log('   👤 _firstName:', prechatData.firstName);
+          console.log('   👤 _lastName:', prechatData.lastName);
+          console.log('   📝 subject:', prechatData.subject);
+        } else {
+          console.log('   📧 email_custom:', prechatData.email);
         }
-        console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
 
         window.prechatDebug.attempts.push({
           timing: 'onEmbeddedMessagingReady',
@@ -1441,7 +1443,7 @@ Expected /conversation POST payload:
           const prechatFields = getHiddenFieldsForMode();
 
           console.log('🔧 Setting prechat fields RIGHT BEFORE launch...');
-          console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (chat_source__c only)');
+          console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom only)');
           console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
 
           try {
@@ -1504,19 +1506,31 @@ Expected /conversation POST payload:
       console.log('Attempts:', window.prechatDebug.attempts);
       console.log('Events:', window.prechatDebug.events);
 
-      document.getElementById('capellaChatBtn').style.display = 'none';
+      const chatBtn = document.getElementById('capellaChatBtn');
+      if (chatBtn) {
+        chatBtn.style.display = 'none';
+      }
     });
 
     window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
-      document.getElementById('capellaChatBtn').style.display = 'none';
+      const chatBtn = document.getElementById('capellaChatBtn');
+      if (chatBtn) {
+        chatBtn.style.display = 'none';
+      }
     });
 
     window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
-      document.getElementById('capellaChatBtn').style.display = 'block';
+      const chatBtn = document.getElementById('capellaChatBtn');
+      if (chatBtn) {
+        chatBtn.style.display = 'block';
+      }
     });
 
     window.addEventListener('onEmbeddedMessagingConversationClosed', () => {
-      document.getElementById('capellaChatBtn').style.display = 'block';
+      const chatBtn = document.getElementById('capellaChatBtn');
+      if (chatBtn) {
+        chatBtn.style.display = 'block';
+      }
     });
 
     // ============================================
