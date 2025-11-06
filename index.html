@@ -1437,27 +1437,35 @@ Expected /conversation POST payload:
           console.log('========================================');
 
           // CRITICAL: Set prechat fields RIGHT BEFORE launching chat
-          // Channel Variable Name: "email_custom" (matches Salesforce config)
-          const prechatFields = {
-            email_custom: 'dogz@mailinator.com'
-          };
+          // Use getHiddenFieldsForMode() to respect authentication mode
+          const prechatFields = getHiddenFieldsForMode();
 
-          console.log('🔧 Setting email_custom field RIGHT BEFORE launch...');
+          console.log('🔧 Setting prechat fields RIGHT BEFORE launch...');
+          console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (chat_source__c only)');
           console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
 
           try {
             // Set prechat fields immediately before launching
             embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
-            console.log('✅ setHiddenPrechatFields({ email_custom: "dogz@mailinator.com" }) called');
+            console.log('✅ setHiddenPrechatFields() called successfully');
 
             window.prechatDebug.attempts.push({
               timing: 'Before launchChat()',
               fields: prechatFields,
+              authMode: isAuthenticatedMode ? 'authenticated' : 'unauthenticated',
               success: true,
               time: new Date().toISOString()
             });
           } catch (err) {
             console.error('❌ Error setting prechat before launch:', err);
+            window.prechatDebug.attempts.push({
+              timing: 'Before launchChat()',
+              fields: prechatFields,
+              authMode: isAuthenticatedMode ? 'authenticated' : 'unauthenticated',
+              success: false,
+              error: err.message,
+              time: new Date().toISOString()
+            });
           }
 
           // Small delay to ensure prechat data is processed
