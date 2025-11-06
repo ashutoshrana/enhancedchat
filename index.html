@@ -734,12 +734,12 @@
     <div class="auth-toggle-label">
       <strong>
         Authentication Mode
-        <span id="authModeBadge" class="auth-mode-badge unauthenticated">Unauthenticated</span>
+        <span id="authModeBadge" class="auth-mode-badge authenticated">Authenticated</span>
       </strong>
-      <small id="authModeDescription">Sending only email_custom (guest user)</small>
+      <small id="authModeDescription">Sending all fields (_email, email_custom, _firstName, _lastName, subject)</small>
     </div>
     <label class="auth-toggle-switch">
-      <input type="checkbox" id="authModeToggle" onchange="toggleAuthMode()">
+      <input type="checkbox" id="authModeToggle" onchange="toggleAuthMode()" checked>
       <span class="auth-toggle-slider"></span>
     </label>
   </div>
@@ -1211,8 +1211,9 @@ Expected /conversation POST payload:
       chat_source__c: 'Website' // Custom field for tracking chat source
     };
 
-    // Authentication mode: false = unauthenticated (send all fields), true = authenticated (send only chat_source__c)
-    let isAuthenticatedMode = false;
+    // Authentication mode: true = authenticated (send all fields), false = unauthenticated (send only email_custom)
+    // Default: Authenticated mode (most users are logged in)
+    let isAuthenticatedMode = true;
 
     // Toggle authentication mode
     function toggleAuthMode() {
@@ -1438,6 +1439,10 @@ Expected /conversation POST payload:
           console.log('🖱️ CHAT BUTTON CLICKED');
           console.log('========================================');
 
+          // Debug: Check authentication mode state
+          console.log('🔍 DEBUG: isAuthenticatedMode =', isAuthenticatedMode);
+          console.log('🔍 DEBUG: Checkbox checked =', document.getElementById('authModeToggle').checked);
+
           // CRITICAL: Set prechat fields RIGHT BEFORE launching chat
           // Use getHiddenFieldsForMode() to respect authentication mode
           const prechatFields = getHiddenFieldsForMode();
@@ -1445,6 +1450,7 @@ Expected /conversation POST payload:
           console.log('🔧 Setting prechat fields RIGHT BEFORE launch...');
           console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom only)');
           console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
+          console.log('🔍 DEBUG: Number of fields =', Object.keys(prechatFields).length);
 
           try {
             // Set prechat fields immediately before launching
