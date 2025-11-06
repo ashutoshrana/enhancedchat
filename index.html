@@ -693,6 +693,54 @@
         align-items: flex-start;
       }
     }
+
+    /* ============================================
+       SALESFORCE CHAT CUSTOMIZATION
+       Customize the Salesforce Embedded Messaging chat window
+       ============================================ */
+
+    /* Hide the "Chat" text in the header */
+    embeddedMessagingFrame::part(header-title-text),
+    .embeddedMessagingFrame::part(header-title-text),
+    .embeddedServiceSidebarHeader .headerText,
+    .slds-chat-header__title,
+    .embeddedServiceSidebarHeader span[class*="headerText"] {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    /* Fix logo/image size in chat header */
+    embeddedMessagingFrame::part(header-logo),
+    .embeddedMessagingFrame::part(header-logo),
+    .embeddedServiceSidebarHeader .branding-image,
+    .embeddedServiceSidebarHeader img,
+    .slds-chat-header__logo img {
+      max-width: 180px !important;
+      max-height: 40px !important;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
+    }
+
+    /* Adjust header layout to center logo when text is hidden */
+    embeddedMessagingFrame::part(header),
+    .embeddedMessagingFrame::part(header),
+    .embeddedServiceSidebarHeader,
+    .slds-chat-header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 12px !important;
+    }
+
+    /* Ensure logo container takes up appropriate space */
+    embeddedMessagingFrame::part(header-logo-container),
+    .embeddedMessagingFrame::part(header-logo-container) {
+      flex: 1 !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+    }
   </style>
 </head>
 <body>
@@ -736,7 +784,7 @@
         Authentication Mode
         <span id="authModeBadge" class="auth-mode-badge authenticated">Authenticated</span>
       </strong>
-      <small id="authModeDescription">Sending all fields (_email, email_custom, _firstName, _lastName, subject)</small>
+      <small id="authModeDescription">Sending all fields (_email, email_custom, _firstName, _lastName, subject, chat_source__c)</small>
     </div>
     <label class="auth-toggle-switch">
       <input type="checkbox" id="authModeToggle" onchange="toggleAuthMode()" checked>
@@ -1225,13 +1273,13 @@ Expected /conversation POST payload:
       if (isAuthenticatedMode) {
         badge.textContent = 'Authenticated';
         badge.className = 'auth-mode-badge authenticated';
-        description.textContent = 'Sending all fields (_email, email_custom, _firstName, _lastName, subject)';
+        description.textContent = 'Sending all fields (_email, email_custom, _firstName, _lastName, subject, chat_source__c)';
         console.log('🔐 Authentication Mode: AUTHENTICATED - All prechat fields will be sent');
       } else {
         badge.textContent = 'Unauthenticated';
         badge.className = 'auth-mode-badge unauthenticated';
-        description.textContent = 'Sending only email_custom (guest user)';
-        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only email_custom will be sent');
+        description.textContent = 'Sending email_custom and chat_source__c (guest user)';
+        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only email_custom and chat_source__c will be sent');
       }
 
       // Update prechat fields immediately if Salesforce is already loaded
@@ -1256,13 +1304,14 @@ Expected /conversation POST payload:
           email_custom: prechatData.email,     // Salesforce expects: email_custom
           _firstName: prechatData.firstName,   // Salesforce expects: _firstName
           _lastName: prechatData.lastName,     // Salesforce expects: _lastName
-          subject: prechatData.subject         // Salesforce expects: subject (lowercase)
+          subject: prechatData.subject,        // Salesforce expects: subject (lowercase)
+          chat_source__c: prechatData.chat_source__c  // Chat source tracking
         };
       } else {
-        // Unauthenticated: Only send email_custom (guest user)
-        // Note: chat_source__c not configured in Salesforce, removed for now
+        // Unauthenticated: Send email_custom and chat_source__c (guest user)
         return {
-          email_custom: prechatData.email
+          email_custom: prechatData.email,
+          chat_source__c: prechatData.chat_source__c  // Chat source tracking
         };
       }
     }
@@ -1386,7 +1435,7 @@ Expected /conversation POST payload:
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
 
         console.log('✅ setHiddenPrechatFields() called:');
-        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom only)');
+        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom + chat_source__c)');
         console.log('   📋 Fields sent:', hiddenFields);
 
         if (isAuthenticatedMode) {
@@ -1395,8 +1444,10 @@ Expected /conversation POST payload:
           console.log('   👤 _firstName:', prechatData.firstName);
           console.log('   👤 _lastName:', prechatData.lastName);
           console.log('   📝 subject:', prechatData.subject);
+          console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
         } else {
           console.log('   📧 email_custom:', prechatData.email);
+          console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
         }
 
         window.prechatDebug.attempts.push({
@@ -1420,6 +1471,54 @@ Expected /conversation POST payload:
       }
 
       console.log('========================================');
+
+      // Customize chat header: hide "Chat" text and fix logo size
+      setTimeout(() => {
+        try {
+          // Find the chat iframe
+          const chatFrame = document.querySelector('iframe[title*="chat" i], iframe[name*="messaging" i]');
+
+          if (chatFrame && chatFrame.contentWindow) {
+            const frameDoc = chatFrame.contentWindow.document;
+
+            // Inject custom styles into the iframe
+            const style = frameDoc.createElement('style');
+            style.textContent = `
+              /* Hide "Chat" text */
+              .slds-chat-header__title,
+              .embeddedServiceSidebarHeader .headerText,
+              [class*="headerText"],
+              [class*="title-text"] {
+                display: none !important;
+                visibility: hidden !important;
+              }
+
+              /* Fix logo size */
+              .slds-chat-header__logo img,
+              .embeddedServiceSidebarHeader img,
+              .branding-image {
+                max-width: 180px !important;
+                max-height: 40px !important;
+                width: auto !important;
+                height: auto !important;
+                object-fit: contain !important;
+              }
+
+              /* Center logo in header */
+              .slds-chat-header,
+              .embeddedServiceSidebarHeader {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+              }
+            `;
+            frameDoc.head.appendChild(style);
+            console.log('✅ Chat header customization applied');
+          }
+        } catch (e) {
+          console.warn('⚠️ Could not customize chat header (cross-origin restriction):', e.message);
+        }
+      }, 1000);
     });
 
     // Chat button created - set up custom launcher
@@ -1448,7 +1547,7 @@ Expected /conversation POST payload:
           const prechatFields = getHiddenFieldsForMode();
 
           console.log('🔧 Setting prechat fields RIGHT BEFORE launch...');
-          console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom only)');
+          console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom + chat_source__c)');
           console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
           console.log('🔍 DEBUG: Number of fields =', Object.keys(prechatFields).length);
 
