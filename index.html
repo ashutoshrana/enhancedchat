@@ -1647,18 +1647,32 @@ Expected /conversation POST payload:
       console.log('========================================');
       console.log('⏰ EVENT: onEmbeddedMessagingWithinBusinessHours');
       console.log('========================================');
-      console.log('Within Business Hours:', event.detail.withinBusinessHours);
+      console.log('Event detail:', event.detail);
+      console.log('Within Business Hours raw value:', event.detail?.withinBusinessHours);
 
       businessHoursEventFired = true; // Mark that business hours are configured
 
-      // Handle undefined as true (chat available by default)
-      // Salesforce may return undefined if business hours not properly configured
-      if (event.detail.withinBusinessHours === undefined) {
-        console.log('⚠️ Business hours value is undefined - treating as TRUE (chat available)');
-        isWithinBusinessHours = true;
-      } else {
-        isWithinBusinessHours = event.detail.withinBusinessHours;
+      // IMPORTANT: Salesforce MIAW sometimes fires this event with undefined value
+      // This is a known issue - happens when business hours are configured but
+      // the event fires before the value is fully loaded
+
+      // Handle undefined/null/missing values
+      const businessHoursValue = event.detail?.withinBusinessHours;
+
+      if (businessHoursValue === undefined || businessHoursValue === null) {
+        console.log('⚠️ Business hours value is undefined/null');
+        console.log('  - This is a Salesforce MIAW timing issue');
+        console.log('  - Keeping current value:', isWithinBusinessHours);
+        console.log('  - Will wait for proper business hours event or use default');
+
+        // Don't change isWithinBusinessHours - keep default (true)
+        // The onEmbeddedMessagingReady timeout will handle showing chat button
+        return; // Exit early - don't call updateChatAvailability yet
       }
+
+      // We got a valid boolean value
+      console.log('✅ Valid business hours value received:', businessHoursValue);
+      isWithinBusinessHours = businessHoursValue;
 
       updateChatAvailability('business_hours_event');
     });
@@ -1753,23 +1767,41 @@ Expected /conversation POST payload:
       console.log('📍 Messaging Ready - resetting agent availability');
       noAgentsAvailable = false;
 
-      // If business hours are not configured, the business hours events will never fire
-      // So we need to call updateChatAvailability here to show the chat button
-      // We'll wait a short time for business hours event to fire, and if it doesn't, show chat
-      setTimeout(() => {
-        if (!businessHoursEventFired) {
-          // Business hours are NOT configured - no event fired
-          // Default to showing chat button (isWithinBusinessHours = true by default)
-          console.log('⚠️ No business hours events fired - assuming business hours not configured');
-          console.log('  - isWithinBusinessHours:', isWithinBusinessHours);
-          console.log('  - noAgentsAvailable:', noAgentsAvailable);
-          console.log('  - Calling updateChatAvailability to show chat button');
+      // IMPORTANT: Business hours event handling strategy
+      // Problem: onEmbeddedMessagingWithinBusinessHours sometimes fires with undefined
+      // Solution: Wait for valid event, then default to true (show chat)
 
-          updateChatAvailability('no_business_hours_configured');
-        } else {
-          console.log('✅ Business hours events fired - availability already set');
+      // Strategy: Wait with multiple timeouts to handle the undefined issue
+      // Timeout 1: Wait 1 second for event to fire
+      setTimeout(() => {
+        if (businessHoursEventFired && isWithinBusinessHours !== undefined) {
+          console.log('✅ Business hours determined from event:', isWithinBusinessHours);
+          return; // Event handled successfully
         }
-      }, 2000); // Wait 2 seconds for business hours events
+
+        console.log('⏳ Business hours event fired with undefined or not fired yet');
+        console.log('  - Waiting longer for valid value...');
+
+        // Timeout 2: Wait another 1.5 seconds
+        setTimeout(() => {
+          if (businessHoursEventFired && isWithinBusinessHours !== undefined) {
+            console.log('✅ Business hours now available from delayed event:', isWithinBusinessHours);
+            return; // Event eventually provided valid value
+          }
+
+          // Final fallback: Default to true (show chat)
+          console.log('⚠️ Business hours could not be determined after waiting');
+          console.log('  - businessHoursEventFired:', businessHoursEventFired);
+          console.log('  - isWithinBusinessHours:', isWithinBusinessHours);
+          console.log('  - Defaulting to TRUE (chat available) and updating availability');
+
+          if (isWithinBusinessHours === undefined || isWithinBusinessHours === null) {
+            isWithinBusinessHours = true; // Default to showing chat
+          }
+
+          updateChatAvailability('business_hours_fallback_after_wait');
+        }, 1500); // Total wait: 2.5 seconds
+      }, 1000); // Initial wait: 1 second
     });
 
     // User clicked offline form button instead of chat
