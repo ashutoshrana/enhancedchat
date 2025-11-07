@@ -1761,7 +1761,7 @@ Expected /conversation POST payload:
       console.log('========================================');
     });
 
-    // Attempt 4: API check after initialization + Final fallback
+    // Attempt 4: API polling with multiple retries + Final fallback
     window.addEventListener('onEmbeddedMessagingReady', () => {
       console.log('📍 Messaging Ready - resetting agent availability');
       noAgentsAvailable = false;
@@ -1773,41 +1773,56 @@ Expected /conversation POST payload:
         return;
       }
 
-      // Try API after delay to allow full initialization
-      setTimeout(() => {
-        // Check if events provided value during the wait
+      // Polling approach: Try API multiple times with increasing delays
+      let attemptCount = 0;
+      const maxAttempts = 5;
+      const delays = [1000, 2000, 3000, 4000, 5000]; // 1s, 2s, 3s, 4s, 5s (total: 15s)
+
+      function tryApiCheck() {
+        // Check if events provided value during polling
         if (businessHoursValue !== null) {
-          console.log('✅ Business hours determined during wait:', businessHoursValue);
+          console.log('✅ Business hours determined during polling:', businessHoursValue);
           console.log('   Source:', businessHoursSource);
           return;
         }
 
-        // Try direct API call
-        console.log('🔍 Attempting to check business hours via API...');
+        attemptCount++;
+        console.log(`🔍 API Check Attempt ${attemptCount}/${maxAttempts}...`);
+
         try {
           const apiValue = embeddedservice_bootstrap.utilAPI?.isWithinBusinessHours?.();
-          console.log('   API returned:', apiValue);
+          console.log(`   API returned:`, apiValue, `(type: ${typeof apiValue})`);
 
           if (setBusinessHours(apiValue, 'api')) {
-            console.log('✅ Business hours determined from API');
+            console.log(`✅ Business hours determined from API on attempt ${attemptCount}`);
             return;
           }
         } catch (e) {
-          console.warn('⚠️ API check error:', e);
+          console.warn(`⚠️ API check error on attempt ${attemptCount}:`, e);
         }
 
-        // Final fallback: Default to true (show chat button)
-        console.log('========================================');
-        console.log('⚠️ Could not determine business hours from:');
-        console.log('   - Primary event (undefined)');
-        console.log('   - Started/Ended events (did not fire)');
-        console.log('   - API (unavailable or returned non-boolean)');
-        console.log('   ➡️ Defaulting to TRUE (chat available)');
-        console.log('   ➡️ Salesforce will handle offline state internally');
-        console.log('========================================');
+        // If we haven't exhausted all attempts, try again
+        if (attemptCount < maxAttempts) {
+          const nextDelay = delays[attemptCount];
+          console.log(`   ⏳ API returned undefined, retrying in ${nextDelay}ms...`);
+          setTimeout(tryApiCheck, nextDelay);
+        } else {
+          // Final fallback after all attempts exhausted
+          console.log('========================================');
+          console.log(`⚠️ Could not determine business hours after ${maxAttempts} attempts:`);
+          console.log('   - Primary event: undefined');
+          console.log('   - Started/Ended events: did not fire');
+          console.log('   - API: returned undefined on all attempts');
+          console.log('   ➡️ Defaulting to TRUE (chat available)');
+          console.log('   ➡️ Salesforce will handle offline state internally');
+          console.log('========================================');
 
-        setBusinessHours(true, 'default_fallback');
-      }, 2500); // Wait 2.5 seconds for initialization
+          setBusinessHours(true, 'default_fallback');
+        }
+      }
+
+      // Start first API check after 1 second
+      setTimeout(tryApiCheck, delays[0]);
     });
 
     // User clicked offline form button instead of chat
