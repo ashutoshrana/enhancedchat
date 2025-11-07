@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Capella University - Chat Support</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <title>Salesforce Chat Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
     :root {
@@ -11,39 +12,52 @@
       --capella-red: #C10016;
       --capella-red-dark: #910012;
       --capella-red-hover: #A5000F;
+      --capella-teal: #94B7BB;
+      --capella-teal-dark: #7A9FA3;
 
       /* Neutral Colors */
-      --gray-50: #F9FAFB;
-      --gray-100: #F3F4F6;
-      --gray-200: #E5E7EB;
-      --gray-300: #D1D5DB;
-      --gray-400: #9CA3AF;
-      --gray-600: #4B5563;
-      --gray-700: #374151;
-      --gray-900: #111827;
+      --capella-gray-50: #F9FAFB;
+      --capella-gray-100: #F3F4F6;
+      --capella-gray-200: #E5E7EB;
+      --capella-gray-300: #D1D5DB;
+      --capella-gray-400: #9CA3AF;
+      --capella-gray-600: #4B5563;
+      --capella-gray-700: #374151;
+      --capella-gray-900: #111827;
+
+      /* Typography */
+      --font-family: Arial, Helvetica, sans-serif;
+      --font-size-sm: 13px;
+      --font-size-base: 14px;
+      --font-size-lg: 16px;
 
       /* Spacing */
+      --spacing-xs: 4px;
       --spacing-sm: 8px;
       --spacing-md: 12px;
       --spacing-lg: 16px;
       --spacing-xl: 20px;
       --spacing-2xl: 24px;
 
-      /* Shadows */
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
+      /* Border Radius */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-xl: 12px;
 
-    * {
-      box-sizing: border-box;
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      padding: 40px 20px;
+      font-family: var(--font-family);
+      padding: 40px;
       max-width: 800px;
       margin: 0 auto;
-      color: var(--gray-900);
+      color: var(--capella-gray-900);
     }
 
     h1 {
@@ -51,64 +65,27 @@
       font-weight: 700;
     }
 
-    /* ======================
-       Leave a Message Button
-       ====================== */
-    #leaveMessageBtn {
-      display: none;
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      background: var(--capella-red);
-      color: white;
-      border: none;
-      border-radius: 28px;
-      padding: 16px 24px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: var(--shadow-lg);
-      transition: all 0.3s ease;
-      z-index: 3141589;
-      align-items: center;
-      gap: 8px;
-    }
+    /* Salesforce generates the chat button - we just control visibility */
 
-    #leaveMessageBtn.show {
-      display: flex;
-    }
-
-    #leaveMessageBtn:hover {
-      background: var(--capella-red-hover);
-      transform: translateY(-2px);
-    }
-
-    #leaveMessageBtn::before {
-      content: '✉';
-      font-size: 20px;
-    }
-
-    /* ======================
-       Offline Contact Form
-       ====================== */
-    #offlineForm {
+    /* Offline Contact Form - Capella Styled */
+    #offlineFormContainer {
       display: none;
       position: fixed;
       right: 20px;
       bottom: 20px;
       width: 400px;
-      max-width: calc(100vw - 40px);
       max-height: 90vh;
       background: white;
-      border-radius: 12px;
+      border-radius: var(--radius-xl);
       box-shadow: var(--shadow-xl);
       z-index: 3141590;
       overflow: hidden;
-      animation: slideIn 0.3s ease-out;
+      font-family: var(--font-family);
     }
 
-    #offlineForm.show {
+    #offlineFormContainer.show {
       display: block;
+      animation: slideIn 0.3s ease-out;
     }
 
     @keyframes slideIn {
@@ -122,7 +99,7 @@
       }
     }
 
-    .form-header {
+    .offline-form-header {
       background: var(--capella-red);
       color: white;
       padding: var(--spacing-xl) var(--spacing-2xl);
@@ -131,13 +108,14 @@
       align-items: center;
     }
 
-    .form-header h3 {
+    .offline-form-header h3 {
       margin: 0;
       font-size: 20px;
       font-weight: 700;
+      letter-spacing: -0.01em;
     }
 
-    .form-close {
+    .offline-form-close {
       background: transparent;
       border: none;
       color: white;
@@ -146,28 +124,61 @@
       padding: 0;
       width: 32px;
       height: 32px;
-      border-radius: 4px;
-      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      transition: background 0.2s ease;
+      line-height: 1;
     }
 
-    .form-close:hover {
+    .offline-form-close:hover {
       background: rgba(255, 255, 255, 0.15);
     }
 
-    .form-body {
+    .offline-form-close:active {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .offline-form-body {
       padding: var(--spacing-2xl);
       max-height: calc(90vh - 80px);
       overflow-y: auto;
     }
 
-    .form-message {
-      background: var(--gray-50);
-      border-left: 4px solid #94B7BB;
+    /* Custom scrollbar for Capella styling */
+    .offline-form-body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .offline-form-body::-webkit-scrollbar-track {
+      background: var(--capella-gray-100);
+    }
+
+    .offline-form-body::-webkit-scrollbar-thumb {
+      background: var(--capella-gray-300);
+      border-radius: 4px;
+    }
+
+    .offline-form-body::-webkit-scrollbar-thumb:hover {
+      background: var(--capella-gray-400);
+    }
+
+    .offline-form-message {
+      background: var(--capella-gray-50);
+      border-left: 4px solid var(--capella-teal);
       padding: var(--spacing-lg);
-      border-radius: 6px;
+      border-radius: var(--radius-md);
       margin-bottom: var(--spacing-xl);
-      font-size: 13px;
-      color: var(--gray-700);
+      font-size: var(--font-size-sm);
+      color: var(--capella-gray-700);
+      line-height: 1.5;
+    }
+
+    .offline-form-message strong {
+      color: var(--capella-gray-900);
+      display: block;
+      margin-bottom: var(--spacing-xs);
     }
 
     .form-group {
@@ -178,34 +189,65 @@
       display: block;
       margin-bottom: var(--spacing-sm);
       font-weight: 600;
-      font-size: 13px;
-      color: var(--gray-700);
+      font-size: var(--font-size-sm);
+      color: var(--capella-gray-700);
+      letter-spacing: 0.01em;
     }
 
-    .form-group .required {
+    .form-group label .required {
       color: var(--capella-red);
+      margin-left: 2px;
     }
 
     .form-group input,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
       width: 100%;
       padding: var(--spacing-md) var(--spacing-lg);
-      border: 2px solid var(--gray-200);
-      border-radius: 6px;
-      font-size: 14px;
-      font-family: inherit;
-      transition: border-color 0.2s;
+      border: 2px solid var(--capella-gray-200);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-family: var(--font-family);
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+      color: var(--capella-gray-900);
+      background: white;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--capella-gray-400);
+    }
+
+    .form-group input:hover,
+    .form-group textarea:hover,
+    .form-group select:hover {
+      border-color: var(--capella-gray-300);
     }
 
     .form-group input:focus,
-    .form-group textarea:focus {
+    .form-group textarea:focus,
+    .form-group select:focus {
       outline: none;
       border-color: var(--capella-red);
+      box-shadow: 0 0 0 4px rgba(193, 0, 22, 0.1);
     }
 
     .form-group textarea {
       resize: vertical;
       min-height: 100px;
+      line-height: 1.5;
+    }
+
+    /* Form Validation States */
+    .form-group input:invalid:not(:placeholder-shown),
+    .form-group textarea:invalid:not(:placeholder-shown) {
+      border-color: var(--capella-red);
+    }
+
+    .form-group input:valid:not(:placeholder-shown),
+    .form-group textarea:valid:not(:placeholder-shown) {
+      border-color: #10B981;
     }
 
     .form-submit {
@@ -213,22 +255,33 @@
       color: white;
       border: none;
       padding: var(--spacing-lg) var(--spacing-2xl);
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-lg);
       font-weight: 700;
       cursor: pointer;
       width: 100%;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      text-transform: none;
+      letter-spacing: 0.01em;
+      box-shadow: var(--shadow-sm);
     }
 
     .form-submit:hover {
       background: var(--capella-red-hover);
+      box-shadow: var(--shadow-md);
       transform: translateY(-1px);
     }
 
+    .form-submit:active {
+      background: var(--capella-red-dark);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(0);
+    }
+
     .form-submit:disabled {
-      background: var(--gray-300);
+      background: var(--capella-gray-300);
       cursor: not-allowed;
+      box-shadow: none;
       transform: none;
     }
 
@@ -242,7 +295,7 @@
       display: block;
     }
 
-    .success-icon {
+    .form-success-icon {
       width: 64px;
       height: 64px;
       background: #10B981;
@@ -252,347 +305,1534 @@
       align-items: center;
       justify-content: center;
       font-size: 32px;
+      font-weight: bold;
       margin-bottom: var(--spacing-xl);
     }
 
     .form-success h3 {
-      color: var(--gray-900);
+      color: var(--capella-gray-900);
       font-size: 24px;
+      font-weight: 700;
       margin: 0 0 var(--spacing-md) 0;
     }
 
     .form-success p {
-      color: var(--gray-600);
+      color: var(--capella-gray-600);
+      font-size: var(--font-size-base);
+      line-height: 1.5;
       margin: 0 0 var(--spacing-xl) 0;
     }
 
-    .success-close {
+    .form-success-close {
       background: var(--capella-red);
       color: white;
       border: none;
       padding: var(--spacing-md) var(--spacing-2xl);
-      border-radius: 6px;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s ease;
       min-width: 120px;
-      transition: background 0.2s;
     }
 
-    .success-close:hover {
+    .form-success-close:hover {
       background: var(--capella-red-hover);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
     }
 
+    .form-success-close:active {
+      background: var(--capella-red-dark);
+      transform: translateY(0);
+    }
+
+    /* Leave a Message Button */
+    /* NOTE: Positioned at same location as Salesforce chat button (right: 20px, bottom: 20px)
+       This is intentional - they are mutually exclusive and never show at the same time.
+       The updateChatAvailability() function ensures only one is visible at any time. */
+    #leaveMessageButton {
+      display: none;
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: var(--capella-red);
+      color: white;
+      border: none;
+      border-radius: 28px;
+      padding: 16px 24px;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+      z-index: 3141589; /* Same z-index as Salesforce chat button - they never overlap */
+      animation: slideIn 0.3s ease-out;
+      min-height: 56px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #leaveMessageButton.show {
+      display: flex;
+    }
+
+    #leaveMessageButton:hover {
+      background: var(--capella-red-hover);
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-2px);
+    }
+
+    #leaveMessageButton:active {
+      background: var(--capella-red-dark);
+      transform: translateY(0);
+    }
+
+    #leaveMessageButton::before {
+      content: '✉';
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* Prechat Editor Styles */
+    .prechat-info-box {
+      background: var(--capella-gray-50);
+      border: 2px solid var(--capella-gray-200);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+      margin: var(--spacing-xl) 0;
+    }
+
+    .prechat-info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .prechat-info-header h3 {
+      margin: 0;
+      color: var(--capella-gray-900);
+      font-size: 18px;
+    }
+
+    .edit-prechat-btn {
+      background: var(--capella-red);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .edit-prechat-btn:hover {
+      background: var(--capella-red-hover);
+      transform: translateY(-1px);
+    }
+
+    .prechat-values {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+    }
+
+    .prechat-value-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .prechat-value-label {
+      font-weight: 600;
+      font-size: var(--font-size-sm);
+      color: var(--capella-gray-700);
+    }
+
+    .prechat-value-text {
+      color: var(--capella-gray-900);
+      font-size: var(--font-size-base);
+    }
+
+    /* Prechat Editor Modal */
+    #prechatEditorModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #prechatEditorModal.show {
+      display: flex;
+    }
+
+    .prechat-editor-content {
+      background: white;
+      border-radius: var(--radius-xl);
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .prechat-editor-header {
+      background: var(--capella-red);
+      color: white;
+      padding: var(--spacing-xl) var(--spacing-2xl);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .prechat-editor-header h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .prechat-editor-close {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      transition: background 0.2s ease;
+    }
+
+    .prechat-editor-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .prechat-editor-body {
+      padding: var(--spacing-2xl);
+    }
+
+    .prechat-editor-footer {
+      padding: var(--spacing-xl) var(--spacing-2xl);
+      border-top: 1px solid var(--capella-gray-200);
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: flex-end;
+    }
+
+    .prechat-btn-cancel {
+      background: var(--capella-gray-200);
+      color: var(--capella-gray-700);
+      border: none;
+      padding: var(--spacing-md) var(--spacing-xl);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .prechat-btn-cancel:hover {
+      background: var(--capella-gray-300);
+    }
+
+    .prechat-btn-save {
+      background: var(--capella-red);
+      color: white;
+      border: none;
+      padding: var(--spacing-md) var(--spacing-xl);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .prechat-btn-save:hover {
+      background: var(--capella-red-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Mobile Responsive */
     @media (max-width: 480px) {
-      #offlineForm {
+      #offlineFormContainer {
         right: 10px;
         bottom: 10px;
         width: calc(100vw - 20px);
+        max-width: 400px;
       }
 
-      #leaveMessageBtn {
+      #leaveMessageButton {
         right: 10px;
         bottom: 10px;
+        padding: 14px 20px;
+        font-size: 13px;
       }
+
+      .prechat-values {
+        grid-template-columns: 1fr;
+      }
+
+      .prechat-editor-content {
+        margin: 0;
+        border-radius: var(--radius-md);
+      }
+    }
+
+    /* Authentication Mode Toggle */
+    .auth-toggle-container {
+      background: var(--capella-gray-50);
+      border: 2px solid var(--capella-gray-200);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      margin: var(--spacing-lg) 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-md);
+    }
+
+    .auth-toggle-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .auth-toggle-label strong {
+      color: var(--capella-gray-900);
+      font-size: var(--font-size-base);
+    }
+
+    .auth-toggle-label small {
+      color: var(--capella-gray-600);
+      font-size: var(--font-size-sm);
+    }
+
+    .auth-toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+
+    .auth-toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .auth-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--capella-gray-300);
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .auth-toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    .auth-toggle-switch input:checked + .auth-toggle-slider {
+      background-color: var(--capella-red);
+    }
+
+    .auth-toggle-switch input:checked + .auth-toggle-slider:before {
+      transform: translateX(26px);
+    }
+
+    .auth-mode-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .auth-mode-badge.authenticated {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .auth-mode-badge.unauthenticated {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    @media (max-width: 768px) {
+      .auth-toggle-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* ============================================
+       SALESFORCE CHAT CUSTOMIZATION
+       Customize the Salesforce Embedded Messaging chat window
+       ============================================ */
+
+    /* Hide the "Chat" text in the header */
+    embeddedMessagingFrame::part(header-title-text),
+    .embeddedMessagingFrame::part(header-title-text),
+    .embeddedServiceSidebarHeader .headerText,
+    .slds-chat-header__title,
+    .embeddedServiceSidebarHeader span[class*="headerText"] {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    /* Fix logo/image size in chat header */
+    embeddedMessagingFrame::part(header-logo),
+    .embeddedMessagingFrame::part(header-logo),
+    .embeddedServiceSidebarHeader .branding-image,
+    .embeddedServiceSidebarHeader img,
+    .slds-chat-header__logo img {
+      max-width: 180px !important;
+      max-height: 40px !important;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
+    }
+
+    /* Adjust header layout to center logo when text is hidden */
+    embeddedMessagingFrame::part(header),
+    .embeddedMessagingFrame::part(header),
+    .embeddedServiceSidebarHeader,
+    .slds-chat-header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 12px !important;
+    }
+
+    /* Ensure logo container takes up appropriate space */
+    embeddedMessagingFrame::part(header-logo-container),
+    .embeddedMessagingFrame::part(header-logo-container) {
+      flex: 1 !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to Capella University Chat Support</h1>
-  <p>Click the chat button in the bottom right corner to start a conversation with our support team.</p>
+  <h1>Welcome to Salesforce Messaging Test</h1>
+  <p>Click the chat button in the bottom right corner to start a conversation.</p>
 
-  <!-- Leave a Message Button (shown when chat is unavailable) -->
-  <button id="leaveMessageBtn" onclick="openOfflineForm()" aria-label="Leave a message">
-    Leave a Message
-  </button>
-
-  <!-- Offline Contact Form -->
-  <div id="offlineForm">
-    <div class="form-header">
-      <h3>Contact Us</h3>
-      <button class="form-close" onclick="closeOfflineForm()" aria-label="Close">×</button>
+  <!-- Prechat Information Display with Edit Button -->
+  <div class="prechat-info-box">
+    <div class="prechat-info-header">
+      <h3>Prechat Information</h3>
+      <button class="edit-prechat-btn" onclick="openPrechatEditor()">✏️ Edit</button>
     </div>
-    <div class="form-body">
-      <div id="formContent">
-        <div class="form-message">
-          <strong>Our support team is currently unavailable.</strong><br>
-          Please leave your message and we'll get back to you as soon as possible.
-        </div>
-        <form id="contactForm" onsubmit="submitForm(event)">
-          <input type="hidden" name="subject" value="Chat Unavailable Form">
-          <input type="hidden" name="00NEc00000jTA0T" value="Admission Center">
-          <input type="hidden" name="external" value="1">
-
-          <div class="form-group">
-            <label>Name<span class="required">*</span></label>
-            <input type="text" name="name" required placeholder="Enter your full name">
-          </div>
-
-          <div class="form-group">
-            <label>Email<span class="required">*</span></label>
-            <input type="email" name="email" required placeholder="your.email@example.com">
-          </div>
-
-          <div class="form-group">
-            <label>Message<span class="required">*</span></label>
-            <textarea name="description" required placeholder="Please describe your inquiry..." rows="5"></textarea>
-          </div>
-
-          <button type="submit" class="form-submit" id="submitBtn">Submit</button>
-        </form>
+    <div class="prechat-values">
+      <div class="prechat-value-item">
+        <div class="prechat-value-label">Email (email_custom)</div>
+        <div class="prechat-value-text" id="display_email">dogz@mailinator.com</div>
       </div>
-      <div id="formSuccess" class="form-success">
-        <div class="success-icon">✓</div>
-        <h3>Thank you!</h3>
-        <p>We've received your message and will get back to you soon.</p>
-        <button class="success-close" onclick="closeOfflineForm()">Close</button>
+      <div class="prechat-value-item">
+        <div class="prechat-value-label">First Name</div>
+        <div class="prechat-value-text" id="display_firstName">Chat</div>
+      </div>
+      <div class="prechat-value-item">
+        <div class="prechat-value-label">Last Name</div>
+        <div class="prechat-value-text" id="display_lastName">TestUser</div>
+      </div>
+      <div class="prechat-value-item">
+        <div class="prechat-value-label">Subject</div>
+        <div class="prechat-value-text" id="display_subject">Chat Inquiry from Website</div>
+      </div>
+      <div class="prechat-value-item">
+        <div class="prechat-value-label">Chat Source (chat_source__c)</div>
+        <div class="prechat-value-text" id="display_chat_source">Website</div>
       </div>
     </div>
   </div>
 
+  <!-- Authentication Mode Toggle -->
+  <div class="auth-toggle-container">
+    <div class="auth-toggle-label">
+      <strong>
+        Authentication Mode
+        <span id="authModeBadge" class="auth-mode-badge authenticated">Authenticated</span>
+      </strong>
+      <small id="authModeDescription">Sending all fields (_email, email_custom, _firstName, _lastName, subject, chat_source__c)</small>
+    </div>
+    <label class="auth-toggle-switch">
+      <input type="checkbox" id="authModeToggle" onchange="toggleAuthMode()" checked>
+      <span class="auth-toggle-slider"></span>
+    </label>
+  </div>
+
+  <div style="background: #d1ecf1; padding: 16px; border-left: 4px solid #17a2b8; margin-top: 20px; border-radius: 4px;">
+    <h3 style="margin-top: 0; color: #0c5460;">🐛 Debugging Mode Active</h3>
+    <p><strong>Open Browser Console (F12) to see detailed logs:</strong></p>
+    <ul>
+      <li>Event firing sequence</li>
+      <li>Prechat API availability checks</li>
+      <li>Field values being sent</li>
+      <li>Expected routingAttributes structure</li>
+      <li>Success/error messages</li>
+    </ul>
+    <p style="background: #fff; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+      <strong>After testing, run:</strong><br>
+      <code>console.log(window.prechatDebug)</code>
+    </p>
+    <p><strong>WHAT TO LOOK FOR IN CONSOLE:</strong></p>
+    <ol style="font-size: 14px;">
+      <li>✅ <code>setHiddenPrechatFields called successfully</code></li>
+      <li>🌐 <code>NETWORK: POST /conversation detected</code></li>
+      <li>✅ <code>routingAttributes found in request!</code></li>
+      <li>📧 <code>Email value: dogz@mailinator.com</code></li>
+    </ol>
+    <div style="background: #fff3cd; padding: 8px; border-left: 3px solid #856404; margin-top: 8px;">
+      <strong>❌ If you see:</strong> <code>routingAttributes MISSING from request</code>
+      <br><strong>Then:</strong> setHiddenPrechatFields is not working correctly
+    </div>
+    <pre style="background: #fff; padding: 8px; border-radius: 4px; font-size: 11px; overflow-x: auto; margin-top: 8px;">
+Expected /conversation POST payload:
+{
+  "routingAttributes": {
+    "_firstName": "Chat",
+    "_lastName": "TestUser",
+    "_email": "dogz@mailinator.com",
+    "_subject": "Chat Inquiry from Website"
+  },
+  "conversationId": "...",
+  "language": "en_US"
+}</pre>
+  </div>
+
+  <!-- Salesforce generates the chat button automatically -->
+
+  <!-- Offline Contact Form -->
+  <div id="offlineFormContainer">
+    <div class="offline-form-header">
+      <h3>Contact Us</h3>
+      <button class="offline-form-close" aria-label="Close" onclick="hideOfflineForm()">×</button>
+    </div>
+    <div class="offline-form-body">
+      <div id="offlineFormContent">
+        <div class="offline-form-message">
+          <strong>Our support team is currently unavailable.</strong>
+          Please leave your message and we'll get back to you as soon as possible.
+        </div>
+        <form id="offlineContactForm" onsubmit="submitOfflineForm(event)">
+          <!-- Hidden fields -->
+          <input type="hidden" name="subject" value="Chat Unavailable Form">
+          <input type="hidden" name="00NEc00000jTA0T" value="Admission Center">
+          <input type="hidden" name="external" value="1">
+
+          <!-- Visible field 1: Name -->
+          <div class="form-group">
+            <label for="offline_name">Name<span class="required">*</span></label>
+            <input
+              type="text"
+              id="offline_name"
+              name="name"
+              placeholder="Enter your full name"
+              required
+              aria-required="true"
+            >
+          </div>
+
+          <!-- Visible field 2: Web Email -->
+          <div class="form-group">
+            <label for="offline_email">Web Email<span class="required">*</span></label>
+            <input
+              type="email"
+              id="offline_email"
+              name="email"
+              placeholder="your.email@example.com"
+              required
+              aria-required="true"
+            >
+          </div>
+
+          <!-- Visible field 3: Inquiry (Description) -->
+          <div class="form-group">
+            <label for="offline_message">Inquiry<span class="required">*</span></label>
+            <textarea
+              id="offline_message"
+              name="description"
+              placeholder="Please provide details about your inquiry..."
+              required
+              aria-required="true"
+              rows="5"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="form-submit" id="offlineSubmitBtn">
+            Submit
+          </button>
+        </form>
+      </div>
+      <div id="offlineFormSuccess" class="form-success">
+        <div class="form-success-icon">✓</div>
+        <h3>Thank you!</h3>
+        <p>We've received your message and will get back to you soon.</p>
+        <button class="form-success-close" onclick="hideOfflineForm()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prechat Editor Modal -->
+  <div id="prechatEditorModal">
+    <div class="prechat-editor-content">
+      <div class="prechat-editor-header">
+        <h3>Edit Prechat Information</h3>
+        <button class="prechat-editor-close" onclick="closePrechatEditor()" aria-label="Close">×</button>
+      </div>
+      <div class="prechat-editor-body">
+        <form id="prechatEditorForm">
+          <div class="form-group">
+            <label for="edit_email">Email (email_custom)<span class="required">*</span></label>
+            <input
+              type="email"
+              id="edit_email"
+              name="email"
+              placeholder="your.email@example.com"
+              required
+              aria-required="true"
+            >
+            <small style="color: var(--capella-gray-600); font-size: 12px; margin-top: 4px; display: block;">
+              This will be sent as "email_custom" hidden prechat field
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="edit_firstName">First Name<span class="required">*</span></label>
+            <input
+              type="text"
+              id="edit_firstName"
+              name="firstName"
+              placeholder="Enter first name"
+              required
+              aria-required="true"
+            >
+          </div>
+          <div class="form-group">
+            <label for="edit_lastName">Last Name<span class="required">*</span></label>
+            <input
+              type="text"
+              id="edit_lastName"
+              name="lastName"
+              placeholder="Enter last name"
+              required
+              aria-required="true"
+            >
+          </div>
+          <div class="form-group">
+            <label for="edit_subject">Subject<span class="required">*</span></label>
+            <input
+              type="text"
+              id="edit_subject"
+              name="subject"
+              placeholder="Enter subject"
+              required
+              aria-required="true"
+            >
+          </div>
+          <div class="form-group">
+            <label for="edit_chat_source">Chat Source (chat_source__c)<span class="required">*</span></label>
+            <input
+              type="text"
+              id="edit_chat_source"
+              name="chat_source"
+              placeholder="e.g., Website, Mobile App, Email, etc."
+              required
+              aria-required="true"
+            >
+            <small style="color: var(--capella-gray-600); font-size: 12px; margin-top: 4px; display: block;">
+              This tracks where the chat originated from
+            </small>
+          </div>
+        </form>
+      </div>
+      <div class="prechat-editor-footer">
+        <button class="prechat-btn-cancel" onclick="closePrechatEditor()">Cancel</button>
+        <button class="prechat-btn-save" onclick="savePrechatInfo()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leave a Message Button (shown when chat is unavailable) -->
+  <button id="leaveMessageButton" onclick="openOfflineForm()" aria-label="Leave a message">
+    Leave a Message
+  </button>
+
   <script>
-    // ======================
-    // Configuration
-    // ======================
-    const SALESFORCE_CONFIG = {
-      orgId: '00DEc00000GfZ2M',
-      deployment: 'admission_github',
-      siteUrl: 'https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119',
-      scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com',
-      webToCaseUrl: 'https://strategiced--qasf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8'
+    // DEBUG: Track all prechat attempts
+    window.prechatDebug = {
+      attempts: [],
+      events: [],
+      networkRequests: []
     };
 
-    const PRECHAT_DATA = {
-      email: 'dogz@mailinator.com',
-      firstName: 'Chat',
-      lastName: 'TestUser',
-      subject: 'Chat Inquiry from Website',
-      chat_source__c: 'Website'
-    };
+    // Network monitoring for debugging (read-only)
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const url = args[0];
+      const options = args[1];
 
-    // ======================
-    // State Management
-    // ======================
-    let isWithinBusinessHours = true;
-    let noAgentsAvailable = false;
-    let businessHoursValue = null;
-    let businessHoursSource = null;
+      // Just log, don't modify
+      if (url && url.includes('/conversation') && options && options.body) {
+        try {
+          const body = JSON.parse(options.body);
+          console.log('🌐 NETWORK: POST /conversation');
+          console.log('📤 Payload:', JSON.stringify(body, null, 2));
 
-    // ======================
-    // Chat Availability Management
-    // ======================
-    function updateChatAvailability(reason) {
-      const isAvailable = isWithinBusinessHours && !noAgentsAvailable;
-
-      if (isAvailable) {
-        hideOfflineButton();
-        showChatButton();
-      } else {
-        hideChatButton();
-        showOfflineButton();
+          if (body.routingAttributes && Object.keys(body.routingAttributes).length > 0) {
+            console.log('✅ routingAttributes FOUND:', body.routingAttributes);
+          } else if (body.conversationId) {
+            console.log('❌ routingAttributes EMPTY in conversation creation request');
+          }
+        } catch (e) {}
       }
-    }
 
+      return originalFetch.apply(this, args);
+    };
+
+    // ============================================
+    // OFFLINE SUPPORT & BUSINESS HOURS LOGIC
+    // ============================================
+    //
+    // HYBRID APPROACH (Proactive + Reactive):
+    //
+    // 1. PROACTIVE (Business Hours Check):
+    //    - Uses Salesforce business hours events to determine baseline availability
+    //    - Shows chat button during business hours
+    //    - Shows offline form outside business hours
+    //
+    // 2. REACTIVE (Session Status Monitoring):
+    //    - After chat is initiated, monitors session status updates
+    //    - If routing fails (no agents, timeout, etc.), switches to offline form
+    //    - Persists the "no agents" flag for the page session to avoid repeated failures
+    //
+    // This ensures:
+    //    ✅ Users see chat button during business hours (good initial UX)
+    //    ✅ System adapts if agents are actually unavailable (reactive refinement)
+    //    ✅ Future visitors see offline form without trying chat first
+    //
+    // Detection Patterns (in order of specificity):
+    //    Pattern 1: event.detail.reason === 'NoAgentsAvailable'
+    //    Pattern 2: event.detail.routingResult.agentsAvailable === false
+    //    Pattern 3: Session waiting > 60 seconds (timeout)
+    //    Pattern 4: Session ended without agent assignment
+    // ============================================
+
+    let isWithinBusinessHours = true; // Default to true until we know otherwise
+    let noAgentsAvailable = false; // Set to true if routing fails (reactive detection)
+    let businessHoursEventFired = false; // Track if business hours events have fired
+
+    // Show/Hide Functions (using Salesforce's button API)
     function showChatButton() {
-      if (embeddedservice_bootstrap?.utilAPI) {
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
         embeddedservice_bootstrap.utilAPI.showChatButton();
+        console.log('✅ Chat button shown (Salesforce API)');
+      } else {
+        console.warn('⚠️ Cannot show chat button - embeddedservice_bootstrap.utilAPI not available yet');
+        console.log('   embeddedservice_bootstrap exists:', typeof embeddedservice_bootstrap !== 'undefined');
+        console.log('   utilAPI exists:', typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI);
       }
     }
 
     function hideChatButton() {
-      if (embeddedservice_bootstrap?.utilAPI) {
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
         embeddedservice_bootstrap.utilAPI.hideChatButton();
+        console.log('❌ Chat button hidden (Salesforce API)');
+      } else {
+        console.warn('⚠️ Cannot hide chat button - embeddedservice_bootstrap.utilAPI not available yet');
       }
     }
 
+    // Show the "Leave a Message" button (when chat is unavailable)
     function showOfflineButton() {
-      document.getElementById('leaveMessageBtn')?.classList.add('show');
+      const button = document.getElementById('leaveMessageButton');
+      if (button) {
+        button.classList.add('show');
+        console.log('📝 Leave a Message button shown');
+      }
     }
 
+    // Hide the "Leave a Message" button
     function hideOfflineButton() {
-      document.getElementById('leaveMessageBtn')?.classList.remove('show');
+      const button = document.getElementById('leaveMessageButton');
+      if (button) {
+        button.classList.remove('show');
+        console.log('❌ Leave a Message button hidden');
+      }
     }
 
-    // ======================
-    // Business Hours Detection
-    // ======================
-    function setBusinessHours(value, source) {
-      if (typeof value !== 'boolean') {
-        return false;
-      }
-
-      businessHoursValue = value;
-      businessHoursSource = source;
-      isWithinBusinessHours = value;
-      updateChatAvailability(source);
-      return true;
-    }
-
-    // Event: Primary business hours event
-    window.addEventListener('onEmbeddedMessagingWithinBusinessHours', (event) => {
-      const value = event.detail?.withinBusinessHours;
-      setBusinessHours(value, 'event');
-    });
-
-    // Event: Business hours started
-    window.addEventListener('onEmbeddedMessagingBusinessHoursStarted', () => {
-      setBusinessHours(true, 'hours_started');
-    });
-
-    // Event: Business hours ended
-    window.addEventListener('onEmbeddedMessagingBusinessHoursEnded', () => {
-      setBusinessHours(false, 'hours_ended');
-    });
-
-    // API polling with retries
-    window.addEventListener('onEmbeddedMessagingReady', () => {
-      noAgentsAvailable = false;
-
-      if (businessHoursValue !== null) return;
-
-      let attemptCount = 0;
-      const maxAttempts = 5;
-      const delays = [1000, 2000, 3000, 4000, 5000];
-
-      function tryApiCheck() {
-        if (businessHoursValue !== null) return;
-
-        attemptCount++;
-
-        try {
-          const apiValue = embeddedservice_bootstrap.utilAPI?.isWithinBusinessHours?.();
-          if (setBusinessHours(apiValue, 'api')) return;
-        } catch (e) {
-          // Silent fail
-        }
-
-        if (attemptCount < maxAttempts) {
-          setTimeout(tryApiCheck, delays[attemptCount]);
-        } else {
-          setBusinessHours(true, 'fallback');
-        }
-      }
-
-      setTimeout(tryApiCheck, delays[0]);
-    });
-
-    // Agent availability monitoring
-    window.addEventListener('onEmbeddedMessagingSessionStatusUpdate', (event) => {
-      const { status, reason, routingResult } = event.detail || {};
-
-      if (status === 'Ended' && reason === 'NoAgentsAvailable') {
-        noAgentsAvailable = true;
-        updateChatAvailability('no_agents');
-      }
-
-      if (status === 'Ended' && routingResult?.agentsAvailable === false) {
-        noAgentsAvailable = true;
-        updateChatAvailability('routing_failed');
-      }
-
-      if (status === 'Active') {
-        noAgentsAvailable = false;
-      }
-    });
-
-    // ======================
-    // Offline Form Functions
-    // ======================
+    // Open the expanded offline form (called when button is clicked)
     function openOfflineForm() {
       hideOfflineButton();
-      document.getElementById('offlineForm')?.classList.add('show');
-    }
-
-    function closeOfflineForm() {
-      const form = document.getElementById('offlineForm');
-      form?.classList.remove('show');
-
-      document.getElementById('contactForm')?.reset();
-      document.getElementById('formContent').style.display = 'block';
-      document.getElementById('formSuccess').classList.remove('show');
-
-      if (!isWithinBusinessHours || noAgentsAvailable) {
-        showOfflineButton();
+      const container = document.getElementById('offlineFormContainer');
+      if (container) {
+        container.classList.add('show');
+        console.log('📝 Offline form expanded');
       }
     }
 
-    async function submitForm(event) {
-      event.preventDefault();
+    // Hide/close the expanded offline form
+    function hideOfflineForm() {
+      const container = document.getElementById('offlineFormContainer');
+      if (container) {
+        container.classList.remove('show');
+        // Reset form
+        document.getElementById('offlineContactForm')?.reset();
+        document.getElementById('offlineFormContent').style.display = 'block';
+        document.getElementById('offlineFormSuccess').classList.remove('show');
+        console.log('❌ Offline form hidden');
 
-      const submitBtn = document.getElementById('submitBtn');
+        // Show the button again if chat is still unavailable
+        if (!isWithinBusinessHours || noAgentsAvailable) {
+          showOfflineButton();
+        }
+      }
+    }
+
+    // Determine what to show based on availability
+    // IMPORTANT: This function ensures chat button and "Leave a Message" button are NEVER shown simultaneously
+    function updateChatAvailability(reason = null) {
+      console.log('🔄 Updating chat availability...');
+      console.log('  - Business Hours:', isWithinBusinessHours);
+      console.log('  - Agents Available:', !noAgentsAvailable);
+      console.log('  - Reason for change:', reason);
+
+      if (isWithinBusinessHours && !noAgentsAvailable) {
+        // Chat is available: Show chat button, hide all offline options
+        hideOfflineButton(); // Ensure "Leave a Message" button is hidden
+
+        // Also hide expanded form if it's open
+        const container = document.getElementById('offlineFormContainer');
+        if (container && container.classList.contains('show')) {
+          container.classList.remove('show');
+        }
+
+        showChatButton(); // Show chat button
+        console.log('✅ Chat available - showing chat button only');
+      } else {
+        // Chat is unavailable: Show "Leave a Message" button, hide chat and form
+        hideChatButton(); // Ensure chat button is hidden
+
+        // Hide expanded form if it's open
+        const container = document.getElementById('offlineFormContainer');
+        if (container && container.classList.contains('show')) {
+          container.classList.remove('show');
+        }
+
+        showOfflineButton(); // Show last for smooth transition
+        console.log('📝 Chat unavailable - showing Leave a Message button only');
+
+        // If switching due to no agents (reactive detection), update the message
+        if (noAgentsAvailable && reason) {
+          const messageEl = document.querySelector('.offline-form-message');
+          if (messageEl) {
+            messageEl.innerHTML = `
+              <strong>All agents are currently assisting other customers.</strong><br>
+              Please leave your message and we'll get back to you as soon as possible.
+            `;
+            console.log('📝 Updated offline form message: No agents detected');
+          }
+        }
+      }
+    }
+
+    // Offline Form Submission (Web-to-Case)
+    async function submitOfflineForm(event) {
+      event.preventDefault(); // Prevent default form submission (prevents navigation)
+
+      const submitBtn = document.getElementById('offlineSubmitBtn');
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
 
       const formData = new FormData(event.target);
+
+      // Build Web-to-Case submission data matching new Salesforce configuration
+      // Hidden fields from form: subject="Chat Unavailable Form", 00NEc00000jTA0T="Admission Center"
       const webToCaseData = new URLSearchParams({
-        orgid: SALESFORCE_CONFIG.orgId,
+        orgid: '00DEc00000GfZ2M',
+        // retURL intentionally omitted - we handle UI in JavaScript
         name: formData.get('name'),
         email: formData.get('email'),
-        subject: formData.get('subject'),
+        subject: formData.get('subject'), // "Chat Unavailable Form" (hidden field)
         description: formData.get('description'),
-        '00NEc00000jTA0T': formData.get('00NEc00000jTA0T'),
-        external: formData.get('external')
+        '00NEc00000jTA0T': formData.get('00NEc00000jTA0T'), // Chat Source: "Admission Center" (hidden field)
+        external: formData.get('external') // "1" (hidden field)
+      });
+
+      console.log('📧 Submitting Web-to-Case (Leave a Message Form):', {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        subject: formData.get('subject'), // Will be "Chat Unavailable Form"
+        description: formData.get('description'),
+        chatSource: formData.get('00NEc00000jTA0T'), // Will be "Admission Center"
+        external: formData.get('external'), // Will be "1"
+        note: 'User will stay on current page after submission'
       });
 
       try {
-        await fetch(SALESFORCE_CONFIG.webToCaseUrl, {
+        // Submit to Salesforce Web-to-Case using fetch with no-cors
+        // This prevents CORS errors but also means we can't read the response
+        await fetch('https://strategiced--qasf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8', {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          mode: 'no-cors', // Required for cross-origin - prevents reading response
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
           body: webToCaseData.toString()
         });
 
-        document.getElementById('formContent').style.display = 'none';
-        document.getElementById('formSuccess').classList.add('show');
+        // Show success message inline (user stays on current page)
+        document.getElementById('offlineFormContent').style.display = 'none';
+        document.getElementById('offlineFormSuccess').classList.add('show');
 
+        console.log('✅ Web-to-Case submitted successfully');
+        console.log('✅ User remains on current page - no navigation occurred');
+
+        // Keep success message visible longer, then allow form re-use
         setTimeout(() => {
+          // Reset form fields but keep success message visible
           event.target.reset();
           submitBtn.disabled = false;
           submitBtn.textContent = 'Submit';
+
+          // After additional time, hide success and show form again
+          setTimeout(() => {
+            document.getElementById('offlineFormContent').style.display = 'block';
+            document.getElementById('offlineFormSuccess').classList.remove('show');
+            console.log('📝 Form ready for next submission');
+          }, 2000);
         }, 3000);
 
       } catch (error) {
-        alert('Sorry, there was an error submitting your message. Please try again.');
+        console.error('❌ Error submitting Web-to-Case:', error);
+
+        // Show user-friendly error message
+        const errorMsg = 'Sorry, there was an error submitting your message. Please try again or contact us directly.';
+        alert(errorMsg);
+
+        // Reset button state
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit';
       }
     }
 
-    // ======================
-    // Salesforce Initialization
-    // ======================
-    window.addEventListener('onEmbeddedMessagingReady', () => {
-      try {
-        const hiddenFields = {
-          _email: PRECHAT_DATA.email,
-          email_custom: PRECHAT_DATA.email,
-          _firstName: PRECHAT_DATA.firstName,
-          _lastName: PRECHAT_DATA.lastName,
-          subject: PRECHAT_DATA.subject,
-          chat_source__c: PRECHAT_DATA.chat_source__c
-        };
+    // ============================================
+    // PRECHAT EDITOR FUNCTIONS
+    // ============================================
 
-        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
-      } catch (err) {
-        // Silent fail
+    // Store current prechat values
+    let prechatData = {
+      email: 'dogz@mailinator.com',
+      firstName: 'Chat',
+      lastName: 'TestUser',
+      subject: 'Chat Inquiry from Website',
+      chat_source__c: 'Website' // Custom field for tracking chat source
+    };
+
+    // Authentication mode: true = authenticated (send all fields), false = unauthenticated (send only email_custom)
+    // Default: Authenticated mode (most users are logged in)
+    let isAuthenticatedMode = true;
+
+    // Toggle authentication mode
+    function toggleAuthMode() {
+      isAuthenticatedMode = document.getElementById('authModeToggle').checked;
+
+      const badge = document.getElementById('authModeBadge');
+      const description = document.getElementById('authModeDescription');
+
+      if (isAuthenticatedMode) {
+        badge.textContent = 'Authenticated';
+        badge.className = 'auth-mode-badge authenticated';
+        description.textContent = 'Sending all fields (_email, email_custom, _firstName, _lastName, subject, chat_source__c)';
+        console.log('🔐 Authentication Mode: AUTHENTICATED - All prechat fields will be sent');
+      } else {
+        badge.textContent = 'Unauthenticated';
+        badge.className = 'auth-mode-badge unauthenticated';
+        description.textContent = 'Sending email_custom and chat_source__c (guest user)';
+        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only email_custom and chat_source__c will be sent');
+      }
+
+      // Update prechat fields immediately if Salesforce is already loaded
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.prechatAPI) {
+        try {
+          const hiddenFields = getHiddenFieldsForMode();
+          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+          console.log('✅ Updated hidden prechat fields based on authentication mode:', hiddenFields);
+        } catch (e) {
+          console.warn('⚠️ Could not update hidden prechat fields:', e);
+        }
+      }
+    }
+
+    // Get hidden fields based on authentication mode
+    function getHiddenFieldsForMode() {
+      if (isAuthenticatedMode) {
+        // Authenticated: Send all fields (user is logged in, we have their data)
+        // Field names MUST match Salesforce Channel Variable Names exactly
+        return {
+          _email: prechatData.email,           // Salesforce expects: _email
+          email_custom: prechatData.email,     // Salesforce expects: email_custom
+          _firstName: prechatData.firstName,   // Salesforce expects: _firstName
+          _lastName: prechatData.lastName,     // Salesforce expects: _lastName
+          subject: prechatData.subject,        // Salesforce expects: subject (lowercase)
+          chat_source__c: prechatData.chat_source__c  // Chat source tracking
+        };
+      } else {
+        // Unauthenticated: Send email_custom and chat_source__c (guest user)
+        return {
+          email_custom: prechatData.email,
+          chat_source__c: prechatData.chat_source__c  // Chat source tracking
+        };
+      }
+    }
+
+    // Open prechat editor modal
+    function openPrechatEditor() {
+      const modal = document.getElementById('prechatEditorModal');
+
+      // Populate form with current values
+      document.getElementById('edit_email').value = prechatData.email;
+      document.getElementById('edit_firstName').value = prechatData.firstName;
+      document.getElementById('edit_lastName').value = prechatData.lastName;
+      document.getElementById('edit_subject').value = prechatData.subject;
+      document.getElementById('edit_chat_source').value = prechatData.chat_source__c;
+
+      modal.classList.add('show');
+      console.log('📝 Prechat editor opened');
+    }
+
+    // Close prechat editor modal
+    function closePrechatEditor() {
+      const modal = document.getElementById('prechatEditorModal');
+      modal.classList.remove('show');
+      console.log('❌ Prechat editor closed');
+    }
+
+    // Save prechat information
+    function savePrechatInfo() {
+      const form = document.getElementById('prechatEditorForm');
+
+      // Validate form
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      // Get new values
+      prechatData.email = document.getElementById('edit_email').value;
+      prechatData.firstName = document.getElementById('edit_firstName').value;
+      prechatData.lastName = document.getElementById('edit_lastName').value;
+      prechatData.subject = document.getElementById('edit_subject').value;
+      prechatData.chat_source__c = document.getElementById('edit_chat_source').value;
+
+      // Update display
+      document.getElementById('display_email').textContent = prechatData.email;
+      document.getElementById('display_firstName').textContent = prechatData.firstName;
+      document.getElementById('display_lastName').textContent = prechatData.lastName;
+      document.getElementById('display_subject').textContent = prechatData.subject;
+      document.getElementById('display_chat_source').textContent = prechatData.chat_source__c;
+
+      // Update hidden prechat fields if Salesforce is already loaded
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.prechatAPI) {
+        try {
+          const hiddenFields = getHiddenFieldsForMode();
+          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+          console.log('✅ Updated hidden prechat fields:', hiddenFields);
+          console.log('   Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (chat_source__c only)');
+        } catch (e) {
+          console.warn('⚠️ Could not update hidden prechat fields:', e);
+        }
+      }
+
+      // Close modal
+      closePrechatEditor();
+
+      console.log('💾 Prechat info saved:', prechatData);
+      alert('Prechat information updated! The new values will be used when you start a chat.');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('prechatEditorModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'prechatEditorModal') {
+        closePrechatEditor();
       }
     });
 
+    // Initialize Embedded Messaging
     function initEmbeddedMessaging() {
       try {
+        console.log('🚀 Initializing Salesforce Embedded Messaging...');
+        console.log('📋 Org ID: 00DEc00000GfZ2M');
+        console.log('📋 Deployment: admission_github');
+
         embeddedservice_bootstrap.settings.language = 'en_US';
+
         embeddedservice_bootstrap.init(
-          SALESFORCE_CONFIG.orgId,
-          SALESFORCE_CONFIG.deployment,
-          SALESFORCE_CONFIG.siteUrl,
-          { scrt2URL: SALESFORCE_CONFIG.scrt2URL }
+          '00DEc00000GfZ2M',
+          'admission_github',
+          'https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119',
+          {
+            scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
+          }
         );
+
+        console.log('✅ Init called successfully');
       } catch (err) {
-        console.error('Error loading Embedded Messaging:', err);
+        console.error('❌ Error loading Embedded Messaging:', err);
       }
+    }
+
+    // IMPORTANT: Set prechat fields EARLY when messaging is ready (before button creation)
+    window.addEventListener('onEmbeddedMessagingReady', () => {
+      console.log('========================================');
+      console.log('✅ EVENT: onEmbeddedMessagingReady FIRED');
+      console.log('========================================');
+
+      window.prechatDebug.events.push({
+        event: 'onEmbeddedMessagingReady',
+        time: new Date().toISOString()
+      });
+
+      // Set hidden prechat field (Channel Variable Name: "email_custom")
+      // Using prechatData object which can be edited by user
+      console.log('🔧 Setting hidden prechat fields...');
+      console.log('📋 Using prechat data:', prechatData);
+
+      try {
+        // Get hidden fields based on authentication mode
+        const hiddenFields = getHiddenFieldsForMode();
+
+        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+
+        console.log('✅ setHiddenPrechatFields() called:');
+        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom + chat_source__c)');
+        console.log('   📋 Fields sent:', hiddenFields);
+
+        if (isAuthenticatedMode) {
+          console.log('   📧 _email:', prechatData.email);
+          console.log('   📧 email_custom:', prechatData.email);
+          console.log('   👤 _firstName:', prechatData.firstName);
+          console.log('   👤 _lastName:', prechatData.lastName);
+          console.log('   📝 subject:', prechatData.subject);
+          console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
+        } else {
+          console.log('   📧 email_custom:', prechatData.email);
+          console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
+        }
+
+        window.prechatDebug.attempts.push({
+          timing: 'onEmbeddedMessagingReady',
+          fields: hiddenFields,
+          prechatData: { ...prechatData },
+          authMode: isAuthenticatedMode ? 'authenticated' : 'unauthenticated',
+          success: true,
+          time: new Date().toISOString()
+        });
+      } catch (err) {
+        console.error('❌ Error setting prechat fields:', err);
+        window.prechatDebug.attempts.push({
+          timing: 'onEmbeddedMessagingReady',
+          fields: {},
+          authMode: isAuthenticatedMode ? 'authenticated' : 'unauthenticated',
+          success: false,
+          error: err.message,
+          time: new Date().toISOString()
+        });
+      }
+
+      console.log('========================================');
+
+      // Customize chat header: hide "Chat" text and fix logo size
+      setTimeout(() => {
+        try {
+          // Find the chat iframe
+          const chatFrame = document.querySelector('iframe[title*="chat" i], iframe[name*="messaging" i]');
+
+          if (chatFrame && chatFrame.contentWindow) {
+            const frameDoc = chatFrame.contentWindow.document;
+
+            // Inject custom styles into the iframe
+            const style = frameDoc.createElement('style');
+            style.textContent = `
+              /* Hide "Chat" text */
+              .slds-chat-header__title,
+              .embeddedServiceSidebarHeader .headerText,
+              [class*="headerText"],
+              [class*="title-text"] {
+                display: none !important;
+                visibility: hidden !important;
+              }
+
+              /* Fix logo size */
+              .slds-chat-header__logo img,
+              .embeddedServiceSidebarHeader img,
+              .branding-image {
+                max-width: 180px !important;
+                max-height: 40px !important;
+                width: auto !important;
+                height: auto !important;
+                object-fit: contain !important;
+              }
+
+              /* Center logo in header */
+              .slds-chat-header,
+              .embeddedServiceSidebarHeader {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+              }
+            `;
+            frameDoc.head.appendChild(style);
+            console.log('✅ Chat header customization applied');
+          }
+        } catch (e) {
+          console.warn('⚠️ Could not customize chat header (cross-origin restriction):', e.message);
+        }
+      }, 1000);
+    });
+
+    // Chat button created - set up custom launcher
+    window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
+      console.log('✅ Chat button created - ready to launch');
+
+      // NOW that button is created, update visibility based on availability
+      // This ensures the button shows/hides correctly based on business hours and agent availability
+      console.log('📍 Button created - checking availability and updating visibility');
+      updateChatAvailability('button_created');
+
+      // Set up custom button click handler
+      const customBtn = document.getElementById('capellaChatBtn');
+      if (customBtn) {
+        customBtn.addEventListener('click', () => {
+          console.log('========================================');
+          console.log('🖱️ CHAT BUTTON CLICKED');
+          console.log('========================================');
+
+          // Debug: Check authentication mode state
+          console.log('🔍 DEBUG: isAuthenticatedMode =', isAuthenticatedMode);
+          console.log('🔍 DEBUG: Checkbox checked =', document.getElementById('authModeToggle').checked);
+
+          // CRITICAL: Set prechat fields RIGHT BEFORE launching chat
+          // Use getHiddenFieldsForMode() to respect authentication mode
+          const prechatFields = getHiddenFieldsForMode();
+
+          console.log('🔧 Setting prechat fields RIGHT BEFORE launch...');
+          console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom + chat_source__c)');
+          console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
+          console.log('🔍 DEBUG: Number of fields =', Object.keys(prechatFields).length);
+
+          try {
+            // Set prechat fields immediately before launching
+            embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
+            console.log('✅ setHiddenPrechatFields() called successfully');
+
+            window.prechatDebug.attempts.push({
+              timing: 'Before launchChat()',
+              fields: prechatFields,
+              authMode: isAuthenticatedMode ? 'authenticated' : 'unauthenticated',
+              success: true,
+              time: new Date().toISOString()
+            });
+          } catch (err) {
+            console.error('❌ Error setting prechat before launch:', err);
+            window.prechatDebug.attempts.push({
+              timing: 'Before launchChat()',
+              fields: prechatFields,
+              authMode: isAuthenticatedMode ? 'authenticated' : 'unauthenticated',
+              success: false,
+              error: err.message,
+              time: new Date().toISOString()
+            });
+          }
+
+          // Small delay to ensure prechat data is processed
+          setTimeout(() => {
+            console.log('🚀 Now launching chat...');
+            embeddedservice_bootstrap.utilAPI
+              .launchChat()
+              .then(() => {
+                console.log('✅ Chat launched successfully');
+                console.log('📊 All prechat attempts:', window.prechatDebug.attempts);
+              })
+              .catch((e) => {
+                console.error('❌ Launch Chat failed:', e);
+              });
+          }, 100); // 100ms delay
+        });
+      }
+    });
+
+    // Conversation events
+    window.addEventListener('onEmbeddedMessagingConversationStarted', (event) => {
+      console.log('========================================');
+      console.log('💬 EVENT: onEmbeddedMessagingConversationStarted');
+      console.log('========================================');
+      console.log('Event details:', event.detail);
+
+      window.prechatDebug.events.push({
+        event: 'onEmbeddedMessagingConversationStarted',
+        time: new Date().toISOString(),
+        details: event.detail
+      });
+
+      // Log all prechat attempts for debugging
+      console.log('📊 PRECHAT DEBUG SUMMARY:');
+      console.log('Total attempts:', window.prechatDebug.attempts.length);
+      console.log('Attempts:', window.prechatDebug.attempts);
+      console.log('Events:', window.prechatDebug.events);
+
+      const chatBtn = document.getElementById('capellaChatBtn');
+      if (chatBtn) {
+        chatBtn.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
+      const chatBtn = document.getElementById('capellaChatBtn');
+      if (chatBtn) {
+        chatBtn.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
+      const chatBtn = document.getElementById('capellaChatBtn');
+      if (chatBtn) {
+        chatBtn.style.display = 'block';
+      }
+    });
+
+    window.addEventListener('onEmbeddedMessagingConversationClosed', () => {
+      const chatBtn = document.getElementById('capellaChatBtn');
+      if (chatBtn) {
+        chatBtn.style.display = 'block';
+      }
+    });
+
+    // ============================================
+    // BUSINESS HOURS & AGENT AVAILABILITY EVENTS
+    // ============================================
+
+    // IMPROVED BUSINESS HOURS DETECTION
+    // Using Combined Approach: Events + API + Fallback
+    // Based on Salesforce best practices for MIAW
+
+    let businessHoursValue = null;
+    let businessHoursSource = null;
+
+    // Helper function to set business hours from any source
+    function setBusinessHours(value, source) {
+      if (typeof value !== 'boolean') {
+        console.log(`⚠️ Invalid business hours value from ${source}:`, value);
+        return false;
+      }
+
+      console.log(`✅ Business hours set from ${source}:`, value);
+      businessHoursValue = value;
+      businessHoursSource = source;
+      isWithinBusinessHours = value;
+      businessHoursEventFired = true;
+      updateChatAvailability(source);
+      return true;
+    }
+
+    // Attempt 1: Primary business hours event
+    window.addEventListener('onEmbeddedMessagingWithinBusinessHours', (event) => {
+      console.log('========================================');
+      console.log('⏰ EVENT: onEmbeddedMessagingWithinBusinessHours');
+      console.log('========================================');
+      console.log('Event detail:', event.detail);
+      console.log('Within Business Hours raw value:', event.detail?.withinBusinessHours);
+
+      const value = event.detail?.withinBusinessHours;
+
+      if (setBusinessHours(value, 'event')) {
+        console.log('✅ Business hours determined from primary event');
+      } else {
+        console.log('⚠️ Event returned undefined/invalid, will try other methods');
+      }
+    });
+
+    // Attempt 2: Business hours started event (more reliable)
+    window.addEventListener('onEmbeddedMessagingBusinessHoursStarted', () => {
+      console.log('========================================');
+      console.log('✅ EVENT: Business Hours STARTED');
+      console.log('========================================');
+      setBusinessHours(true, 'hours_started_event');
+    });
+
+    // Attempt 3: Business hours ended event (more reliable)
+    window.addEventListener('onEmbeddedMessagingBusinessHoursEnded', () => {
+      console.log('========================================');
+      console.log('❌ EVENT: Business Hours ENDED');
+      console.log('========================================');
+      setBusinessHours(false, 'hours_ended_event');
+    });
+
+    // Monitor session status for agent availability (REACTIVE detection)
+    window.addEventListener('onEmbeddedMessagingSessionStatusUpdate', (event) => {
+      console.log('========================================');
+      console.log('📊 EVENT: Session Status Update');
+      console.log('========================================');
+      console.log('📋 Full event.detail structure:', JSON.stringify(event.detail, null, 2));
+      console.log('📌 Status:', event.detail.status);
+      console.log('📌 Reason:', event.detail.reason);
+      console.log('📌 Routing Result:', event.detail.routingResult);
+      console.log('📌 Agent Info:', event.detail.agentInfo);
+
+      // Pattern 1: Check for explicit "NoAgentsAvailable" reason
+      if (event.detail.status === 'Ended' && event.detail.reason === 'NoAgentsAvailable') {
+        console.log('⚠️ DETECTED: No agents available (Pattern 1: reason field)');
+        noAgentsAvailable = true;
+        updateChatAvailability('session_ended_no_agents');
+        return;
+      }
+
+      // Pattern 2: Check for routing failure with no agents
+      if (event.detail.status === 'Ended' && event.detail.routingResult) {
+        if (event.detail.routingResult.agentsAvailable === false ||
+            event.detail.routingResult.success === false) {
+          console.log('⚠️ DETECTED: No agents available (Pattern 2: routingResult)');
+          noAgentsAvailable = true;
+          updateChatAvailability('routing_failed');
+          return;
+        }
+      }
+
+      // Pattern 3: Check for "Waiting" status that times out (long wait = no agents)
+      if (event.detail.status === 'Waiting') {
+        console.log('⏳ Session waiting for agent...');
+        // Set a flag that we're waiting
+        window.sessionWaitingStartTime = window.sessionWaitingStartTime || Date.now();
+
+        // If waiting more than 60 seconds, assume no agents
+        const waitTime = Date.now() - window.sessionWaitingStartTime;
+        if (waitTime > 60000) {
+          console.log('⚠️ DETECTED: Waiting timeout exceeded 60s (Pattern 3: long wait)');
+          noAgentsAvailable = true;
+          updateChatAvailability('waiting_timeout');
+        }
+      }
+
+      // Pattern 4: Session ended without ever becoming active
+      if (event.detail.status === 'Ended' && !event.detail.agentInfo) {
+        console.log('⚠️ DETECTED: Session ended without agent assignment (Pattern 4: no agent)');
+        noAgentsAvailable = true;
+        updateChatAvailability('ended_no_agent_assigned');
+        return;
+      }
+
+      // Reset waiting timer if session becomes active
+      if (event.detail.status === 'Active') {
+        console.log('✅ Session active - agent connected');
+        window.sessionWaitingStartTime = null;
+        noAgentsAvailable = false; // Reset flag - agents are available
+      }
+
+      console.log('========================================');
+    });
+
+    // Attempt 4: API polling with multiple retries + Final fallback
+    window.addEventListener('onEmbeddedMessagingReady', () => {
+      console.log('📍 Messaging Ready - resetting agent availability');
+      noAgentsAvailable = false;
+
+      // If we already got a valid value from events, we're done
+      if (businessHoursValue !== null) {
+        console.log('✅ Business hours already determined:', businessHoursValue);
+        console.log('   Source:', businessHoursSource);
+        return;
+      }
+
+      // Polling approach: Try API multiple times with increasing delays
+      let attemptCount = 0;
+      const maxAttempts = 5;
+      const delays = [1000, 2000, 3000, 4000, 5000]; // 1s, 2s, 3s, 4s, 5s (total: 15s)
+
+      function tryApiCheck() {
+        // Check if events provided value during polling
+        if (businessHoursValue !== null) {
+          console.log('✅ Business hours determined during polling:', businessHoursValue);
+          console.log('   Source:', businessHoursSource);
+          return;
+        }
+
+        attemptCount++;
+        console.log(`🔍 API Check Attempt ${attemptCount}/${maxAttempts}...`);
+
+        try {
+          const apiValue = embeddedservice_bootstrap.utilAPI?.isWithinBusinessHours?.();
+          console.log(`   API returned:`, apiValue, `(type: ${typeof apiValue})`);
+
+          if (setBusinessHours(apiValue, 'api')) {
+            console.log(`✅ Business hours determined from API on attempt ${attemptCount}`);
+            return;
+          }
+        } catch (e) {
+          console.warn(`⚠️ API check error on attempt ${attemptCount}:`, e);
+        }
+
+        // If we haven't exhausted all attempts, try again
+        if (attemptCount < maxAttempts) {
+          const nextDelay = delays[attemptCount];
+          console.log(`   ⏳ API returned undefined, retrying in ${nextDelay}ms...`);
+          setTimeout(tryApiCheck, nextDelay);
+        } else {
+          // Final fallback after all attempts exhausted
+          console.log('========================================');
+          console.log(`⚠️ Could not determine business hours after ${maxAttempts} attempts:`);
+          console.log('   - Primary event: undefined');
+          console.log('   - Started/Ended events: did not fire');
+          console.log('   - API: returned undefined on all attempts');
+          console.log('   ➡️ Defaulting to TRUE (chat available)');
+          console.log('   ➡️ Salesforce will handle offline state internally');
+          console.log('========================================');
+
+          setBusinessHours(true, 'default_fallback');
+        }
+      }
+
+      // Start first API check after 1 second
+      setTimeout(tryApiCheck, delays[0]);
+    });
+
+    // User clicked offline form button instead of chat
+    function showOfflineFormManually() {
+      hideChatButton();
+      openOfflineForm();
     }
   </script>
 
-  <!-- Salesforce Bootstrap -->
+  <!-- Salesforce bootstrap -->
   <script
     src="https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119/assets/js/bootstrap.min.js"
     onload="initEmbeddedMessaging()"
