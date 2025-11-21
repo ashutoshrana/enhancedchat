@@ -848,25 +848,11 @@ Expected /conversation POST payload:
         <form id="offlineContactForm" onsubmit="submitOfflineForm(event)">
           <!-- Hidden fields -->
           <input type="hidden" name="subject" value="Chat Unavailable Form">
-          <input type="hidden" name="00NEc00000jTA0T" value="Admission Center">
           <input type="hidden" name="external" value="1">
 
-          <!-- Visible field 1: Name -->
+          <!-- Visible field 1: Email -->
           <div class="form-group">
-            <label for="offline_name">Name<span class="required">*</span></label>
-            <input
-              type="text"
-              id="offline_name"
-              name="name"
-              placeholder="Enter your full name"
-              required
-              aria-required="true"
-            >
-          </div>
-
-          <!-- Visible field 2: Web Email -->
-          <div class="form-group">
-            <label for="offline_email">Web Email<span class="required">*</span></label>
+            <label for="offline_email">Email<span class="required">*</span></label>
             <input
               type="email"
               id="offline_email"
@@ -877,9 +863,9 @@ Expected /conversation POST payload:
             >
           </div>
 
-          <!-- Visible field 3: Inquiry (Description) -->
+          <!-- Visible field 2: Description -->
           <div class="form-group">
-            <label for="offline_message">Inquiry<span class="required">*</span></label>
+            <label for="offline_message">Description<span class="required">*</span></label>
             <textarea
               id="offline_message"
               name="description"
@@ -1177,24 +1163,20 @@ Expected /conversation POST payload:
       const formData = new FormData(event.target);
 
       // Build Web-to-Case submission data matching new Salesforce configuration
-      // Hidden fields from form: subject="Chat Unavailable Form", 00NEc00000jTA0T="Admission Center"
+      // Hidden fields from form: subject="Chat Unavailable Form", external="1"
       const webToCaseData = new URLSearchParams({
-        orgid: '00DEc00000GfZ2M',
+        orgid: '00DU8000008OjxF',
         // retURL intentionally omitted - we handle UI in JavaScript
-        name: formData.get('name'),
         email: formData.get('email'),
         subject: formData.get('subject'), // "Chat Unavailable Form" (hidden field)
         description: formData.get('description'),
-        '00NEc00000jTA0T': formData.get('00NEc00000jTA0T'), // Chat Source: "Admission Center" (hidden field)
         external: formData.get('external') // "1" (hidden field)
       });
 
       console.log('📧 Submitting Web-to-Case (Leave a Message Form):', {
-        name: formData.get('name'),
         email: formData.get('email'),
         subject: formData.get('subject'), // Will be "Chat Unavailable Form"
         description: formData.get('description'),
-        chatSource: formData.get('00NEc00000jTA0T'), // Will be "Admission Center"
         external: formData.get('external'), // Will be "1"
         note: 'User will stay on current page after submission'
       });
@@ -1202,7 +1184,7 @@ Expected /conversation POST payload:
       try {
         // Submit to Salesforce Web-to-Case using fetch with no-cors
         // This prevents CORS errors but also means we can't read the response
-        await fetch('https://strategiced--qasf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8', {
+        await fetch('https://strategiced--stgsf.sandbox.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8&orgId=00DU8000008OjxF', {
           method: 'POST',
           mode: 'no-cors', // Required for cross-origin - prevents reading response
           headers: {
@@ -1392,17 +1374,17 @@ Expected /conversation POST payload:
     function initEmbeddedMessaging() {
       try {
         console.log('🚀 Initializing Salesforce Embedded Messaging...');
-        console.log('📋 Org ID: 00DEc00000GfZ2M');
-        console.log('📋 Deployment: admission_github');
+        console.log('📋 Org ID: 00DU8000008OjxF');
+        console.log('📋 Deployment: GithubAdmission');
 
         embeddedservice_bootstrap.settings.language = 'en_US';
 
         embeddedservice_bootstrap.init(
-          '00DEc00000GfZ2M',
-          'admission_github',
-          'https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119',
+          '00DU8000008OjxF',
+          'GithubAdmission',
+          'https://strategiced--stgsf.sandbox.my.site.com/ESWGithubAdmission1763702789883',
           {
-            scrt2URL: 'https://strategiced--qasf.sandbox.my.salesforce-scrt.com'
+            scrt2URL: 'https://strategiced--stgsf.sandbox.my.salesforce-scrt.com'
           }
         );
 
@@ -1834,7 +1816,8 @@ Expected /conversation POST payload:
 
   <!-- Salesforce bootstrap -->
   <script
-    src="https://strategiced--qasf.sandbox.my.site.com/ESWadmissiongithub1762055730119/assets/js/bootstrap.min.js"
+    type="text/javascript"
+    src="https://strategiced--stgsf.sandbox.my.site.com/ESWGithubAdmission1763702789883/assets/js/bootstrap.min.js"
     onload="initEmbeddedMessaging()"
   ></script>
 </body>
