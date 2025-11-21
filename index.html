@@ -846,11 +846,24 @@ Expected /conversation POST payload:
           Please leave your message and we'll get back to you as soon as possible.
         </div>
         <form id="offlineContactForm" onsubmit="submitOfflineForm(event)">
-          <!-- Hidden fields -->
-          <input type="hidden" name="subject" value="Chat Unavailable Form">
+          <!-- Hidden field -->
           <input type="hidden" name="external" value="1">
 
-          <!-- Visible field 1: Email -->
+          <!-- Visible field 1: Contact Name -->
+          <div class="form-group">
+            <label for="offline_name">Contact Name<span class="required">*</span></label>
+            <input
+              type="text"
+              id="offline_name"
+              name="name"
+              placeholder="Your full name"
+              maxlength="80"
+              required
+              aria-required="true"
+            >
+          </div>
+
+          <!-- Visible field 2: Email -->
           <div class="form-group">
             <label for="offline_email">Email<span class="required">*</span></label>
             <input
@@ -858,16 +871,31 @@ Expected /conversation POST payload:
               id="offline_email"
               name="email"
               placeholder="your.email@example.com"
+              maxlength="80"
               required
               aria-required="true"
             >
           </div>
 
-          <!-- Visible field 2: Description -->
+          <!-- Visible field 3: Subject -->
           <div class="form-group">
-            <label for="offline_message">Description<span class="required">*</span></label>
+            <label for="offline_subject">Subject<span class="required">*</span></label>
+            <input
+              type="text"
+              id="offline_subject"
+              name="subject"
+              placeholder="Brief subject of your inquiry"
+              maxlength="80"
+              required
+              aria-required="true"
+            >
+          </div>
+
+          <!-- Visible field 4: Description -->
+          <div class="form-group">
+            <label for="offline_description">Description<span class="required">*</span></label>
             <textarea
-              id="offline_message"
+              id="offline_description"
               name="description"
               placeholder="Please provide details about your inquiry..."
               required
@@ -1162,20 +1190,23 @@ Expected /conversation POST payload:
 
       const formData = new FormData(event.target);
 
-      // Build Web-to-Case submission data matching new Salesforce configuration
-      // Hidden fields from form: subject="Chat Unavailable Form", external="1"
+      // Build Web-to-Case submission data matching Salesforce configuration
+      // All visible fields: name, email, subject, description
+      // Hidden field: external="1"
       const webToCaseData = new URLSearchParams({
         orgid: '00DU8000008OjxF',
         // retURL intentionally omitted - we handle UI in JavaScript
+        name: formData.get('name'),
         email: formData.get('email'),
-        subject: formData.get('subject'), // "Chat Unavailable Form" (hidden field)
+        subject: formData.get('subject'),
         description: formData.get('description'),
         external: formData.get('external') // "1" (hidden field)
       });
 
       console.log('📧 Submitting Web-to-Case (Leave a Message Form):', {
+        name: formData.get('name'),
         email: formData.get('email'),
-        subject: formData.get('subject'), // Will be "Chat Unavailable Form"
+        subject: formData.get('subject'),
         description: formData.get('description'),
         external: formData.get('external'), // Will be "1"
         note: 'User will stay on current page after submission'
