@@ -877,21 +877,7 @@ Expected /conversation POST payload:
             >
           </div>
 
-          <!-- Visible field 3: Subject -->
-          <div class="form-group">
-            <label for="offline_subject">Subject<span class="required">*</span></label>
-            <input
-              type="text"
-              id="offline_subject"
-              name="subject"
-              placeholder="Brief subject of your inquiry"
-              maxlength="80"
-              required
-              aria-required="true"
-            >
-          </div>
-
-          <!-- Visible field 4: Description -->
+          <!-- Visible field 3: Description -->
           <div class="form-group">
             <label for="offline_description">Description<span class="required">*</span></label>
             <textarea
@@ -1191,14 +1177,13 @@ Expected /conversation POST payload:
       const formData = new FormData(event.target);
 
       // Build Web-to-Case submission data matching Salesforce configuration
-      // All visible fields: name, email, subject, description
+      // Visible fields: name, email, description
       // Hidden field: external="1"
       const webToCaseData = new URLSearchParams({
         orgid: '00DU8000008OjxF',
         // retURL intentionally omitted - we handle UI in JavaScript
         name: formData.get('name'),
         email: formData.get('email'),
-        subject: formData.get('subject'),
         description: formData.get('description'),
         external: formData.get('external') // "1" (hidden field)
       });
@@ -1206,7 +1191,6 @@ Expected /conversation POST payload:
       console.log('📧 Submitting Web-to-Case (Leave a Message Form):', {
         name: formData.get('name'),
         email: formData.get('email'),
-        subject: formData.get('subject'),
         description: formData.get('description'),
         external: formData.get('external'), // Will be "1"
         note: 'User will stay on current page after submission'
