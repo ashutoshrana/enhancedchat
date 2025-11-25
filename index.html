@@ -846,8 +846,10 @@ Expected /conversation POST payload:
           Please leave your message and we'll get back to you as soon as possible.
         </div>
         <form id="offlineContactForm" onsubmit="submitOfflineForm(event)">
-          <!-- Hidden field -->
+          <!-- Hidden fields -->
           <input type="hidden" name="external" value="1">
+          <input type="hidden" name="subject" value="Chat Unavailable Form">
+          <input type="hidden" name="00NU8000003uBgb" id="offline_chat_source" value="Website">
 
           <!-- Visible field 1: Contact Name -->
           <div class="form-group">
@@ -1178,21 +1180,25 @@ Expected /conversation POST payload:
 
       // Build Web-to-Case submission data matching Salesforce configuration
       // Visible fields: name, email, description
-      // Hidden field: external="1"
+      // Hidden fields: external="1", subject="Chat Unavailable Form", 00NU8000003uBgb="Website"
       const webToCaseData = new URLSearchParams({
         orgid: '00DU8000008OjxF',
         // retURL intentionally omitted - we handle UI in JavaScript
         name: formData.get('name'),
         email: formData.get('email'),
+        subject: formData.get('subject'),              // "Chat Unavailable Form" (hidden)
         description: formData.get('description'),
-        external: formData.get('external') // "1" (hidden field)
+        '00NU8000003uBgb': formData.get('00NU8000003uBgb'), // Chat Source = "Website" (hidden)
+        external: formData.get('external')             // "1" (hidden)
       });
 
       console.log('📧 Submitting Web-to-Case (Leave a Message Form):', {
         name: formData.get('name'),
         email: formData.get('email'),
+        subject: formData.get('subject'),              // "Chat Unavailable Form"
         description: formData.get('description'),
-        external: formData.get('external'), // Will be "1"
+        chatSource: formData.get('00NU8000003uBgb'),  // "Website"
+        external: formData.get('external'),            // "1"
         note: 'User will stay on current page after submission'
       });
 
@@ -1275,8 +1281,8 @@ Expected /conversation POST payload:
       } else {
         badge.textContent = 'Unauthenticated';
         badge.className = 'auth-mode-badge unauthenticated';
-        description.textContent = 'Sending email_custom and chat_source__c (guest user)';
-        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only email_custom and chat_source__c will be sent');
+        description.textContent = 'Sending ONLY chat_source__c (guest user, no email)';
+        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only chat_source__c will be sent');
       }
 
       // Update prechat fields immediately if Salesforce is already loaded
@@ -1305,10 +1311,9 @@ Expected /conversation POST payload:
           chat_source__c: prechatData.chat_source__c  // Chat source tracking
         };
       } else {
-        // Unauthenticated: Send email_custom and chat_source__c (guest user)
+        // Unauthenticated: Send ONLY chat_source__c (guest user, no email)
         return {
-          email_custom: prechatData.email,
-          chat_source__c: prechatData.chat_source__c  // Chat source tracking
+          chat_source__c: prechatData.chat_source__c
         };
       }
     }
