@@ -771,7 +771,7 @@
         <div class="prechat-value-text" id="display_subject">Chat Inquiry from Website</div>
       </div>
       <div class="prechat-value-item">
-        <div class="prechat-value-label">Chat Source (chat_source__c)</div>
+        <div class="prechat-value-label">Chat Source (ChatSource)</div>
         <div class="prechat-value-text" id="display_chat_source">Website</div>
       </div>
     </div>
@@ -784,7 +784,7 @@
         Authentication Mode
         <span id="authModeBadge" class="auth-mode-badge authenticated">Authenticated</span>
       </strong>
-      <small id="authModeDescription">Sending all fields (_email, email_custom, _firstName, _lastName, subject, chat_source__c)</small>
+      <small id="authModeDescription">Sending all fields (_email, email_custom, _firstName, _lastName, subject, ChatSource)</small>
     </div>
     <label class="auth-toggle-switch">
       <input type="checkbox" id="authModeToggle" onchange="toggleAuthMode()" checked>
@@ -963,7 +963,7 @@ Expected /conversation POST payload:
             >
           </div>
           <div class="form-group">
-            <label for="edit_chat_source">Chat Source (chat_source__c)<span class="required">*</span></label>
+            <label for="edit_chat_source">Chat Source (ChatSource)<span class="required">*</span></label>
             <input
               type="text"
               id="edit_chat_source"
@@ -1259,7 +1259,7 @@ Expected /conversation POST payload:
       firstName: 'Chat',
       lastName: 'TestUser',
       subject: 'Chat Inquiry from Website',
-      chat_source__c: 'Website' // Custom field for tracking chat source
+      ChatSource: 'Website' // Custom field for tracking chat source
     };
 
     // Authentication mode: true = authenticated (send all fields), false = unauthenticated (send only email_custom)
@@ -1276,13 +1276,13 @@ Expected /conversation POST payload:
       if (isAuthenticatedMode) {
         badge.textContent = 'Authenticated';
         badge.className = 'auth-mode-badge authenticated';
-        description.textContent = 'Sending all fields (_email, email_custom, _firstName, _lastName, subject, chat_source__c)';
+        description.textContent = 'Sending all fields (_email, email_custom, _firstName, _lastName, subject, ChatSource)';
         console.log('🔐 Authentication Mode: AUTHENTICATED - All prechat fields will be sent');
       } else {
         badge.textContent = 'Unauthenticated';
         badge.className = 'auth-mode-badge unauthenticated';
-        description.textContent = 'Sending ONLY chat_source__c (guest user, no email)';
-        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only chat_source__c will be sent');
+        description.textContent = 'Sending ONLY ChatSource (guest user, no email)';
+        console.log('🔓 Authentication Mode: UNAUTHENTICATED - Only ChatSource will be sent');
       }
 
       // Update prechat fields immediately if Salesforce is already loaded
@@ -1308,12 +1308,12 @@ Expected /conversation POST payload:
           _firstName: prechatData.firstName,   // Salesforce expects: _firstName
           _lastName: prechatData.lastName,     // Salesforce expects: _lastName
           subject: prechatData.subject,        // Salesforce expects: subject (lowercase)
-          chat_source__c: prechatData.chat_source__c  // Chat source tracking
+          ChatSource: prechatData.ChatSource  // Chat source tracking
         };
       } else {
-        // Unauthenticated: Send ONLY chat_source__c (guest user, no email)
+        // Unauthenticated: Send ONLY ChatSource (guest user, no email)
         return {
-          chat_source__c: prechatData.chat_source__c
+          ChatSource: prechatData.ChatSource
         };
       }
     }
@@ -1327,7 +1327,7 @@ Expected /conversation POST payload:
       document.getElementById('edit_firstName').value = prechatData.firstName;
       document.getElementById('edit_lastName').value = prechatData.lastName;
       document.getElementById('edit_subject').value = prechatData.subject;
-      document.getElementById('edit_chat_source').value = prechatData.chat_source__c;
+      document.getElementById('edit_chat_source').value = prechatData.ChatSource;
 
       modal.classList.add('show');
       console.log('📝 Prechat editor opened');
@@ -1355,14 +1355,14 @@ Expected /conversation POST payload:
       prechatData.firstName = document.getElementById('edit_firstName').value;
       prechatData.lastName = document.getElementById('edit_lastName').value;
       prechatData.subject = document.getElementById('edit_subject').value;
-      prechatData.chat_source__c = document.getElementById('edit_chat_source').value;
+      prechatData.ChatSource = document.getElementById('edit_chat_source').value;
 
       // Update display
       document.getElementById('display_email').textContent = prechatData.email;
       document.getElementById('display_firstName').textContent = prechatData.firstName;
       document.getElementById('display_lastName').textContent = prechatData.lastName;
       document.getElementById('display_subject').textContent = prechatData.subject;
-      document.getElementById('display_chat_source').textContent = prechatData.chat_source__c;
+      document.getElementById('display_chat_source').textContent = prechatData.ChatSource;
 
       // Update hidden prechat fields if Salesforce is already loaded
       if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.prechatAPI) {
@@ -1370,7 +1370,7 @@ Expected /conversation POST payload:
           const hiddenFields = getHiddenFieldsForMode();
           embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
           console.log('✅ Updated hidden prechat fields:', hiddenFields);
-          console.log('   Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (chat_source__c only)');
+          console.log('   Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (ChatSource only)');
         } catch (e) {
           console.warn('⚠️ Could not update hidden prechat fields:', e);
         }
@@ -1437,7 +1437,7 @@ Expected /conversation POST payload:
         embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
 
         console.log('✅ setHiddenPrechatFields() called:');
-        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom + chat_source__c)');
+        console.log('   🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (ChatSource only)');
         console.log('   📋 Fields sent:', hiddenFields);
 
         if (isAuthenticatedMode) {
@@ -1446,10 +1446,9 @@ Expected /conversation POST payload:
           console.log('   👤 _firstName:', prechatData.firstName);
           console.log('   👤 _lastName:', prechatData.lastName);
           console.log('   📝 subject:', prechatData.subject);
-          console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
+          console.log('   🌐 ChatSource:', prechatData.ChatSource);
         } else {
-          console.log('   📧 email_custom:', prechatData.email);
-          console.log('   🌐 chat_source__c:', prechatData.chat_source__c);
+          console.log('   🌐 ChatSource:', prechatData.ChatSource);
         }
 
         window.prechatDebug.attempts.push({
@@ -1549,7 +1548,7 @@ Expected /conversation POST payload:
           const prechatFields = getHiddenFieldsForMode();
 
           console.log('🔧 Setting prechat fields RIGHT BEFORE launch...');
-          console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (email_custom + chat_source__c)');
+          console.log('🔐 Mode:', isAuthenticatedMode ? 'Authenticated (all fields)' : 'Unauthenticated (ChatSource only)');
           console.log('📋 Fields:', JSON.stringify(prechatFields, null, 2));
           console.log('🔍 DEBUG: Number of fields =', Object.keys(prechatFields).length);
 
