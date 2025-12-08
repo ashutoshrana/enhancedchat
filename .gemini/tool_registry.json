@@ -1,0 +1,20 @@
+{
+  "tools": [
+    {
+      "name": "salesforce_mcp",
+      "description": "Salesforce DX MCP Server",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@salesforce/mcp",
+        "--orgs",
+        "QASF",
+        "--toolsets",
+        "orgs,metadata,data,users",
+        "--tools",
+        "run_apex_test",
+        "--allow-non-ga-tools"
+      ]
+    }
+  ]
+}
