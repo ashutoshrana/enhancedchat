@@ -348,8 +348,9 @@
     }
 
     /* Leave a Message Button */
-    /* NOTE: Only shown when no agents are available (detected reactively when user tries to chat).
-       Salesforce automatically handles chat button visibility based on business hours. */
+    /* NOTE: Positioned at same location as Salesforce chat button (right: 20px, bottom: 20px)
+       This is intentional - they are mutually exclusive and never show at the same time.
+       The updateChatAvailability() function ensures only one is visible at any time. */
     #leaveMessageButton {
       display: none;
       position: fixed;
@@ -1049,10 +1050,30 @@ Expected /conversation POST payload:
     //    Pattern 4: Session ended without agent assignment
     // ============================================
 
+    let isWithinBusinessHours = true; // Default to true until we know otherwise
     let noAgentsAvailable = false; // Set to true if routing fails (reactive detection)
+    let businessHoursEventFired = false; // Track if business hours events have fired
 
-    // Note: We let Salesforce automatically show/hide chat button based on business hours.
-    // No manual showChatButton() or hideChatButton() calls needed!
+    // Show/Hide Functions (using Salesforce's button API)
+    function showChatButton() {
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
+        embeddedservice_bootstrap.utilAPI.showChatButton();
+        console.log('✅ Chat button shown (Salesforce API)');
+      } else {
+        console.warn('⚠️ Cannot show chat button - embeddedservice_bootstrap.utilAPI not available yet');
+        console.log('   embeddedservice_bootstrap exists:', typeof embeddedservice_bootstrap !== 'undefined');
+        console.log('   utilAPI exists:', typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI);
+      }
+    }
+
+    function hideChatButton() {
+      if (typeof embeddedservice_bootstrap !== 'undefined' && embeddedservice_bootstrap.utilAPI) {
+        embeddedservice_bootstrap.utilAPI.hideChatButton();
+        console.log('❌ Chat button hidden (Salesforce API)');
+      } else {
+        console.warn('⚠️ Cannot hide chat button - embeddedservice_bootstrap.utilAPI not available yet');
+      }
+    }
 
     // Show the "Leave a Message" button (when chat is unavailable)
     function showOfflineButton() {
@@ -1092,11 +1113,60 @@ Expected /conversation POST payload:
         document.getElementById('offlineFormContent').style.display = 'block';
         document.getElementById('offlineFormSuccess').classList.remove('show');
         console.log('❌ Offline form hidden');
+
+        // Show the button again if chat is still unavailable
+        if (!isWithinBusinessHours || noAgentsAvailable) {
+          showOfflineButton();
+        }
       }
     }
 
-    // Note: Salesforce automatically handles chat button visibility based on business hours.
-    // We only show the offline form when no agents are available (detected reactively).
+    // Determine what to show based on availability
+    // IMPORTANT: This function ensures chat button and "Leave a Message" button are NEVER shown simultaneously
+    function updateChatAvailability(reason = null) {
+      console.log('🔄 Updating chat availability...');
+      console.log('  - Business Hours:', isWithinBusinessHours);
+      console.log('  - Agents Available:', !noAgentsAvailable);
+      console.log('  - Reason for change:', reason);
+
+      if (isWithinBusinessHours && !noAgentsAvailable) {
+        // Chat is available: Show chat button, hide all offline options
+        hideOfflineButton(); // Ensure "Leave a Message" button is hidden
+
+        // Also hide expanded form if it's open
+        const container = document.getElementById('offlineFormContainer');
+        if (container && container.classList.contains('show')) {
+          container.classList.remove('show');
+        }
+
+        showChatButton(); // Show chat button
+        console.log('✅ Chat available - showing chat button only');
+      } else {
+        // Chat is unavailable: Show "Leave a Message" button, hide chat and form
+        hideChatButton(); // Ensure chat button is hidden
+
+        // Hide expanded form if it's open
+        const container = document.getElementById('offlineFormContainer');
+        if (container && container.classList.contains('show')) {
+          container.classList.remove('show');
+        }
+
+        showOfflineButton(); // Show last for smooth transition
+        console.log('📝 Chat unavailable - showing Leave a Message button only');
+
+        // If switching due to no agents (reactive detection), update the message
+        if (noAgentsAvailable && reason) {
+          const messageEl = document.querySelector('.offline-form-message');
+          if (messageEl) {
+            messageEl.innerHTML = `
+              <strong>All agents are currently assisting other customers.</strong><br>
+              Please leave your message and we'll get back to you as soon as possible.
+            `;
+            console.log('📝 Updated offline form message: No agents detected');
+          }
+        }
+      }
+    }
 
     // Offline Form Submission (Web-to-Case)
     async function submitOfflineForm(event) {
@@ -1456,8 +1526,10 @@ Expected /conversation POST payload:
     window.addEventListener('onEmbeddedMessagingButtonCreated', () => {
       console.log('✅ Chat button created - ready to launch');
 
-      // Button created - Salesforce will handle visibility based on business hours
-      console.log('📍 Chat button created by Salesforce');
+      // NOW that button is created, update visibility based on availability
+      // This ensures the button shows/hides correctly based on business hours and agent availability
+      console.log('📍 Button created - checking availability and updating visibility');
+      updateChatAvailability('button_created');
 
       // Set up custom button click handler
       const customBtn = document.getElementById('capellaChatBtn');
@@ -1568,47 +1640,196 @@ Expected /conversation POST payload:
     });
 
     // ============================================
+    // BUSINESS HOURS & AGENT AVAILABILITY EVENTS
     // ============================================
-    // SIMPLIFIED AGENT AVAILABILITY DETECTION
-    // ============================================
-    // Per Salesforce documentation: Salesforce automatically shows/hides chat button
-    // based on business hours configuration. We only detect "no agents available" reactively.
 
-    // Monitor session status for "no agents available" (only when user tries to chat)
+    // IMPROVED BUSINESS HOURS DETECTION
+    // Using Combined Approach: Events + API + Fallback
+    // Based on Salesforce best practices for MIAW
+
+    let businessHoursValue = null;
+    let businessHoursSource = null;
+
+    // Helper function to set business hours from any source
+    function setBusinessHours(value, source) {
+      if (typeof value !== 'boolean') {
+        console.log(`⚠️ Invalid business hours value from ${source}:`, value);
+        return false;
+      }
+
+      console.log(`✅ Business hours set from ${source}:`, value);
+      businessHoursValue = value;
+      businessHoursSource = source;
+      isWithinBusinessHours = value;
+      businessHoursEventFired = true;
+      updateChatAvailability(source);
+      return true;
+    }
+
+    // Attempt 1: Primary business hours event
+    window.addEventListener('onEmbeddedMessagingWithinBusinessHours', (event) => {
+      console.log('========================================');
+      console.log('⏰ EVENT: onEmbeddedMessagingWithinBusinessHours');
+      console.log('========================================');
+      console.log('Event detail:', event.detail);
+      console.log('Within Business Hours raw value:', event.detail?.withinBusinessHours);
+
+      const value = event.detail?.withinBusinessHours;
+
+      if (setBusinessHours(value, 'event')) {
+        console.log('✅ Business hours determined from primary event');
+      } else {
+        console.log('⚠️ Event returned undefined/invalid, will try other methods');
+      }
+    });
+
+    // Attempt 2: Business hours started event (more reliable)
+    window.addEventListener('onEmbeddedMessagingBusinessHoursStarted', () => {
+      console.log('========================================');
+      console.log('✅ EVENT: Business Hours STARTED');
+      console.log('========================================');
+      setBusinessHours(true, 'hours_started_event');
+    });
+
+    // Attempt 3: Business hours ended event (more reliable)
+    window.addEventListener('onEmbeddedMessagingBusinessHoursEnded', () => {
+      console.log('========================================');
+      console.log('❌ EVENT: Business Hours ENDED');
+      console.log('========================================');
+      setBusinessHours(false, 'hours_ended_event');
+    });
+
+    // Monitor session status for agent availability (REACTIVE detection)
     window.addEventListener('onEmbeddedMessagingSessionStatusUpdate', (event) => {
       console.log('========================================');
       console.log('📊 EVENT: Session Status Update');
       console.log('========================================');
+      console.log('📋 Full event.detail structure:', JSON.stringify(event.detail, null, 2));
       console.log('📌 Status:', event.detail.status);
       console.log('📌 Reason:', event.detail.reason);
+      console.log('📌 Routing Result:', event.detail.routingResult);
+      console.log('📌 Agent Info:', event.detail.agentInfo);
 
-      // Detect when user tries to chat but no agents are available
+      // Pattern 1: Check for explicit "NoAgentsAvailable" reason
       if (event.detail.status === 'Ended' && event.detail.reason === 'NoAgentsAvailable') {
-        console.log('⚠️ No agents available - showing offline form');
+        console.log('⚠️ DETECTED: No agents available (Pattern 1: reason field)');
         noAgentsAvailable = true;
-        showOfflineForm(); // Auto-open offline form for user convenience
+        updateChatAvailability('session_ended_no_agents');
         return;
       }
 
-      // Reset flag when agent connects successfully
+      // Pattern 2: Check for routing failure with no agents
+      if (event.detail.status === 'Ended' && event.detail.routingResult) {
+        if (event.detail.routingResult.agentsAvailable === false ||
+            event.detail.routingResult.success === false) {
+          console.log('⚠️ DETECTED: No agents available (Pattern 2: routingResult)');
+          noAgentsAvailable = true;
+          updateChatAvailability('routing_failed');
+          return;
+        }
+      }
+
+      // Pattern 3: Check for "Waiting" status that times out (long wait = no agents)
+      if (event.detail.status === 'Waiting') {
+        console.log('⏳ Session waiting for agent...');
+        // Set a flag that we're waiting
+        window.sessionWaitingStartTime = window.sessionWaitingStartTime || Date.now();
+
+        // If waiting more than 60 seconds, assume no agents
+        const waitTime = Date.now() - window.sessionWaitingStartTime;
+        if (waitTime > 60000) {
+          console.log('⚠️ DETECTED: Waiting timeout exceeded 60s (Pattern 3: long wait)');
+          noAgentsAvailable = true;
+          updateChatAvailability('waiting_timeout');
+        }
+      }
+
+      // Pattern 4: Session ended without ever becoming active
+      if (event.detail.status === 'Ended' && !event.detail.agentInfo) {
+        console.log('⚠️ DETECTED: Session ended without agent assignment (Pattern 4: no agent)');
+        noAgentsAvailable = true;
+        updateChatAvailability('ended_no_agent_assigned');
+        return;
+      }
+
+      // Reset waiting timer if session becomes active
       if (event.detail.status === 'Active') {
-        console.log('✅ Agent connected');
-        noAgentsAvailable = false;
-        hideOfflineButton(); // Hide "Leave a Message" when chat is active
+        console.log('✅ Session active - agent connected');
+        window.sessionWaitingStartTime = null;
+        noAgentsAvailable = false; // Reset flag - agents are available
       }
 
       console.log('========================================');
     });
 
-    // Reset agent availability flag when messaging initializes
+    // Attempt 4: API polling with multiple retries + Final fallback
     window.addEventListener('onEmbeddedMessagingReady', () => {
-      console.log('📍 Messaging Ready');
+      console.log('📍 Messaging Ready - resetting agent availability');
       noAgentsAvailable = false;
+
+      // If we already got a valid value from events, we're done
+      if (businessHoursValue !== null) {
+        console.log('✅ Business hours already determined:', businessHoursValue);
+        console.log('   Source:', businessHoursSource);
+        return;
+      }
+
+      // Polling approach: Try API multiple times with increasing delays
+      let attemptCount = 0;
+      const maxAttempts = 5;
+      const delays = [1000, 2000, 3000, 4000, 5000]; // 1s, 2s, 3s, 4s, 5s (total: 15s)
+
+      function tryApiCheck() {
+        // Check if events provided value during polling
+        if (businessHoursValue !== null) {
+          console.log('✅ Business hours determined during polling:', businessHoursValue);
+          console.log('   Source:', businessHoursSource);
+          return;
+        }
+
+        attemptCount++;
+        console.log(`🔍 API Check Attempt ${attemptCount}/${maxAttempts}...`);
+
+        try {
+          const apiValue = embeddedservice_bootstrap.utilAPI?.isWithinBusinessHours?.();
+          console.log(`   API returned:`, apiValue, `(type: ${typeof apiValue})`);
+
+          if (setBusinessHours(apiValue, 'api')) {
+            console.log(`✅ Business hours determined from API on attempt ${attemptCount}`);
+            return;
+          }
+        } catch (e) {
+          console.warn(`⚠️ API check error on attempt ${attemptCount}:`, e);
+        }
+
+        // If we haven't exhausted all attempts, try again
+        if (attemptCount < maxAttempts) {
+          const nextDelay = delays[attemptCount];
+          console.log(`   ⏳ API returned undefined, retrying in ${nextDelay}ms...`);
+          setTimeout(tryApiCheck, nextDelay);
+        } else {
+          // Final fallback after all attempts exhausted
+          console.log('========================================');
+          console.log(`⚠️ Could not determine business hours after ${maxAttempts} attempts:`);
+          console.log('   - Primary event: undefined');
+          console.log('   - Started/Ended events: did not fire');
+          console.log('   - API: returned undefined on all attempts');
+          console.log('   ➡️ Defaulting to TRUE (chat available)');
+          console.log('   ➡️ Salesforce will handle offline state internally');
+          console.log('========================================');
+
+          setBusinessHours(true, 'default_fallback');
+        }
+      }
+
+      // Start first API check after 1 second
+      setTimeout(tryApiCheck, delays[0]);
     });
 
-    // User clicked offline form button
+    // User clicked offline form button instead of chat
     function showOfflineFormManually() {
-      showOfflineForm();
+      hideChatButton();
+      openOfflineForm();
     }
   </script>
 
