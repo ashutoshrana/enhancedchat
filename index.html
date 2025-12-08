@@ -1606,51 +1606,6 @@ Expected /conversation POST payload:
       noAgentsAvailable = false;
     });
 
-    // ============================================
-    // BUSINESS HOURS EVENTS - For "Leave a Message" Button
-    // ============================================
-    // We listen to business hours events ONLY to show/hide the "Leave a Message" button.
-    // Salesforce handles chat button visibility automatically.
-
-    // When business hours END - show "Leave a Message" button
-    window.addEventListener('onEmbeddedMessagingBusinessHoursEnded', () => {
-      console.log('========================================');
-      console.log('⏰ Business Hours ENDED');
-      console.log('========================================');
-      console.log('✅ Showing "Leave a Message" button (chat unavailable outside hours)');
-      showOfflineButton();
-    });
-
-    // When business hours START - hide "Leave a Message" button
-    window.addEventListener('onEmbeddedMessagingBusinessHoursStarted', () => {
-      console.log('========================================');
-      console.log('⏰ Business Hours STARTED');
-      console.log('========================================');
-      console.log('❌ Hiding "Leave a Message" button (chat available during hours)');
-      hideOfflineButton();
-    });
-
-    // Check initial business hours status
-    window.addEventListener('onEmbeddedMessagingReady', () => {
-      // Wait a moment for Salesforce to initialize, then check business hours
-      setTimeout(() => {
-        try {
-          const withinBusinessHours = embeddedservice_bootstrap.utilAPI?.isWithinBusinessHours?.();
-          console.log('📍 Initial business hours check:', withinBusinessHours);
-
-          if (withinBusinessHours === false) {
-            console.log('✅ Outside business hours - showing "Leave a Message" button');
-            showOfflineButton();
-          } else {
-            console.log('❌ Within business hours - hiding "Leave a Message" button');
-            hideOfflineButton();
-          }
-        } catch (e) {
-          console.warn('⚠️ Could not check initial business hours:', e);
-        }
-      }, 2000);
-    });
-
     // User clicked offline form button
     function showOfflineFormManually() {
       showOfflineForm();
